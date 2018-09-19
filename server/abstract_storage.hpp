@@ -1,7 +1,6 @@
 #pragma once
 
 #include "base/message.hpp"
-
 #include "glog/logging.h"
 
 namespace csci5570 {

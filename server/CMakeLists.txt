@@ -3,6 +3,7 @@ include_directories(${PROJECT_SOURCE_DIR} ${HUSKY_EXTERNAL_INCLUDE})
 file(GLOB server-src-files
         server_thread.cpp
         map_storage.hpp
+        vector_storage.hpp
         consistency/asp_model.cpp
         consistency/bsp_model.cpp
         consistency/ssp_model.cpp

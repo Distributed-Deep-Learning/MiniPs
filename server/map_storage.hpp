@@ -2,9 +2,7 @@
 
 #include "base/message.hpp"
 #include "server/abstract_storage.hpp"
-
 #include "glog/logging.h"
-
 #include <map>
 
 namespace csci5570 {
