@@ -15,8 +15,6 @@ namespace csci5570 {
     public:
         // using Keys = std::vector<Key>;
         // using KVPairs = std::pair<std::vector<Key>, std::vector<double>>;
-        using Keys = third_party::SArray<Key>;
-        using KVPairs = std::pair<third_party::SArray<Key>, third_party::SArray<double>>;
 
         AbstractPartitionManager(const std::vector<uint32_t> &server_thread_ids) : server_thread_ids_(
                 server_thread_ids) {}

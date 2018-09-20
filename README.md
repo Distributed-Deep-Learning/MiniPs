@@ -35,41 +35,41 @@ make -j4      # build all the targets
 Below are the milestones for each week. 
 
 ## Milestone 1: Get familiar with the communication module and actor abstraction
-* The mailbox is provided as a bottom layer communication module
-* The prototypes of server threads, worker threads, and communication threads are also provided for your reference
-* There are some utility files for compilation and testing for your reference
+* [x] The mailbox is provided as a bottom layer communication module
+* [x] The prototypes of server threads, worker threads, and communication threads are also provided for your reference
+* [x] There are some utility files for compilation and testing for your reference
 
 ## Milestone 2: Create server threads and their model storage
-* Check the overall picture about the worker and server in `test/test_worker.cpp` and `test/test_server.cpp`.
-* Understand how the modules on the server side work together.
-* Implement `server_thread.cpp` according to the information given in `server_thread_test.cpp`.
-* Implement `map_storage.hpp` according to the information given in `map_storage_test.cpp`.
+* [x] Check the overall picture about the worker and server in `test/test_worker.cpp` and `test/test_server.cpp`.
+* [x] Understand how the modules on the server side work together.
+* [x] Implement `server_thread.cpp` according to the information given in `server_thread_test.cpp`.
+* [x] Implement `map_storage.hpp` according to the information given in `map_storage_test.cpp`.
 
 ## Milestone 3: Distribute the model to servers
-* Check `base/abstract_partition_manager.hpp` and implement your parititoning strategies
-* You should have tried implementing MapStorage in the previous milestone. You may try other storage method such as using vector.
-* Write a small program to link the paritition manager with the storages and to initialize storages associated with different server threads
+* [x] Check `base/abstract_partition_manager.hpp` and implement your parititoning strategies
+* [x] You should have tried implementing MapStorage in the previous milestone. You may try other storage method such as using vector.
+* [ ] Write a small program to link the paritition manager with the storages and to initialize storages associated with different server threads
 
 ## Milestone 4: Now the workers come into play
-* Check `worker/kv_client_table_test.cpp`. Understand how `AbstractCallbackRunner` and `AbstractPartitionManager` functions and how the modules on the worker side work together
-* Understand how model parameters are rendered to users in the process from mailbox receiving messages, to worker threads invoking callbacks, and finally to KVClientTable returning with completed requests
-* Implement a callback runner to handle reply messages
-* Implement [KVClientTable](worker/kv_client_table.hpp) according to the information given in `worker/kv_client_table_test.cpp`
+* [x] Check `worker/kv_client_table_test.cpp`. Understand how `AbstractCallbackRunner` and `AbstractPartitionManager` functions and how the modules on the worker side work together
+* [ ] Understand how model parameters are rendered to users in the process from mailbox receiving messages, to worker threads invoking callbacks, and finally to KVClientTable returning with completed requests
+* [ ] Implement a callback runner to handle reply messages
+* [x] Implement [KVClientTable](worker/kv_client_table.hpp) according to the information given in `worker/kv_client_table_test.cpp`
 
 ## Milestone 5: Feed the training data
-* Check the io folder and understand how to connect to HDFS and coordinate data loading among workers
-* Take a look at test/test_hdfs_read.cpp and see how the connector may be used to load data
-* Check the lib folder for the abstraction of data loaders and labeled sample
-* Implement the data loaders and parsers. Understanding the producer-consumer paradigm may help
+* [ ] Check the io folder and understand how to connect to HDFS and coordinate data loading among workers
+* [ ] Take a look at test/test_hdfs_read.cpp and see how the connector may be used to load data
+* [ ] Check the lib folder for the abstraction of data loaders and labeled sample
+* [ ] Implement the data loaders and parsers. Understanding the producer-consumer paradigm may help
 
 ## Milestone 6: Orders are to be established
-* Check the tests for the three consistency models and understand the expected behaviors
-* Check the pending buffer and progress tracker interface
-* Implement ASP, BSP, and SSP models
+* [ ] Check the tests for the three consistency models and understand the expected behaviors
+* [ ] Check the pending buffer and progress tracker interface
+* [ ] Implement ASP, BSP, and SSP models
 
 ## Milestone 7: Put together and run
-* Check the tests and complete engine.cpp, info.hpp, simple_id_mapper.cpp, and worker_spec.cpp
-* Write a script to launch the system on the cluster
+* [ ] Check the tests and complete engine.cpp, info.hpp, simple_id_mapper.cpp, and worker_spec.cpp
+* [ ] Write a script to launch the system on the cluster
 
 ### Hints for the driver part
 Here I highlight some hints for the driver of the user program
