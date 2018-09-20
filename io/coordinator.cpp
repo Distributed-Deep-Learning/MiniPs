@@ -21,54 +21,55 @@
 
 namespace csci5570 {
 
-Coordinator::Coordinator(int proc_id, std::string hostname, zmq::context_t* context, std::string master_host,
-                         int master_port)
-    : proc_id_(proc_id), hostname_(hostname), context_(context), master_host_(master_host), master_port_(master_port) {}
+    Coordinator::Coordinator(int proc_id, std::string hostname, zmq::context_t *context,
+                             std::string master_host, int master_port)
+            : proc_id_(proc_id), hostname_(hostname), context_(context), master_host_(master_host),
+              master_port_(master_port) {}
 
-Coordinator::~Coordinator() {
-  delete zmq_coord_;
-  zmq_coord_ = nullptr;
-}
+    Coordinator::~Coordinator() {
+        delete zmq_coord_;
+        zmq_coord_ = nullptr;
+    }
 
-void Coordinator::serve() {  // not thread-safe, must be called by only one thread at the same time
-  if (zmq_coord_)
-    return;
+    void Coordinator::serve() {  // not thread-safe, must be called by only one thread at the same time
+        if (zmq_coord_)
+            return;
 
-  std::string hostname = hostname_ + "-" + std::to_string(proc_id_);
-  zmq_coord_ = new zmq::socket_t(*context_, ZMQ_DEALER);
-  zmq_coord_->setsockopt(ZMQ_IDENTITY, hostname.c_str(), hostname.size());
-  int linger = 2000;
-  zmq_coord_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
-  zmq_coord_->connect("tcp://" + master_host_ + ":" + std::to_string(master_port_));
-}
+        std::string hostname = hostname_ + "-" + std::to_string(proc_id_);
+        zmq_coord_ = new zmq::socket_t(*context_, ZMQ_DEALER);
+        zmq_coord_->setsockopt(ZMQ_IDENTITY, hostname.c_str(), hostname.size());
+        int linger = 2000;
+        zmq_coord_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
+        zmq_coord_->connect("tcp://" + master_host_ + ":" + std::to_string(master_port_));
+    }
 
-BinStream Coordinator::ask_master(BinStream& question, size_t type) {
-  std::lock_guard<std::mutex> lock(coord_lock_);
-  zmq_send_common(zmq_coord_, nullptr, 0, ZMQ_SNDMORE);  //
-  // Question type
-  zmq_send_common(zmq_coord_, &type, sizeof(int32_t), ZMQ_SNDMORE);
-  // Question body
-  zmq_send_common(zmq_coord_, question.get_remained_buffer(), question.size());
+    BinStream Coordinator::ask_master(BinStream &question, size_t type) {
+        std::lock_guard<std::mutex> lock(coord_lock_);
+        zmq_send_common(zmq_coord_, nullptr, 0, ZMQ_SNDMORE);  //
+        // Question type
+        zmq_send_common(zmq_coord_, &type, sizeof(int32_t), ZMQ_SNDMORE);
+        // Question body
+        zmq_send_common(zmq_coord_, question.get_remained_buffer(), question.size());
 
-  zmq::message_t msg1, msg2;
-  BinStream answer;
-  // receive notification
-  zmq_recv_common(zmq_coord_, &msg1);
-  // receive answer to question
-  zmq_recv_common(zmq_coord_, &msg2);
-  answer.push_back_bytes(reinterpret_cast<char*>(msg2.data()), msg2.size());
+        zmq::message_t msg1, msg2;
+        BinStream answer;
+        // receive notification
+        zmq_recv_common(zmq_coord_, &msg1);
+        // receive answer to question
+        zmq_recv_common(zmq_coord_, &msg2);
+        answer.push_back_bytes(reinterpret_cast<char *>(msg2.data()), msg2.size());
 
-  return answer;
-}
+        return answer;
+    }
 
-void Coordinator::notify_master(BinStream& message, size_t type) {
-  std::lock_guard<std::mutex> lock(coord_lock_);
-  // send dummy
-  zmq_send_common(zmq_coord_, nullptr, 0, ZMQ_SNDMORE);
-  // send type
-  zmq_send_common(zmq_coord_, &type, sizeof(int32_t), ZMQ_SNDMORE);
-  // Message body
-  zmq_send_common(zmq_coord_, message.get_remained_buffer(), message.size());
-}
+    void Coordinator::notify_master(BinStream &message, size_t type) {
+        std::lock_guard<std::mutex> lock(coord_lock_);
+        // send dummy
+        zmq_send_common(zmq_coord_, nullptr, 0, ZMQ_SNDMORE);
+        // send type
+        zmq_send_common(zmq_coord_, &type, sizeof(int32_t), ZMQ_SNDMORE);
+        // Message body
+        zmq_send_common(zmq_coord_, message.get_remained_buffer(), message.size());
+    }
 
 }  // namespace csci5570

@@ -91,7 +91,7 @@ namespace csci5570 {
         // Send sliced data to the queue, the queue was listened by workers
         void Send_(const std::vector<std::pair<int, KVPairs>> &sliced, bool is_add) {
             CHECK_NOTNULL(partition_manager_);
-            for (size_t i = 0; i < sliced.size(); ++i) {
+            for (size_t i = 0; i < sliced.size(); i++) {
                 Message msg;
                 msg.meta.sender = app_thread_id_;
                 msg.meta.recver = sliced[i].first;
