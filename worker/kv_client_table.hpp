@@ -10,6 +10,7 @@
 #include <cinttypes>
 #include <vector>
 #include "base/message.hpp"
+#include <algorithm>
 
 namespace csci5570 {
 
