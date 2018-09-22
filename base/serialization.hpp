@@ -28,250 +28,273 @@
 
 namespace csci5570 {
 
-class BinStream {
- public:
-  BinStream();
-  explicit BinStream(size_t sz);
-  explicit BinStream(const std::vector<char>& v);
-  explicit BinStream(std::vector<char>&& v);
-  BinStream(const char* src, size_t sz);
-  BinStream(const BinStream& stream);
-  BinStream(BinStream&& stream);
-  virtual ~BinStream();
+    class BinStream {
+    public:
+        BinStream();
 
-  BinStream& operator=(BinStream&& stream);
+        explicit BinStream(size_t sz);
 
-  size_t hash();
-  void clear();
-  void purge();
-  void resize(size_t size);
-  void seek(size_t pos);
+        explicit BinStream(const std::vector<char> &v);
 
-  void append(const BinStream& m);
-  void push_back_bytes(const char* src, size_t sz);
-  virtual void* pop_front_bytes(size_t sz);
-  virtual size_t size() const { return buffer_.size() - front_; }
+        explicit BinStream(std::vector<char> &&v);
 
-  /// Note that this method just returns the pointer pointing to the very
-  /// beginning of the buffer_, and doesn't care about how much data have
-  /// been read.
-  inline char* get_buffer() { return &buffer_[0]; }
-  inline const std::vector<char>& get_buffer_vector() { return buffer_; }
-  inline const char* get_remained_buffer() const { return (&buffer_[0]) + front_; }
-  inline std::string to_string() const { return std::string(buffer_.begin() + front_, buffer_.end()); }
+        BinStream(const char *src, size_t sz);
 
- protected:
-  std::vector<char> buffer_;
+        BinStream(const BinStream &stream);
 
- private:
-  size_t front_;
-};
+        BinStream(BinStream &&stream);
 
-template <typename T>
-class has_serialize {
- private:
-  template <typename U>
-  static constexpr auto check(int) ->
-      typename std::is_same<decltype(std::declval<U>().serialize(*(new BinStream))), BinStream&>::type;
+        virtual ~BinStream();
 
-  template <typename>
-  static constexpr std::false_type check(...);
+        BinStream &operator=(BinStream &&stream);
 
-  typedef decltype(check<T>(0)) type;
+        size_t hash();
 
- public:
-  static constexpr bool value = type::value;
-};
+        void clear();
 
-template <typename T>
-class has_deserialize {
- private:
-  template <typename U>
-  static constexpr auto check(int) ->
-      typename std::is_same<decltype(std::declval<U>().deserialize(*(new BinStream))), BinStream&>::type;
+        void purge();
 
-  template <typename>
-  static constexpr std::false_type check(...);
+        void resize(size_t size);
 
-  typedef decltype(check<T>(0)) type;
+        void seek(size_t pos);
 
- public:
-  static constexpr bool value = type::value;
-};
+        void append(const BinStream &m);
 
-template <typename InputT>
-typename std::enable_if<has_serialize<InputT>::value, BinStream>::type& operator<<(BinStream& stream, const InputT& x) {
-  x.serialize(stream);
-  return stream;
-}
+        void push_back_bytes(const char *src, size_t sz);
 
-template <typename OutputT>
-typename std::enable_if<has_deserialize<OutputT>::value, BinStream>::type& operator>>(BinStream& stream, OutputT& x) {
-  x.deserialize(stream);
-  return stream;
-}
+        virtual void *pop_front_bytes(size_t sz);
 
-template <typename InputT>
-typename std::enable_if<!has_serialize<InputT>::value, BinStream>::type& operator<<(BinStream& stream,
-                                                                                    const InputT& x) {
-  // static_assert(IS_TRIVIALLY_COPYABLE(InputT), "For non trivially copyable type, serialization functions are
-  // needed");
-  stream.push_back_bytes((char*) &x, sizeof(InputT));
-  return stream;
-}
+        virtual size_t size() const { return buffer_.size() - front_; }
 
-template <typename OutputT>
-typename std::enable_if<!has_deserialize<OutputT>::value, BinStream>::type& operator>>(BinStream& stream, OutputT& x) {
-  // static_assert(IS_TRIVIALLY_COPYABLE(OutputT),
-  //               "For non trivially copyable type, serialization functions are needed");
-  x = *(OutputT*) (stream.pop_front_bytes(sizeof(OutputT)));
-  return stream;
-}
+        /// Note that this method just returns the pointer pointing to the very
+        /// beginning of the buffer_, and doesn't care about how much data have
+        /// been read.
+        inline char *get_buffer() { return &buffer_[0]; }
 
-template <typename InputT>
-BinStream& operator<<(BinStream& stream, const std::vector<InputT>& v) {
-  size_t len = v.size();
-  stream << len;
-  for (int i = 0; i < v.size(); ++i)
-    stream << v[i];
-  return stream;
-}
+        inline const std::vector<char> &get_buffer_vector() { return buffer_; }
 
-template <typename OutputT>
-BinStream& operator>>(BinStream& stream, std::vector<OutputT>& v) {
-  size_t len;
-  stream >> len;
-  v.clear();
-  v.resize(len);
-  for (int i = 0; i < v.size(); ++i)
-    stream >> v[i];
-  return stream;
-}
+        inline const char *get_remained_buffer() const { return (&buffer_[0]) + front_; }
 
-template <typename K, typename V>
-BinStream& operator<<(BinStream& stream, const std::map<K, V>& map) {
-  size_t len = map.size();
-  stream << len;
-  for (auto& elem : map)
-    stream << elem;
-  return stream;
-}
+        inline std::string to_string() const { return std::string(buffer_.begin() + front_, buffer_.end()); }
 
-template <typename K, typename V>
-BinStream& operator>>(BinStream& stream, std::map<K, V>& map) {
-  size_t len;
-  stream >> len;
-  map.clear();
-  for (int i = 0; i < len; i++) {
-    std::pair<K, V> elem;
-    stream >> elem;
-    map.insert(elem);
-  }
-  return stream;
-}
+    protected:
+        std::vector<char> buffer_;
 
-template <typename K, typename V>
-BinStream& operator<<(BinStream& stream, const std::unordered_map<K, V>& unordered_map) {
-  size_t len = unordered_map.size();
-  stream << len;
-  for (auto& elem : unordered_map)
-    stream << elem;
-  return stream;
-}
+    private:
+        size_t front_;
+    };
 
-template <typename K, typename V>
-BinStream& operator>>(BinStream& stream, std::unordered_map<K, V>& unordered_map) {
-  size_t len;
-  stream >> len;
-  unordered_map.clear();
-  for (int i = 0; i < len; i++) {
-    std::pair<K, V> elem;
-    stream >> elem;
-    unordered_map.insert(elem);
-  }
-  return stream;
-}
+    template<typename T>
+    class has_serialize {
+    private:
+        template<typename U>
+        static constexpr auto check(int) ->
+        typename std::is_same<decltype(std::declval<U>().serialize(*(new BinStream))), BinStream &>::type;
 
-template <typename T>
-BinStream& operator<<(BinStream& stream, const std::shared_ptr<T>& ptr) {
-  stream << *ptr;
-  return stream;
-}
+        template<typename>
+        static constexpr std::false_type check(...);
 
-template <typename T>
-BinStream& operator>>(BinStream& stream, std::shared_ptr<T>& ptr) {
-  T tmp;
-  stream >> tmp;
-  ptr.reset(new T);
-  *ptr = tmp;
-  return stream;
-}
+        typedef decltype(check<T>(0)) type;
 
-template <typename T>
-BinStream& operator<<(BinStream& stream, const std::unique_ptr<T>& ptr) {
-  stream << *ptr;
-  return stream;
-}
+    public:
+        static constexpr bool value = type::value;
+    };
 
-template <typename T>
-BinStream& operator>>(BinStream& stream, std::unique_ptr<T>& ptr) {
-  T tmp;
-  stream >> tmp;
-  ptr.reset(new T);
-  *ptr = tmp;
-  return stream;
-}
+    template<typename T>
+    class has_deserialize {
+    private:
+        template<typename U>
+        static constexpr auto check(int) ->
+        typename std::is_same<decltype(std::declval<U>().deserialize(*(new BinStream))), BinStream &>::type;
 
-template <typename InputT>
-BinStream& operator<<(BinStream& stream, const std::basic_string<InputT>& v) {
-  size_t len = v.size();
-  stream << len;
-  for (auto& elem : v)
-    stream << elem;
-  return stream;
-}
+        template<typename>
+        static constexpr std::false_type check(...);
 
-template <typename OutputT>
-BinStream& operator>>(BinStream& stream, std::basic_string<OutputT>& v) {
-  size_t len;
-  stream >> len;
-  v.clear();
-  try {
-    v.resize(len);
-  } catch (std::exception e) {
-    assert(false);
-  }
-  for (auto& elem : v)
-    stream >> elem;
-  return stream;
-}
+        typedef decltype(check<T>(0)) type;
 
-template <typename FirstT, typename SecondT>
-BinStream& operator<<(BinStream& stream, const std::pair<FirstT, SecondT>& p) {
-  stream << p.first << p.second;
-  return stream;
-}
+    public:
+        static constexpr bool value = type::value;
+    };
 
-template <typename FirstT, typename SecondT>
-BinStream& operator>>(BinStream& stream, std::pair<FirstT, SecondT>& p) {
-  stream >> p.first >> p.second;
-  return stream;
-}
+    template<typename InputT>
+    typename std::enable_if<has_serialize<InputT>::value, BinStream>::type &
+    operator<<(BinStream &stream, const InputT &x) {
+        x.serialize(stream);
+        return stream;
+    }
 
-BinStream& operator<<(BinStream& stream, const BinStream& bin);
-BinStream& operator>>(BinStream& stream, BinStream& bin);
+    template<typename OutputT>
+    typename std::enable_if<has_deserialize<OutputT>::value, BinStream>::type &
+    operator>>(BinStream &stream, OutputT &x) {
+        x.deserialize(stream);
+        return stream;
+    }
 
-BinStream& operator<<(BinStream& stream, const std::string& x);
-BinStream& operator>>(BinStream& stream, std::string& x);
+    template<typename InputT>
+    typename std::enable_if<!has_serialize<InputT>::value, BinStream>::type &operator<<(BinStream &stream,
+                                                                                        const InputT &x) {
+        // static_assert(IS_TRIVIALLY_COPYABLE(InputT), "For non trivially copyable type, serialization functions are
+        // needed");
+        stream.push_back_bytes((char *) &x, sizeof(InputT));
+        return stream;
+    }
 
-BinStream& operator<<(BinStream& stream, const std::vector<bool>& v);
-BinStream& operator>>(BinStream& stream, std::vector<bool>& v);
+    template<typename OutputT>
+    typename std::enable_if<!has_deserialize<OutputT>::value, BinStream>::type &
+    operator>>(BinStream &stream, OutputT &x) {
+        // static_assert(IS_TRIVIALLY_COPYABLE(OutputT),
+        //               "For non trivially copyable type, serialization functions are needed");
+        x = *(OutputT *) (stream.pop_front_bytes(sizeof(OutputT)));
+        return stream;
+    }
 
-template <typename Value>
-Value deser(BinStream& in) {
-  Value v;
-  in >> v;
-  return v;
-}
+    template<typename InputT>
+    BinStream &operator<<(BinStream &stream, const std::vector<InputT> &v) {
+        size_t len = v.size();
+        stream << len;
+        for (int i = 0; i < v.size(); ++i)
+            stream << v[i];
+        return stream;
+    }
+
+    template<typename OutputT>
+    BinStream &operator>>(BinStream &stream, std::vector<OutputT> &v) {
+        size_t len;
+        stream >> len;
+        v.clear();
+        v.resize(len);
+        for (int i = 0; i < v.size(); ++i)
+            stream >> v[i];
+        return stream;
+    }
+
+    template<typename K, typename V>
+    BinStream &operator<<(BinStream &stream, const std::map<K, V> &map) {
+        size_t len = map.size();
+        stream << len;
+        for (auto &elem : map)
+            stream << elem;
+        return stream;
+    }
+
+    template<typename K, typename V>
+    BinStream &operator>>(BinStream &stream, std::map<K, V> &map) {
+        size_t len;
+        stream >> len;
+        map.clear();
+        for (int i = 0; i < len; i++) {
+            std::pair<K, V> elem;
+            stream >> elem;
+            map.insert(elem);
+        }
+        return stream;
+    }
+
+    template<typename K, typename V>
+    BinStream &operator<<(BinStream &stream, const std::unordered_map<K, V> &unordered_map) {
+        size_t len = unordered_map.size();
+        stream << len;
+        for (auto &elem : unordered_map)
+            stream << elem;
+        return stream;
+    }
+
+    template<typename K, typename V>
+    BinStream &operator>>(BinStream &stream, std::unordered_map<K, V> &unordered_map) {
+        size_t len;
+        stream >> len;
+        unordered_map.clear();
+        for (int i = 0; i < len; i++) {
+            std::pair<K, V> elem;
+            stream >> elem;
+            unordered_map.insert(elem);
+        }
+        return stream;
+    }
+
+    template<typename T>
+    BinStream &operator<<(BinStream &stream, const std::shared_ptr<T> &ptr) {
+        stream << *ptr;
+        return stream;
+    }
+
+    template<typename T>
+    BinStream &operator>>(BinStream &stream, std::shared_ptr<T> &ptr) {
+        T tmp;
+        stream >> tmp;
+        ptr.reset(new T);
+        *ptr = tmp;
+        return stream;
+    }
+
+    template<typename T>
+    BinStream &operator<<(BinStream &stream, const std::unique_ptr<T> &ptr) {
+        stream << *ptr;
+        return stream;
+    }
+
+    template<typename T>
+    BinStream &operator>>(BinStream &stream, std::unique_ptr<T> &ptr) {
+        T tmp;
+        stream >> tmp;
+        ptr.reset(new T);
+        *ptr = tmp;
+        return stream;
+    }
+
+    template<typename InputT>
+    BinStream &operator<<(BinStream &stream, const std::basic_string<InputT> &v) {
+        size_t len = v.size();
+        stream << len;
+        for (auto &elem : v)
+            stream << elem;
+        return stream;
+    }
+
+    template<typename OutputT>
+    BinStream &operator>>(BinStream &stream, std::basic_string<OutputT> &v) {
+        size_t len;
+        stream >> len;
+        v.clear();
+        try {
+            v.resize(len);
+        } catch (std::exception e) {
+            assert(false);
+        }
+        for (auto &elem : v)
+            stream >> elem;
+        return stream;
+    }
+
+    template<typename FirstT, typename SecondT>
+    BinStream &operator<<(BinStream &stream, const std::pair<FirstT, SecondT> &p) {
+        stream << p.first << p.second;
+        return stream;
+    }
+
+    template<typename FirstT, typename SecondT>
+    BinStream &operator>>(BinStream &stream, std::pair<FirstT, SecondT> &p) {
+        stream >> p.first >> p.second;
+        return stream;
+    }
+
+    BinStream &operator<<(BinStream &stream, const BinStream &bin);
+
+    BinStream &operator>>(BinStream &stream, BinStream &bin);
+
+    BinStream &operator<<(BinStream &stream, const std::string &x);
+
+    BinStream &operator>>(BinStream &stream, std::string &x);
+
+    BinStream &operator<<(BinStream &stream, const std::vector<bool> &v);
+
+    BinStream &operator>>(BinStream &stream, std::vector<bool> &v);
+
+    template<typename Value>
+    Value deser(BinStream &in) {
+        Value v;
+        in >> v;
+        return v;
+    }
 
 }  // namespace csci5570

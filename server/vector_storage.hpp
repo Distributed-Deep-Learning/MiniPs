@@ -15,7 +15,7 @@ namespace csci5570 {
     public:
         VectorStorage() = default;
 
-        virtual void SubAdd(const third_party::SArray <Key> &typed_keys,
+        virtual void SubAdd(const third_party::SArray<Key> &typed_keys,
                             const third_party::SArray<char> &vals) override {
             auto typed_vals = third_party::SArray<Val>(vals);
             for (size_t index = 0; index < typed_keys.size(); index++) {
@@ -25,8 +25,8 @@ namespace csci5570 {
             }
         }
 
-        virtual third_party::SArray<char> SubGet(const third_party::SArray <Key> &typed_keys) override {
-            third_party::SArray <Val> reply_vals(typed_keys.size());
+        virtual third_party::SArray<char> SubGet(const third_party::SArray<Key> &typed_keys) override {
+            third_party::SArray<Val> reply_vals(typed_keys.size());
             for (size_t i = 0; i < typed_keys.size(); i++) {
                 CHECK_GE(typed_keys[i], range_.begin());
                 CHECK_LT(typed_keys[i], range_.end());

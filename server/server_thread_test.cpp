@@ -6,112 +6,118 @@
 #include "server/server_thread.hpp"
 
 namespace csci5570 {
-namespace {
+    namespace {
 
-class TestServerThread : public testing::Test {
- public:
-  TestServerThread() {}
-  ~TestServerThread() {}
+        class TestServerThread : public testing::Test {
+        public:
+            TestServerThread() {}
 
- protected:
-  void SetUp() {}
-  void TearDown() {}
-};
+            ~TestServerThread() {}
 
-class FakeModel : public AbstractModel {
- public:
-  virtual void Clock(Message&) override { clock_count_ += 1; }
-  virtual void Add(Message&) override { add_count_ += 1; }
-  virtual void Get(Message&) override { get_count_ += 1; }
-  virtual int GetProgress(int tid) override { return -1; }
-  virtual void ResetWorker(Message& msg) override {}
+        protected:
+            void SetUp() {}
 
-  int clock_count_ = 0;
-  int add_count_ = 0;
-  int get_count_ = 0;
-};
+            void TearDown() {}
+        };
 
-TEST_F(TestServerThread, Construct) { ServerThread server_thread(0); }
+        class FakeModel : public AbstractModel {
+        public:
+            virtual void Clock(Message &) override { clock_count_ += 1; }
 
-TEST_F(TestServerThread, RegisterModel) {
-  ServerThread server_thread(0);
-  std::unique_ptr<AbstractModel> model(new FakeModel());
-  const uint32_t model_id = 0;
-  server_thread.RegisterModel(model_id, std::move(model));
-  auto* p = static_cast<FakeModel*>(server_thread.GetModel(model_id));
-  EXPECT_NE(p, nullptr);
-}
+            virtual void Add(Message &) override { add_count_ += 1; }
 
-TEST_F(TestServerThread, Clock) {
-  ServerThread server_thread(0);
-  std::unique_ptr<AbstractModel> model(new FakeModel());
-  const uint32_t model_id = 0;
-  server_thread.RegisterModel(model_id, std::move(model));
-  auto* p = static_cast<FakeModel*>(server_thread.GetModel(model_id));
-  server_thread.Start();
+            virtual void Get(Message &) override { get_count_ += 1; }
 
-  auto* work_queue = server_thread.GetWorkQueue();
-  Message m;
-  m.meta.flag = Flag::kClock;
-  m.meta.model_id = model_id;
-  work_queue->Push(m);
-  work_queue->Push(m);
+            virtual int GetProgress(int tid) override { return -1; }
 
-  Message exit_msg;
-  exit_msg.meta.flag = Flag::kExit;
-  work_queue->Push(exit_msg);
-  server_thread.Stop();
+            virtual void ResetWorker(Message &msg) override {}
 
-  EXPECT_EQ(p->clock_count_, 2);
-}
+            int clock_count_ = 0;
+            int add_count_ = 0;
+            int get_count_ = 0;
+        };
 
-TEST_F(TestServerThread, Add) {
-  ServerThread server_thread(0);
-  std::unique_ptr<AbstractModel> model(new FakeModel());
-  const uint32_t model_id = 0;
-  server_thread.RegisterModel(model_id, std::move(model));
-  auto* p = static_cast<FakeModel*>(server_thread.GetModel(model_id));
-  server_thread.Start();
+        TEST_F(TestServerThread, Construct) { ServerThread server_thread(0); }
 
-  auto* work_queue = server_thread.GetWorkQueue();
+        TEST_F(TestServerThread, RegisterModel) {
+            ServerThread server_thread(0);
+            std::unique_ptr<AbstractModel> model(new FakeModel());
+            const uint32_t model_id = 0;
+            server_thread.RegisterModel(model_id, std::move(model));
+            auto *p = static_cast<FakeModel *>(server_thread.GetModel(model_id));
+            EXPECT_NE(p, nullptr);
+        }
 
-  Message msg;
-  msg.meta.flag = Flag::kAdd;
-  msg.meta.model_id = model_id;
-  work_queue->Push(msg);
+        TEST_F(TestServerThread, Clock) {
+            ServerThread server_thread(0);
+            std::unique_ptr<AbstractModel> model(new FakeModel());
+            const uint32_t model_id = 0;
+            server_thread.RegisterModel(model_id, std::move(model));
+            auto *p = static_cast<FakeModel *>(server_thread.GetModel(model_id));
+            server_thread.Start();
 
-  Message exit_msg;
-  exit_msg.meta.flag = Flag::kExit;
-  work_queue->Push(exit_msg);
-  server_thread.Stop();
+            auto *work_queue = server_thread.GetWorkQueue();
+            Message m;
+            m.meta.flag = Flag::kClock;
+            m.meta.model_id = model_id;
+            work_queue->Push(m);
+            work_queue->Push(m);
 
-  EXPECT_EQ(p->add_count_, 1);
-}
+            Message exit_msg;
+            exit_msg.meta.flag = Flag::kExit;
+            work_queue->Push(exit_msg);
+            server_thread.Stop();
 
-TEST_F(TestServerThread, Get) {
-  ServerThread server_thread(0);
-  std::unique_ptr<AbstractModel> model(new FakeModel());
-  const uint32_t model_id = 0;
-  server_thread.RegisterModel(model_id, std::move(model));
-  auto* p = static_cast<FakeModel*>(server_thread.GetModel(model_id));
-  server_thread.Start();
+            EXPECT_EQ(p->clock_count_, 2);
+        }
 
-  auto* work_queue = server_thread.GetWorkQueue();
+        TEST_F(TestServerThread, Add) {
+            ServerThread server_thread(0);
+            std::unique_ptr<AbstractModel> model(new FakeModel());
+            const uint32_t model_id = 0;
+            server_thread.RegisterModel(model_id, std::move(model));
+            auto *p = static_cast<FakeModel *>(server_thread.GetModel(model_id));
+            server_thread.Start();
 
-  Message msg;
-  msg.meta.flag = Flag::kGet;
-  msg.meta.model_id = model_id;
-  work_queue->Push(msg);
-  work_queue->Push(msg);
-  work_queue->Push(msg);
+            auto *work_queue = server_thread.GetWorkQueue();
 
-  Message exit_msg;
-  exit_msg.meta.flag = Flag::kExit;
-  work_queue->Push(exit_msg);
-  server_thread.Stop();
+            Message msg;
+            msg.meta.flag = Flag::kAdd;
+            msg.meta.model_id = model_id;
+            work_queue->Push(msg);
 
-  EXPECT_EQ(p->get_count_, 3);
-}
+            Message exit_msg;
+            exit_msg.meta.flag = Flag::kExit;
+            work_queue->Push(exit_msg);
+            server_thread.Stop();
 
-}  // namespace
+            EXPECT_EQ(p->add_count_, 1);
+        }
+
+        TEST_F(TestServerThread, Get) {
+            ServerThread server_thread(0);
+            std::unique_ptr<AbstractModel> model(new FakeModel());
+            const uint32_t model_id = 0;
+            server_thread.RegisterModel(model_id, std::move(model));
+            auto *p = static_cast<FakeModel *>(server_thread.GetModel(model_id));
+            server_thread.Start();
+
+            auto *work_queue = server_thread.GetWorkQueue();
+
+            Message msg;
+            msg.meta.flag = Flag::kGet;
+            msg.meta.model_id = model_id;
+            work_queue->Push(msg);
+            work_queue->Push(msg);
+            work_queue->Push(msg);
+
+            Message exit_msg;
+            exit_msg.meta.flag = Flag::kExit;
+            work_queue->Push(exit_msg);
+            server_thread.Stop();
+
+            EXPECT_EQ(p->get_count_, 3);
+        }
+
+    }  // namespace
 }  // namespace csci5570

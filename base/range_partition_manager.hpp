@@ -55,7 +55,8 @@ namespace csci5570 {
                 if (cur_split_end_index > cur_split_start_index) {
                     KVPairs kv;
                     kv.first = kvs.first.segment(cur_split_start_index, cur_split_end_index);
-                    kv.second = kvs.second.segment(cur_split_start_index * values_ratio, cur_split_end_index * values_ratio);
+                    kv.second = kvs.second.segment(cur_split_start_index * values_ratio,
+                                                   cur_split_end_index * values_ratio);
                     sliced->push_back(std::make_pair(server_thread_ids_[i], std::move(kv)));
                 }
                 cur_split_start_index = cur_split_end_index;

@@ -4,75 +4,77 @@
 #include "server/map_storage.hpp"
 
 namespace csci5570 {
-namespace {
+    namespace {
 
-class TestMapStorage : public testing::Test {
- public:
-  TestMapStorage() {}
-  ~TestMapStorage() {}
+        class TestMapStorage : public testing::Test {
+        public:
+            TestMapStorage() {}
 
- protected:
-  void SetUp() {}
-  void TearDown() {}
-};
+            ~TestMapStorage() {}
 
-TEST_F(TestMapStorage, AddGetInt) {
-  MapStorage<int> s;
+        protected:
+            void SetUp() {}
 
-  Message m;
-  third_party::SArray<Key> s_keys({13, 14, 15});
-  third_party::SArray<int> s_vals({1, 2, 3});
-  m.AddData(s_keys);
-  m.AddData(s_vals);
-  s.Add(m);
+            void TearDown() {}
+        };
 
-  Message m2;
-  m2.AddData(s_keys);
-  Message rep = s.Get(m2);
+        TEST_F(TestMapStorage, AddGetInt) {
+            MapStorage<int> s;
 
-  EXPECT_EQ(rep.data.size(), 2);
-  auto rep_keys = third_party::SArray<Key>(rep.data[0]);
-  auto rep_vals = third_party::SArray<int>(rep.data[1]);
-  for (int index = 0; index < s_keys.size(); index++) {
-    EXPECT_EQ(rep_keys[index], s_keys[index]);
-    EXPECT_EQ(rep_vals[index], s_vals[index]);
-  }
-}
+            Message m;
+            third_party::SArray<Key> s_keys({13, 14, 15});
+            third_party::SArray<int> s_vals({1, 2, 3});
+            m.AddData(s_keys);
+            m.AddData(s_vals);
+            s.Add(m);
 
-TEST_F(TestMapStorage, AddGetFloat) {
-  MapStorage<float> s;
+            Message m2;
+            m2.AddData(s_keys);
+            Message rep = s.Get(m2);
 
-  Message m;
-  third_party::SArray<Key> s_keys({13, 14, 15});
-  third_party::SArray<float> s_vals({0.1, 0.2, 0.3});
-  m.AddData(s_keys);
-  m.AddData(s_vals);
-  s.Add(m);
+            EXPECT_EQ(rep.data.size(), 2);
+            auto rep_keys = third_party::SArray<Key>(rep.data[0]);
+            auto rep_vals = third_party::SArray<int>(rep.data[1]);
+            for (int index = 0; index < s_keys.size(); index++) {
+                EXPECT_EQ(rep_keys[index], s_keys[index]);
+                EXPECT_EQ(rep_vals[index], s_vals[index]);
+            }
+        }
 
-  Message m2;
-  m2.AddData(s_keys);
-  Message rep = s.Get(m2);
+        TEST_F(TestMapStorage, AddGetFloat) {
+            MapStorage<float> s;
 
-  EXPECT_EQ(rep.data.size(), 2);
-  auto rep_keys = third_party::SArray<Key>(rep.data[0]);
-  auto rep_vals = third_party::SArray<float>(rep.data[1]);
-  for (int index = 0; index < s_keys.size(); index++) {
-    EXPECT_EQ(rep_keys[index], s_keys[index]);
-    EXPECT_EQ(rep_vals[index], s_vals[index]);
-  }
-}
+            Message m;
+            third_party::SArray<Key> s_keys({13, 14, 15});
+            third_party::SArray<float> s_vals({0.1, 0.2, 0.3});
+            m.AddData(s_keys);
+            m.AddData(s_vals);
+            s.Add(m);
 
-TEST_F(TestMapStorage, SubAddSubGet) {
-  MapStorage<float> s;
+            Message m2;
+            m2.AddData(s_keys);
+            Message rep = s.Get(m2);
 
-  third_party::SArray<Key> s_keys({13, 14, 15});
-  third_party::SArray<float> s_vals({0.1, 0.2, 0.3});
-  s.SubAdd(s_keys, third_party::SArray<char>(s_vals));
-  third_party::SArray<float> ret = third_party::SArray<float>(s.SubGet(s_keys));
-  for (int i = 0; i < s_keys.size(); ++ i) {
-    EXPECT_EQ(ret[i], s_vals[i]);
-  }
-}
+            EXPECT_EQ(rep.data.size(), 2);
+            auto rep_keys = third_party::SArray<Key>(rep.data[0]);
+            auto rep_vals = third_party::SArray<float>(rep.data[1]);
+            for (int index = 0; index < s_keys.size(); index++) {
+                EXPECT_EQ(rep_keys[index], s_keys[index]);
+                EXPECT_EQ(rep_vals[index], s_vals[index]);
+            }
+        }
 
-}  // namespace
+        TEST_F(TestMapStorage, SubAddSubGet) {
+            MapStorage<float> s;
+
+            third_party::SArray<Key> s_keys({13, 14, 15});
+            third_party::SArray<float> s_vals({0.1, 0.2, 0.3});
+            s.SubAdd(s_keys, third_party::SArray<char>(s_vals));
+            third_party::SArray<float> ret = third_party::SArray<float>(s.SubGet(s_keys));
+            for (int i = 0; i < s_keys.size(); ++i) {
+                EXPECT_EQ(ret[i], s_vals[i]);
+            }
+        }
+
+    }  // namespace
 }  // namespace csci5570

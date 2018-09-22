@@ -5,24 +5,26 @@
 #include "base/third_party/sarray.h"
 
 namespace csci5570 {
-namespace {
+    namespace {
 
-class TestMessage : public testing::Test {
- public:
-  TestMessage() {}
-  ~TestMessage() {}
+        class TestMessage : public testing::Test {
+        public:
+            TestMessage() {}
 
- protected:
-  void SetUp() {}
-  void TearDown() {}
-};
+            ~TestMessage() {}
 
-TEST_F(TestMessage, BasicNotBreakDown) {
-  Message m;
-  std::vector<int> keys{1, 2, 3};
-  third_party::SArray<int> data(keys);
-  m.AddData(data);
-}
+        protected:
+            void SetUp() {}
 
-}  // namespace
+            void TearDown() {}
+        };
+
+        TEST_F(TestMessage, BasicNotBreakDown) {
+            Message m;
+            std::vector<int> keys{1, 2, 3};
+            third_party::SArray<int> data(keys);
+            m.AddData(data);
+        }
+
+    }  // namespace
 }  // namespace csci5570
