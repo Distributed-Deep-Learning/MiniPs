@@ -59,7 +59,7 @@ Below are the milestones for each week.
 ## Milestone 5: Feed the training data
 * [x] Check the io folder and understand how to connect to HDFS and coordinate data loading among workers
 * [x] Take a look at test/test_hdfs_read.cpp and see how the connector may be used to load data
-* [ ] Check the lib folder for the abstraction of data loaders and labeled sample
+* [x] Check the lib folder for the abstraction of data loaders and labeled sample
 * [ ] Implement the data loaders and parsers. Understanding the producer-consumer paradigm may help
 
 ## Milestone 6: Orders are to be established

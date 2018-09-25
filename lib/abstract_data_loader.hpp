@@ -2,10 +2,11 @@
 
 #include <functional>
 #include <string>
-
 #include "boost/utility/string_ref.hpp"
-
 #include "lib/parser.hpp"
+#include <io/hdfs_manager.hpp>
+#include <base/node.hpp>
+#include <vector>
 
 namespace csci5570 {
     namespace lib {
@@ -18,16 +19,45 @@ namespace csci5570 {
              * Load samples from the url into datastore
              *
              * @param url          input file/directory
-             * @param n_features   the number of features in the dataset
              * @param parse        a parsing function
              * @param datastore    a container for the samples / external in-memory storage abstraction
              */
             template<typename Parse>
             // e.g. std::function<Sample(boost::string_ref, int)>
-            static void load(std::string url, int n_features, Parse parse, DataStore *datastore) {
+            static void load(std::string url, Parse parse, DataStore *datastore) {
                 // 1. Connect to the data source, e.g. HDFS, via the modules in io
-                // 2. Extract and parse lines
-                // 3. Put samples into datastore
+                HDFSManager::Config config;
+                config.master_host = "localhost";
+                config.master_port = 19817;
+
+                config.url = url;
+                config.worker_host = "localhost";
+                config.hdfs_namenode = "localhost";
+                config.hdfs_namenode_port = 9000;
+                config.num_local_load_thread = 2;
+
+                Node my_node;
+                my_node.id = 0;
+                my_node.hostname = "localhost";
+                my_node.port = 33254;
+                std::vector<Node> nodes = {my_node};
+
+                zmq::context_t* zmq_context = new zmq::context_t(1);
+                HDFSManager hdfs_manager(my_node, nodes, config, zmq_context);
+                hdfs_manager.Start();
+                hdfs_manager.Run([my_node, datastore, parse](HDFSManager::InputFormat* input_format, int local_tid) {
+                    // 2. Extract and parse lines
+                    int count = 0;
+                    while (input_format->HasNext()) {
+                        auto item = input_format->GetNextItem();
+                        // 3. Put samples into datastore
+                        datastore->push_back(parse(item));
+                        count++;
+                    }
+                    LOG(INFO) << count << " lines in (node, thread):("
+                              << my_node.id << "," << local_tid << ")";
+                });
+                hdfs_manager.Stop();
             }
 
         };  // class AbstractDataLoader
