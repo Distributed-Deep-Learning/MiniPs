@@ -6,7 +6,9 @@ file(GLOB base-src-files
         abstract_partition_manager.hpp
         node.hpp
         node_utils.hpp
-        magic.hpp)
+        magic.hpp
+        message.hpp
+        utils.hpp)
 
 add_library(base-objs OBJECT ${base-src-files})
 set_property(TARGET base-objs PROPERTY CXX_STANDARD 11)

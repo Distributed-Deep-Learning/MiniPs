@@ -9,6 +9,8 @@ file(GLOB server-src-files
         consistency/ssp_model.cpp
         util/progress_tracker.cpp
         util/pending_buffer.cpp
+        abstract_storage.hpp
+        abstract_model.hpp
         )
 
 add_library(server-objs OBJECT ${server-src-files})

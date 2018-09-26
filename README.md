@@ -63,9 +63,9 @@ Below are the milestones for each week.
 * [ ] Implement the data loaders and parsers. Understanding the producer-consumer paradigm may help
 
 ## Milestone 6: Orders are to be established
-* [ ] Check the tests for the three consistency models and understand the expected behaviors
-* [ ] Check the pending buffer and progress tracker interface
-* [ ] Implement ASP, BSP, and SSP models
+* [x] Check the tests for the three consistency models and understand the expected behaviors
+* [x] Check the pending buffer and progress tracker interface
+* [x] Implement ASP, BSP, and SSP models
 
 ## Milestone 7: Put together and run
 * [ ] Check the tests and complete engine.cpp, info.hpp, simple_id_mapper.cpp, and worker_spec.cpp

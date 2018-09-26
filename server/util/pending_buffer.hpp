@@ -22,6 +22,10 @@ namespace csci5570 {
          * Return the number of pending requests at the specific progress
          */
         virtual int Size(const int progress);
+
+    private:
+        // TODO: each vec of buffer_ should be pop one by one, now it is not guaranteed
+        std::unordered_map<int, std::vector<Message>> buffer_;
     };
 
 }  // namespace csci5570

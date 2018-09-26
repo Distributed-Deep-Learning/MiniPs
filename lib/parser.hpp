@@ -12,7 +12,7 @@ namespace csci5570 {
             /**
              * Parsing logic for one line in file
              *
-             * @param line    a line read from the input file
+             * @param line  a line read from the input file
              */
             static Sample parse_libsvm(boost::string_ref line) {
                 // check the LibSVM format and complete the parsing
@@ -48,7 +48,7 @@ namespace csci5570 {
 
             static Sample parse_mnist(boost::string_ref line) {
                 // check the MNIST format and complete the parsing
-                // TODO: parse mnist
+                // TODO: may be done in the future
             }
 
             // You may implement other parsing logic

@@ -5,31 +5,60 @@
 namespace csci5570 {
 
     void ProgressTracker::Init(const std::vector<uint32_t> &tids) {
-        // TODO
+        progresses_.clear();
+        for (auto tid : tids) {
+            progresses_.insert({tid, 0});
+        }
+        min_clock_ = 0;
     }
 
     int ProgressTracker::AdvanceAndGetChangedMinClock(int tid) {
-        // TODO
+        CHECK(CheckThreadValid(tid));
+        if (IsUniqueMin(tid)) {
+            min_clock_ += 1;
+            progresses_[tid] += 1;
+            return min_clock_;
+        } else {
+            progresses_[tid] += 1;
+            return -1;
+        }
     }
 
     int ProgressTracker::GetNumThreads() const {
-        // TODO
+        return progresses_.size();
     }
 
     int ProgressTracker::GetProgress(int tid) const {
-        // TODO
+        CHECK(CheckThreadValid(tid));
+
+        auto it = progresses_.find(tid);
+        return it->second;
+
     }
 
     int ProgressTracker::GetMinClock() const {
-        // TODO
+        return min_clock_;
     }
 
     bool ProgressTracker::IsUniqueMin(int tid) const {
-        // TODO
+        CHECK(CheckThreadValid(tid));
+        auto it = progresses_.find(tid);
+        if (it->second != min_clock_) {
+            return false;
+        }
+        int min_count = 0;
+        for (auto it : progresses_) {
+            if (it.second == min_clock_)
+                min_count += 1;
+            if (min_count > 1)
+                return false;
+        }
+        return true;
     }
 
     bool ProgressTracker::CheckThreadValid(int tid) const {
-        // TODO
+        auto it = progresses_.find(tid);
+        return it != progresses_.end();
     }
 
 }  // namespace csci5570
