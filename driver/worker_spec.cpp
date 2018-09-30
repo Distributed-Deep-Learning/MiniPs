@@ -1,37 +1,59 @@
 #include "driver/worker_spec.hpp"
 #include "glog/logging.h"
+#include "simple_id_mapper.hpp"
 
 namespace csci5570 {
 
     WorkerSpec::WorkerSpec(const std::vector<WorkerAlloc> &worker_alloc) {
-        // TODO
+        Init(worker_alloc);
     }
 
     bool WorkerSpec::HasLocalWorkers(uint32_t node_id) const {
-        // TODO
+        return node_to_workers_.find(node_id) != node_to_workers_.end();
     }
 
     const std::vector<uint32_t> &WorkerSpec::GetLocalWorkers(uint32_t node_id) const {
-        // TODO
+        auto it = node_to_workers_.find(node_id);
+        CHECK(it != node_to_workers_.end());
+        return it->second;
     }
 
     const std::vector<uint32_t> &WorkerSpec::GetLocalThreads(uint32_t node_id) const {
-        // TODO
+        auto it = node_to_threads_.find(node_id);
+        CHECK(it != node_to_threads_.end());
+        return it->second;
     }
 
     std::map<uint32_t, std::vector<uint32_t>> WorkerSpec::GetNodeToWorkers() {
-        // TODO
+        return node_to_workers_;
     }
 
     std::vector<uint32_t> WorkerSpec::GetAllThreadIds() {
-        // TODO
+        return {thread_ids_.begin(), thread_ids_.end()};
     }
 
     void WorkerSpec::InsertWorkerIdThreadId(uint32_t worker_id, uint32_t thread_id) {
-        // TODO
+        CHECK(worker_to_thread_.find(worker_id) == worker_to_thread_.end());
+        CHECK(thread_to_worker_.find(thread_id) == thread_to_worker_.end());
+        CHECK(thread_ids_.find(thread_id) == thread_ids_.end());
+        CHECK(worker_to_node_.find(worker_id) != worker_to_node_.end());
+
+        worker_to_thread_[worker_id] = thread_id;
+        thread_to_worker_[thread_id] = worker_id;
+        thread_ids_.insert(thread_id);
+        node_to_threads_[worker_to_node_[worker_id]].push_back(thread_id);
     }
 
     void WorkerSpec::Init(const std::vector<WorkerAlloc> &worker_alloc) {
-        // TODO
+        for (const auto &node : worker_alloc) {
+            CHECK_LT(node.node_id, SimpleIdMapper::kMaxNodeId);
+            CHECK_LT(node.num_workers, SimpleIdMapper::kMaxThreadsPerNode - SimpleIdMapper::kMaxBgThreadsPerNode);
+
+            for (int i = 0; i < node.num_workers; i++) {
+                worker_to_node_[num_workers_] = node.node_id;
+                node_to_workers_[node.node_id].push_back(num_workers_);
+                num_workers_ += 1;
+            }
+        }
     }
 }  // namespace csci5570

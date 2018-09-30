@@ -1,17 +1,6 @@
 include_directories(${PROJECT_SOURCE_DIR} ${HUSKY_EXTERNAL_INCLUDE})
 
-file(GLOB server-src-files
-        server_thread.cpp
-        map_storage.hpp
-        vector_storage.hpp
-        consistency/asp_model.cpp
-        consistency/bsp_model.cpp
-        consistency/ssp_model.cpp
-        util/progress_tracker.cpp
-        util/pending_buffer.cpp
-        abstract_storage.hpp
-        abstract_model.hpp
-        )
+file(GLOB_RECURSE server-src-files *.cpp *.hpp)
 
 add_library(server-objs OBJECT ${server-src-files})
 set_property(TARGET server-objs PROPERTY CXX_STANDARD 11)

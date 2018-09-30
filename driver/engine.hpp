@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-
 #include "base/abstract_partition_manager.hpp"
 #include "base/node.hpp"
 #include "comm/mailbox.hpp"
@@ -12,6 +11,13 @@
 #include "server/server_thread.hpp"
 #include "worker/abstract_callback_runner.hpp"
 #include "worker/worker_thread.hpp"
+#include "server/abstract_storage.hpp"
+#include "server/map_storage.hpp"
+#include "server/vector_storage.hpp"
+#include "server/consistency/bsp_model.hpp"
+#include "server/consistency/ssp_model.hpp"
+#include "server/consistency/asp_model.hpp"
+#include "base/range_partition_manager.hpp"
 
 namespace csci5570 {
 
@@ -19,8 +25,8 @@ namespace csci5570 {
         SSP, BSP, ASP
     };
     enum class StorageType {
-        Map
-    };  // May have Vector
+        Map, Vector
+    };
 
     class Engine {
     public:
@@ -103,7 +109,44 @@ namespace csci5570 {
         template<typename Val>
         uint32_t CreateTable(std::unique_ptr<AbstractPartitionManager> partition_manager, ModelType model_type,
                              StorageType storage_type, int model_staleness = 0) {
-            // TODO
+            // 1. Assign a table id (incremental and consecutive)
+            // 2. Register the partition manager to the model
+            RegisterPartitionManager(model_count_, std::move(partition_manager));
+
+            CHECK(id_mapper_);
+            auto server_thread_ids = id_mapper_->GetAllServerThreads();
+
+            // 3. For each local server thread maintained by the engine
+            for (auto& server_thread : server_thread_group_) {
+                std::unique_ptr<AbstractStorage> storage;
+                std::unique_ptr<AbstractModel> model;
+
+                // a. Create a storage according to <storage_type>
+                if (storage_type == StorageType::Map) {
+                    storage.reset(new MapStorage<Val>());
+                } else if (storage_type == StorageType::Vector) {
+                    auto it = std::find(server_thread_ids.begin(), server_thread_ids.end(), server_thread->GetId());
+                    storage.reset(new VectorStorage<Val>());
+                } else {
+                    CHECK(false) << "Unknown storage_type";
+                }
+
+                // b. Create a model according to <model_type>
+                if (model_type == ModelType::SSP) {
+                    model.reset(new SSPModel(model_count_, std::move(storage), model_staleness, sender_->GetMessageQueue()));
+                } else if (model_type == ModelType::BSP) {
+                    model.reset(new BSPModel(model_count_, std::move(storage), sender_->GetMessageQueue()));
+                } else if (model_type == ModelType::ASP) {
+                    model.reset(new ASPModel(model_count_, std::move(storage), sender_->GetMessageQueue()));
+                } else {
+                    CHECK(false) << "Unknown model_type";
+                }
+
+                // c. Register the model to the server thread
+                server_thread->RegisterModel(model_count_, std::move(model));
+            }
+
+            return model_count_++;
         }
 
         /**
@@ -117,8 +160,14 @@ namespace csci5570 {
          * @return                    the created table(model) id
          */
         template<typename Val>
-        uint32_t CreateTable(ModelType model_type, StorageType storage_type, int model_staleness = 0) {
-            // TODO
+        uint32_t CreateTable(const std::vector<third_party::Range> &ranges, ModelType model_type, StorageType storage_type, int model_staleness = 0) {
+            // 1. Create a default partition manager
+            CHECK(id_mapper_);
+            const auto server_thread_ids = id_mapper_->GetAllServerThreads();
+            std::unique_ptr<AbstractPartitionManager> partition_manager(new RangePartitionManager(server_thread_ids, ranges));
+
+            // 2. Create a table with the partition manager
+            return CreateTable<Val>(std::move(partition_manager), model_type, storage_type, model_staleness);
         }
 
         /**
@@ -150,18 +199,21 @@ namespace csci5570 {
         void RegisterPartitionManager(uint32_t table_id, std::unique_ptr<AbstractPartitionManager> partition_manager);
 
         std::map<uint32_t, std::unique_ptr<AbstractPartitionManager>> partition_manager_map_;
+
         // nodes
         Node node_;
         std::vector<Node> nodes_;
+
         // mailbox
         std::unique_ptr<SimpleIdMapper> id_mapper_;
         std::unique_ptr<Mailbox> mailbox_;
         std::unique_ptr<Sender> sender_;
+
         // worker elements
-        std::unique_ptr<AbstractCallbackRunner> callback_runner_;
-        std::unique_ptr<AbstractWorkerThread> worker_thread_;
+        std::unique_ptr<WorkerThread> worker_thread_;
+
         // server elements
-        std::vector<ServerThread> server_thread_group_;
+        std::vector<std::unique_ptr<ServerThread>> server_thread_group_;
         size_t model_count_ = 0;
     };
 

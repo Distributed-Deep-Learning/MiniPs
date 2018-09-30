@@ -119,6 +119,12 @@ namespace csci5570 {
         queue_map_.insert({queue_id, queue});
     }
 
+    void Mailbox::DeregisterQueue(uint32_t queue_id) {
+        std::lock_guard<std::mutex> lk(mu_);
+        CHECK(queue_map_.find(queue_id) != queue_map_.end());
+        queue_map_.erase(queue_id);
+    }
+
     void Mailbox::Receiving() {
         VLOG(1) << "Start receiving";
         while (true) {

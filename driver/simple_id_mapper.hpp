@@ -18,7 +18,7 @@ namespace csci5570 {
  */
     class SimpleIdMapper : public AbstractIdMapper {
     public:
-        SimpleIdMapper(Node node, const std::vector<Node> &nodes);
+        SimpleIdMapper(Node node, const std::vector<Node>& nodes) : node_(node), nodes_(nodes) {}
 
         /**
          * Finds the host id of a specific thread
@@ -80,8 +80,11 @@ namespace csci5570 {
          */
         std::vector<uint32_t> GetAllServerThreads();
 
+        // Max nodes number in cluster
         static const uint32_t kMaxNodeId = 1000;
+        // Max threads in each node
         static const uint32_t kMaxThreadsPerNode = 1000;
+
         // BgThreads include server threads and worker threads
         // Their ids are [0, 100) for node id 0.
         static const uint32_t kMaxBgThreadsPerNode = 100;
@@ -90,9 +93,11 @@ namespace csci5570 {
         static const uint32_t kWorkerHelperThreadId = 50;
 
     private:
-        // The server thread's id in each node
+        // Server thread id start with 0, 1000, 2000 etc. in each node
         std::map<uint32_t, std::vector<uint32_t>> node2server_;
+        // Worker helper thread is 50, 1050, 2050 etc. in each node
         std::map<uint32_t, std::vector<uint32_t>> node2worker_helper_;
+        // Worker thread id start with 0, 1000, 2000 etc. in each node
         std::map<uint32_t, std::set<uint32_t>> node2worker_;
 
         Node node_;

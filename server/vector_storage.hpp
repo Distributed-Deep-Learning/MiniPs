@@ -11,7 +11,7 @@
 
 namespace csci5570 {
     template<typename Val>
-    class VectorStorage : AbstractStorage {
+    class VectorStorage : public AbstractStorage {
     public:
         VectorStorage() = default;
 

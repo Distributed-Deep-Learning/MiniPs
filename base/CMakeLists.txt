@@ -1,14 +1,6 @@
 include_directories(${PROJECT_SOURCE_DIR} ${HUSKY_EXTERNAL_INCLUDE})
 
-file(GLOB base-src-files
-        serialization.cpp
-        range_partition_manager.hpp
-        abstract_partition_manager.hpp
-        node.hpp
-        node_utils.hpp
-        magic.hpp
-        message.hpp
-        utils.hpp)
+file(GLOB_RECURSE base-src-files *.cpp *.hpp *.h)
 
 add_library(base-objs OBJECT ${base-src-files})
 set_property(TARGET base-objs PROPERTY CXX_STANDARD 11)

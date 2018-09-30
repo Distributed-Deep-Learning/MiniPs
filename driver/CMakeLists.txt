@@ -1,10 +1,6 @@
 include_directories(${PROJECT_SOURCE_DIR} ${HUSKY_EXTERNAL_INCLUDE})
 
-file(GLOB driver-src-files
-        simple_id_mapper.cpp
-        engine.cpp
-        worker_spec.cpp
-        )
+file(GLOB_RECURSE driver-src-files *.hpp *.cpp)
 
 add_library(driver-objs OBJECT ${driver-src-files})
 set_property(TARGET driver-objs PROPERTY CXX_STANDARD 11)
