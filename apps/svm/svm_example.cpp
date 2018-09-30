@@ -13,15 +13,16 @@
 namespace csci5570 {
 
     void Run() {
-        lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
-        lib::Parser<SVMItem> parser;
+//        lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
+//        lib::Parser<SVMItem> parser;
+//
+//        std::function<SVMItem(boost::string_ref)> parse = [parser](boost::string_ref line) {
+//            return parser.parse_libsvm(line);
+//        };
+//        std::vector<SVMItem> datastore;
+//        loader.load("hdfs:///datasets/classification/a1a", parse, &datastore);
+//        CHECK_EQ(datastore.size(), 1605);
 
-        std::function<SVMItem(boost::string_ref)> parse = [parser](boost::string_ref line) {
-            return parser.parse_libsvm(line);
-        };
-        std::vector<SVMItem> datastore;
-        loader.load("hdfs:///datasets/classification/a1a", parse, &datastore);
-        CHECK_EQ(datastore.size(), 1605);
     }
 
 }

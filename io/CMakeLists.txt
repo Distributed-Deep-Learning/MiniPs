@@ -10,7 +10,6 @@ if (LIBHDFS3_FOUND)
             hdfs_file_splitter.cpp
             line_input_format.hpp
             hdfs_manager.cpp
-            hdfs_manager.hpp
             )
     list(APPEND io-src-files ${io-src-hdfs-files})
 endif (LIBHDFS3_FOUND)

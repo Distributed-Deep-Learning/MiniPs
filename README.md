@@ -68,7 +68,7 @@ Below are the milestones for each week.
 * [x] Implement ASP, BSP, and SSP models
 
 ## Milestone 7: Put together and run
-* [ ] Check the tests and complete engine.cpp, info.hpp, simple_id_mapper.cpp, and worker_spec.cpp
+* [x] Check the tests and complete engine.cpp, info.hpp, simple_id_mapper.cpp, and worker_spec.cpp
 * [ ] Write a script to launch the system on the cluster
 
 ### Hints for the driver part

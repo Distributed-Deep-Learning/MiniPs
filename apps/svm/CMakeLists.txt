@@ -1,9 +1,7 @@
 include_directories(${PROJECT_SOURCE_DIR} ${HUSKY_EXTERNAL_INCLUDE})
 
 if (LIBHDFS3_FOUND)
-    file(GLOB svm-src-files
-            svm_example.cpp.cpp
-            )
+    file(GLOB_RECURSE svm-src-files *.hpp *.cpp)
 
     add_executable(SVM_Example svm_example.cpp)
     target_link_libraries(SVM_Example csci5570)

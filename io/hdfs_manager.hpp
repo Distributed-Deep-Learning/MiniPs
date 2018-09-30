@@ -22,6 +22,7 @@ namespace csci5570 {
             std::string master_host;
             int master_port;
             std::string worker_host;
+            int worker_port;
             std::string hdfs_namenode;
             int hdfs_namenode_port;
             std::string url;

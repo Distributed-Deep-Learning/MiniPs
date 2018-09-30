@@ -34,8 +34,11 @@ namespace csci5570 {
          * @param table_id    the model id
          */
         template<typename Val>
-        KVClientTable<Val> CreateKVClientTable(uint32_t table_id) const {
-            // TODO
+        std::unique_ptr<KVClientTable<Val>> CreateKVClientTable(uint32_t table_id) const {
+            CHECK(partition_manager_map.find(table_id) != partition_manager_map.end());
+            std::unique_ptr<KVClientTable<Val>> table(new KVClientTable<Val>(
+                    thread_id, table_id, send_queue, partition_manager_map.find(table_id)->second, callback_runner));
+            return table;
         }
     };
 

@@ -6,7 +6,7 @@
 #include "io/hdfs_assigner.hpp"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
-#include <base/node_utils.hpp>
+#include "base/node_utils.hpp"
 
 namespace csci5570 {
 
