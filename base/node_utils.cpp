@@ -3,8 +3,6 @@
 // Created by aiyongbiao on 2018/9/25.
 //
 
-#pragma once
-
 #include <vector>
 #include <string>
 #include "base/node.hpp"

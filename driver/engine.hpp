@@ -108,7 +108,7 @@ namespace csci5570 {
          */
         template<typename Val>
         uint32_t CreateTable(std::unique_ptr<AbstractPartitionManager> partition_manager, ModelType model_type,
-                             StorageType storage_type, int model_staleness = 0) {
+                             StorageType storage_type, const std::vector<third_party::Range> &ranges, int model_staleness = 0) {
             // 1. Assign a table id (incremental and consecutive)
             // 2. Register the partition manager to the model
             RegisterPartitionManager(model_count_, std::move(partition_manager));
@@ -126,7 +126,7 @@ namespace csci5570 {
                     storage.reset(new MapStorage<Val>());
                 } else if (storage_type == StorageType::Vector) {
                     auto it = std::find(server_thread_ids.begin(), server_thread_ids.end(), server_thread->GetId());
-                    storage.reset(new VectorStorage<Val>());
+                    storage.reset(new VectorStorage<Val>(ranges[it - server_thread_ids.begin()]));
                 } else {
                     CHECK(false) << "Unknown storage_type";
                 }
@@ -167,7 +167,7 @@ namespace csci5570 {
             std::unique_ptr<AbstractPartitionManager> partition_manager(new RangePartitionManager(server_thread_ids, ranges));
 
             // 2. Create a table with the partition manager
-            return CreateTable<Val>(std::move(partition_manager), model_type, storage_type, model_staleness);
+            return CreateTable<Val>(std::move(partition_manager), model_type, storage_type, ranges, model_staleness);
         }
 
         /**

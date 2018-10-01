@@ -12,23 +12,24 @@
 #include "server/map_storage.hpp"
 #include "server/vector_storage.hpp"
 #include "lib/batch_data_sampler.cpp"
+#include <cmath>
 
-DEFINE_int32(my_id, -1, "The process id of this program");
-DEFINE_string(config_file, "", "The config file path");
-DEFINE_string(hdfs_namenode, "", "The hdfs namenode hostname");
-DEFINE_string(input, "", "The hdfs input url");
-DEFINE_int32(hdfs_namenode_port, -1, "The hdfs namenode port");
+DEFINE_int32(my_id, 0, "The process id of this program");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
+DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
+DEFINE_string(input, "hdfs:///datasets/classification/a1a", "The hdfs input url");
+DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 
-DEFINE_string(kModelType, "", "ASP/SSP/BSP/SparseSSP");
-DEFINE_string(kStorageType, "", "Map/Vector");
-DEFINE_int32(num_dims, 0, "number of dimensions");
-DEFINE_int32(batch_size, 100, "batch size of each epoch");
-DEFINE_int32(num_iters, 10, "number of iters");
+DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP/SparseSSP");
+DEFINE_string(kStorageType, "Vector", "Map/Vector");
+DEFINE_int32(num_dims, 54686452, "number of dimensions");
+DEFINE_int32(batch_size, 1, "batch size of each epoch");
+DEFINE_int32(num_iters, 1000, "number of iters");
 DEFINE_int32(kStaleness, 0, "stalness");
-DEFINE_int32(kSpeculation, 1, "speculation");
-DEFINE_string(kSparseSSPRecorderType, "", "None/Map/Vector");
-DEFINE_int32(num_workers_per_node, 1, "num_workers_per_node");
-DEFINE_int32(with_injected_straggler, 0, "with injected straggler or not, 0/1");
+DEFINE_int32(kSpeculation, 5, "speculation");
+DEFINE_string(kSparseSSPRecorderType, "Vector", "None/Map/Vector");
+DEFINE_int32(num_workers_per_node, 2, "num_workers_per_node");
+DEFINE_int32(with_injected_straggler, 1, "with injected straggler or not, 0/1");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
 
@@ -78,17 +79,11 @@ namespace csci5570 {
         config.url = FLAGS_input;
         config.worker_host = my_node.hostname;
         config.worker_port = my_node.port;
-        config.master_port = 19715;
+        config.master_port = 19817;
         config.master_host = nodes[0].hostname;
         config.hdfs_namenode = FLAGS_hdfs_namenode;
         config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
         config.num_local_load_thread = FLAGS_num_workers_per_node;
-
-        zmq::context_t *zmq_context = new zmq::context_t(1);
-        HDFSManager hdfs_manager(my_node, nodes, config, zmq_context);
-        LOG(INFO) << "manager set up";
-        hdfs_manager.Start();
-        LOG(INFO) << "manager start";
 
         std::vector<SVMItem> data;
         lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;

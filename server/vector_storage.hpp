@@ -13,7 +13,11 @@ namespace csci5570 {
     template<typename Val>
     class VectorStorage : public AbstractStorage {
     public:
-        VectorStorage() = default;
+        VectorStorage() = delete;
+
+        VectorStorage(third_party::Range range) : range_(range), storage_(range.size(), Val()) {
+            CHECK_LE(range_.begin(), range_.end());
+        }
 
         virtual void SubAdd(const third_party::SArray<Key> &typed_keys,
                             const third_party::SArray<char> &vals) override {
