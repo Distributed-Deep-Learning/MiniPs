@@ -15,7 +15,7 @@
 #include <cmath>
 
 DEFINE_int32(my_id, 0, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///datasets/classification/a1a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -37,7 +37,7 @@ namespace csci5570 {
 
     template<typename T>
     void test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
-
+        LOG(INFO) << "start test error ...";
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
@@ -92,7 +92,7 @@ namespace csci5570 {
             // parse data
             return parser.parse_libsvm(line);
         };
-        loader.load(config, my_node, nodes, parse, &data);
+        loader.load(config, my_node, nodes, parse, data);
         LOG(INFO) << "Finished loading data!";
 
         int count = 0;

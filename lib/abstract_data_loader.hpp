@@ -24,20 +24,28 @@ namespace csci5570 {
              */
             template<typename Parse>
             // e.g. std::function<Sample(boost::string_ref, int)>
-            static void load(HDFSManager::Config config, Node my_node, std::vector<Node> nodes, Parse parse, DataStore *datastore) {
+            static void load(HDFSManager::Config config, Node my_node, std::vector<Node> nodes,
+                             Parse parse, DataStore &datastore) {
                 // 1. Connect to the data source, e.g. HDFS, via the modules in io
                 zmq::context_t* zmq_context = new zmq::context_t(1);
                 HDFSManager hdfs_manager(my_node, nodes, config, zmq_context);
                 hdfs_manager.Start();
 
-                hdfs_manager.Run([my_node, datastore, parse](HDFSManager::InputFormat* input_format, int local_tid) {
+                std::mutex lock;
+                hdfs_manager.Run([my_node, &datastore, parse, &lock](HDFSManager::InputFormat* input_format, int local_tid) {
                     // 2. Extract and parse lines
                     int count = 0;
                     while (input_format->HasNext()) {
                         auto item = input_format->GetNextItem();
+                        if (item.empty()) {
+                            return;
+                        }
+
                         // 3. Put samples into datastore
-                        datastore->push_back(parse(item));
+                        lock.lock();
+                        datastore.push_back(parse(item));
                         count++;
+                        lock.unlock();
                     }
                     LOG(INFO) << count << " lines in (node, thread):("
                               << my_node.id << "," << local_tid << ")";

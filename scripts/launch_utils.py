@@ -71,7 +71,7 @@ def launch_util(progfile, hostfile, env_params, params, argv):
   if len(argv) == 1 or (len(argv) == 2 and argv[1] == "local"):
     params["config_file"] = hostfile_path
     launch_nodes(prog_path, hostfile_path, env_params, params)
-  elif len(argv) == 2 and argv[1] == "kill":
+  elif (len(argv) == 2 and argv[1] == "kill") or (len(argv) == 3 and argv[2] == "kill"):
     kill_nodes(prog_path, hostfile_path)
   else:
     print "arg error: " + str(argv)

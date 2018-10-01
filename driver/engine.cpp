@@ -25,6 +25,8 @@ namespace csci5570 {
     }
 
     void Engine::StopEverything() {
+        LOG(INFO) << "Engine StopEverything...";
+
         StopMailbox();
         StopSender();
         StopServerThreads();
