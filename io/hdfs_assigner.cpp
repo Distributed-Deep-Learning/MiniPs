@@ -57,7 +57,7 @@ namespace csci5570 {
         stream >> worker_name >> worker_id;
         finished_workers_.insert(worker_id);
 
-        LOG(INFO) << "master => worker finished @" << worker_name << "-" << std::to_string(worker_id);
+        LOG(INFO) << "handle_exit: master => worker finished @" << worker_name << "-" << std::to_string(worker_id);
 
         if ((finished_workers_.size() == num_workers_alive_)) {
             halt();
@@ -76,7 +76,7 @@ namespace csci5570 {
 
         // reset num_worker_alive
         num_workers_alive_ = num_threads;
-        LOG(INFO) << url << " " << host << " " << num_threads << " " << id << " " << load_type;
+        LOG(INFO) << "handle_block_request:" << url << " " << host << " " << num_threads << " " << id << " " << load_type;
         std::pair<std::string, size_t> ret = answer(host, url, id);
         stream.clear();
         stream << ret.first << ret.second;

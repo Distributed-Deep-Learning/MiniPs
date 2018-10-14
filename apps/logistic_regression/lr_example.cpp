@@ -130,13 +130,6 @@ namespace csci5570 {
         uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, FLAGS_kStaleness);
         engine.Barrier();
 
-        // If no data have been allocated, stop the task
-        if (data.empty()) {
-            LOG(INFO) << "exit the node since no data have been read";
-            engine.StopEverything();
-            exit(1);
-        }
-
         // 3. Construct tasks
         MLTask task;
         std::vector<WorkerAlloc> worker_alloc;
@@ -226,8 +219,12 @@ namespace csci5570 {
             LOG(INFO) << "total time: " << total_time << " ms on worker: " << info.worker_id;
         });
 
-        // 4. Run tasks
-        engine.Run(task);
+        // If the data is empty, do not continue
+        if (!data.empty()) {
+            // 4. Run tasks
+            engine.Run(task);
+        }
+
         // 5. Stop engine
         engine.StopEverything();
     }

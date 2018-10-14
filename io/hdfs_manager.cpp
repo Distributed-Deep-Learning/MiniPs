@@ -46,7 +46,6 @@ namespace csci5570 {
                 InputFormat input_format(config_, coordinator_, num_threads);
                 func(&input_format, i);
                 BinStream finish_signal;
-                LOG(INFO) << "Send finish signal";
                 finish_signal << config_.worker_host << node_.id * config_.num_local_load_thread + i;
                 coordinator_->notify_master(finish_signal, 300);
             });
