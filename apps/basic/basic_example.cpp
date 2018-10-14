@@ -11,8 +11,8 @@
 #include <algorithm>
 #include <numeric>
 
-DEFINE_int32(my_id, -1, "The process id of this program");
-DEFINE_string(config_file, "", "The config file path");
+DEFINE_int32(my_id, 1, "The process id of this program");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
 
 namespace csci5570 {
 

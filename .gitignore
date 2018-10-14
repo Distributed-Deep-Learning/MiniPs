@@ -26,6 +26,7 @@ latex/*
 # IDE Generated File
 .idea/*
 .DS_Store
+scripts/.idea/*
 
 # Don't Sync Local Dev Files
 test/test_hdfs_read.cpp

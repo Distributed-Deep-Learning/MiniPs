@@ -48,19 +48,19 @@ Below are the milestones for each week.
 ## Milestone 3: Distribute the model to servers
 * [x] Check `base/abstract_partition_manager.hpp` and implement your parititoning strategies
 * [x] You should have tried implementing MapStorage in the previous milestone. You may try other storage method such as using vector.
-* [ ] Write a small program to link the paritition manager with the storages and to initialize storages associated with different server threads
+* [x] Write a small program to link the paritition manager with the storages and to initialize storages associated with different server threads
 
 ## Milestone 4: Now the workers come into play
 * [x] Check `worker/kv_client_table_test.cpp`. Understand how `AbstractCallbackRunner` and `AbstractPartitionManager` functions and how the modules on the worker side work together
-* [ ] Understand how model parameters are rendered to users in the process from mailbox receiving messages, to worker threads invoking callbacks, and finally to KVClientTable returning with completed requests
-* [ ] Implement a callback runner to handle reply messages
+* [x] Understand how model parameters are rendered to users in the process from mailbox receiving messages, to worker threads invoking callbacks, and finally to KVClientTable returning with completed requests
+* [x] Implement a callback runner to handle reply messages
 * [x] Implement [KVClientTable](worker/kv_client_table.hpp) according to the information given in `worker/kv_client_table_test.cpp`
 
 ## Milestone 5: Feed the training data
 * [x] Check the io folder and understand how to connect to HDFS and coordinate data loading among workers
 * [x] Take a look at test/test_hdfs_read.cpp and see how the connector may be used to load data
 * [x] Check the lib folder for the abstraction of data loaders and labeled sample
-* [ ] Implement the data loaders and parsers. Understanding the producer-consumer paradigm may help
+* [x]  nd parsers. Understanding the producer-consumer paradigm may help
 
 ## Milestone 6: Orders are to be established
 * [x] Check the tests for the three consistency models and understand the expected behaviors

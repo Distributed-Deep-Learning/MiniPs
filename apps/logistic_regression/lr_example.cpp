@@ -14,8 +14,8 @@
 #include "lib/batch_data_sampler.cpp"
 #include <cmath>
 
-DEFINE_int32(my_id, 0, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
+DEFINE_int32(my_id, 1, "The process id of this program");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///datasets/classification/a1a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -95,12 +95,6 @@ namespace csci5570 {
         loader.load(config, my_node, nodes, parse, data);
         LOG(INFO) << "Finished loading data!";
 
-        int count = 0;
-        for (int i = 0; i < 10; i++) {
-            count += data[i].first.size();
-        }
-        LOG(INFO) << "Estimated number of non-zero: " << count / 10;
-
         // 2. Start engine
         Engine engine(my_node, nodes);
         engine.StartEverything();
@@ -136,6 +130,13 @@ namespace csci5570 {
         uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, FLAGS_kStaleness);
         engine.Barrier();
 
+        // If no data have been allocated, stop the task
+        if (data.empty()) {
+            LOG(INFO) << "exit the node since no data have been read";
+            engine.StopEverything();
+            exit(1);
+        }
+
         // 3. Construct tasks
         MLTask task;
         std::vector<WorkerAlloc> worker_alloc;
@@ -169,7 +170,6 @@ namespace csci5570 {
             std::chrono::steady_clock::time_point end_time;
             srand(time(0));
 
-            //　TO DO: make it real LR algorithm
             auto table = info.CreateKVClientTable<double>(kTableId);
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
