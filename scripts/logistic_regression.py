@@ -12,7 +12,7 @@ from launch_utils import launch_util
 local_debug = True if len(sys.argv) >= 2 and sys.argv[1] == "local" else False
 
 hostfile = "config/localnodes" if local_debug else "config/clusternodes"
-progfile = ("cmake-build-debug" if local_debug else "debug") + "/LR_Example"
+progfile = ("cmake-build-debug" if local_debug else "debug") + "/LRExample"
 
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
