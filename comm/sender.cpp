@@ -1,4 +1,5 @@
 #include "comm/sender.hpp"
+#include "glog/logging.h"
 
 namespace csci5570 {
     Sender::Sender(AbstractMailbox *mailbox) : mailbox_(mailbox) {}
@@ -11,6 +12,8 @@ namespace csci5570 {
         while (true) {
             Message to_send;
             send_message_queue_.WaitAndPop(&to_send);
+            LOG(INFO) << "Sender::Send():" + to_send.DebugString();
+
             if (to_send.meta.flag == Flag::kExit)
                 break;
             mailbox_->Send(to_send);

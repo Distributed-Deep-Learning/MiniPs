@@ -1,7 +1,6 @@
 #include "comm/mailbox.hpp"
 
 #include <algorithm>
-
 #include "glog/logging.h"
 
 namespace csci5570 {
@@ -131,7 +130,7 @@ namespace csci5570 {
             Message msg;
             int recv_bytes = Recv(&msg);
             // For debugging, show received message
-            VLOG(1) << "Received message " << msg.DebugString();
+            LOG(INFO) << "Mailbox::Receiving():" << msg.DebugString();
 
             if (msg.meta.flag == Flag::kExit) {
                 break;
@@ -151,6 +150,8 @@ namespace csci5570 {
     }
 
     int Mailbox::Send(const Message &msg) {
+        LOG(INFO) << "Mailbox::Send:" << msg.DebugString();
+
         std::lock_guard<std::mutex> lk(mu_);
         // find the socket
         int id;
@@ -191,7 +192,6 @@ namespace csci5570 {
         int send_bytes = meta_size;
 
         // send data
-        VLOG(1) << "Start sending data";
         for (int i = 0; i < num_data; ++i) {
             zmq_msg_t data_msg;
             third_party::SArray<char> *data = new third_party::SArray<char>(msg.data[i]);

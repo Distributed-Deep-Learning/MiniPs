@@ -194,10 +194,10 @@ namespace csci5570 {
                         deltas[j] += FLAGS_alpha * field.second * (y - pred_y);
                     }
                 }
-                table->Add(keys, deltas);  // issue Push
+                table->Add(keys, deltas);
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
-
+                
                 LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
 
                 if (FLAGS_with_injected_straggler) {
