@@ -17,6 +17,7 @@ progfile = ("cmake-build-debug" if local_debug else "debug") + "/LRExample"
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
     "hdfs_namenode_port": 9000,
+    "assigner_master_port": 19201,
     "input": "hdfs:///datasets/classification/a1a" if local_debug else "hdfs:///jasper/kdd12",
     "kStaleness": 0,
     "kSpeculation": 5,

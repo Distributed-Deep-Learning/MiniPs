@@ -41,7 +41,9 @@ namespace csci5570 {
             callback_runner_->RegisterRecvHandle(app_thread_id_, model_id_, [&](Message &msg) { HandleMsg_(msg); });
         };
 
-        void Clock() {};
+        void Clock() {
+            Clock_();
+        };
 
         void Add(const std::vector<Key> &keys, const std::vector<Val> &vals) {
             Add_(third_party::SArray<Key>(keys), third_party::SArray<Val>(vals));
@@ -108,6 +110,19 @@ namespace csci5570 {
                 sender_queue_->Push(std::move(msg));
             }
         };
+
+        void Clock_() {
+            CHECK_NOTNULL(partition_manager_);
+            const auto& server_thread_ids = partition_manager_->GetServerThreadIds();
+            for (uint32_t server_id : server_thread_ids) {
+                Message msg;
+                msg.meta.sender = app_thread_id_;
+                msg.meta.recver = server_id;
+                msg.meta.model_id = model_id_;
+                msg.meta.flag = Flag::kClock;
+                sender_queue_->Push(std::move(msg));
+            }
+        }
 
         void Add_(const third_party::SArray <Key> &keys, const third_party::SArray <Val> &vals) {
             CHECK_NOTNULL(partition_manager_);

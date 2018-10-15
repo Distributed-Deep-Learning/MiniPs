@@ -14,11 +14,12 @@
 #include "lib/batch_data_sampler.cpp"
 #include <cmath>
 
-DEFINE_int32(my_id, 1, "The process id of this program");
+DEFINE_int32(my_id, 0, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///datasets/classification/a1a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
+DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
 DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP/SparseSSP");
 DEFINE_string(kStorageType, "Vector", "Map/Vector");
@@ -79,7 +80,7 @@ namespace csci5570 {
         config.url = FLAGS_input;
         config.worker_host = my_node.hostname;
         config.worker_port = my_node.port;
-        config.master_port = 19688;
+        config.master_port = FLAGS_assigner_master_port;
         config.master_host = nodes[0].hostname;
         config.hdfs_namenode = FLAGS_hdfs_namenode;
         config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
@@ -166,7 +167,7 @@ namespace csci5570 {
             auto table = info.CreateKVClientTable<double>(kTableId);
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
-            for (int i = 0; i < FLAGS_num_iters; ++i) {
+            for (int i = 0; i < FLAGS_num_iters; i++) {
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
                 table->Get(keys, &params);
@@ -197,8 +198,7 @@ namespace csci5570 {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                if (i % 10 == 0)
-                    LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
+                LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
 
                 if (FLAGS_with_injected_straggler) {
                     double r = (double) rand() / RAND_MAX;
