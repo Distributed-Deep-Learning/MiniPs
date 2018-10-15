@@ -79,7 +79,7 @@ namespace csci5570 {
         config.url = FLAGS_input;
         config.worker_host = my_node.hostname;
         config.worker_port = my_node.port;
-        config.master_port = 19817;
+        config.master_port = 19688;
         config.master_host = nodes[0].hostname;
         config.hdfs_namenode = FLAGS_hdfs_namenode;
         config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
