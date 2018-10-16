@@ -129,9 +129,6 @@ namespace csci5570 {
         while (true) {
             Message msg;
             int recv_bytes = Recv(&msg);
-            // For debugging, show received message
-            LOG(INFO) << "Mailbox::Receiving():" << msg.DebugString();
-
             if (msg.meta.flag == Flag::kExit) {
                 break;
             } else if (msg.meta.flag == Flag::kBarrier) {
@@ -150,8 +147,6 @@ namespace csci5570 {
     }
 
     int Mailbox::Send(const Message &msg) {
-        LOG(INFO) << "Mailbox::Send:" << msg.DebugString();
-
         std::lock_guard<std::mutex> lk(mu_);
         // find the socket
         int id;

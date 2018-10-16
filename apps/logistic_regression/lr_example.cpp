@@ -155,8 +155,8 @@ namespace csci5570 {
 
             for (int i = 0; i < FLAGS_num_iters + FLAGS_kSpeculation; ++i) {
                 batch_data_sampler.random_start_point();
-                future_keys.push_back(batch_data_sampler.prepare_next_batch());  // prepare keys
-                future_data_ptrs.push_back(batch_data_sampler.get_data_ptrs()); // prepare ptrs to data
+                future_keys.push_back(batch_data_sampler.prepare_next_batch());
+                future_data_ptrs.push_back(batch_data_sampler.get_data_ptrs());
             }
             CHECK_EQ(future_keys.size(), FLAGS_num_iters + FLAGS_kSpeculation);
 
@@ -197,7 +197,7 @@ namespace csci5570 {
                 table->Add(keys, deltas);
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
-                
+
                 LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
 
                 if (FLAGS_with_injected_straggler) {
