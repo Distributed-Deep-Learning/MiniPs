@@ -18,8 +18,6 @@ namespace csci5570 {
 
         virtual void ResetWorker(Message &msg) = 0;
 
-        virtual void DeleteWorker(uint32_t node_id) = 0;
-
         virtual ~AbstractModel() {}
     };
 

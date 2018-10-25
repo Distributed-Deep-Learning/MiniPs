@@ -41,11 +41,6 @@ namespace csci5570 {
                     models_[model_id]->ResetWorker(msg);
                     break;
                 }
-                case Flag::kForceQuit: {
-                    LOG(INFO) << "delete worker in model" << model_id;
-                    models_[model_id]->DeleteWorker(msg.meta.sender);
-                    break;
-                }
                 default:
                     CHECK(false) << "Unknown flag in msg: " << FlagName[static_cast<int>(msg.meta.flag)];
             }

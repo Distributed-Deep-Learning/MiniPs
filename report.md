@@ -46,6 +46,51 @@ int HDFSFileSplitter::read_block(const std::string &fn) {
 
 When this happened, the working node which no data for trainning should be safely stopped without stop the cluster running.
 
+To solving this, we need detect the no-trainning-data node, and shut it down carefully in the beginning stage.
+
+comm/mailbox.cpp
+
+```cpp
+if (msg.meta.flag == Flag::kForceQuit) {
+    LOG(INFO) << "Received kForceQuit from" << msg.meta.sender;
+    nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const & node) {
+        return msg.meta.sender == node.id;
+    }), nodes_.end());
+
+    engine_->UpdateNodes(nodes_);
+
+    std::unique_lock<std::mutex> lk(mu_);
+    quit_count_ += 1;
+    if (barrier_count_ + quit_count_ >= nodes_.size()) {
+        barrier_cond_.notify_one();
+    }
+}
+```
+
+driver/engine.cpp
+
+```cpp
+void Engine::UpdateNodes(std::vector<Node> &nodes) {
+    nodes_ = nodes;
+    id_mapper_->Update(nodes, 1);
+}
+```
+
+Force-quit the node if the empty data was read
+
+```cpp
+// Quit the engine if no traning data is read
+if (data.empty()) {
+    LOG(INFO) << "ForceQuit the engine as no data allocated";
+    for (auto node : nodes) {
+        engine.ForceQuit(node.id);
+    }
+    engine.StopEverything();
+    return;
+}
+engine.Barrier();
+```
+
 ### Fault tolerance
 
 ### Multi-tasking and scheduling

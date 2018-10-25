@@ -81,8 +81,4 @@ namespace csci5570 {
         reply_queue_->Push(reply_msg);
     }
 
-    void BSPModel::DeleteWorker(uint32_t node_id) {
-
-    }
-
 }  // namespace csci5570

@@ -29,8 +29,6 @@ namespace csci5570 {
 
         virtual void ResetWorker(Message &msg) override;
 
-        virtual void DeleteWorker(uint32_t node_id) override;
-
         /**
          * Return the number of requests waiting at the specific progress
          *
