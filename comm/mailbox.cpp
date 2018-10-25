@@ -13,8 +13,8 @@ namespace csci5570 {
         }
     }
 
-    Mailbox::Mailbox(const Node &node, const std::vector<Node> &nodes, AbstractIdMapper *id_mapper)
-            : node_(node), nodes_(nodes), id_mapper_(id_mapper) {
+    Mailbox::Mailbox(const Node &node, const std::vector<Node> &nodes, AbstractIdMapper *id_mapper, Engine *engine)
+            : node_(node), nodes_(nodes), id_mapper_(id_mapper), engine_(engine) {
         // Do some checks
         CHECK(nodes_.size());
         CHECK(std::find(nodes_.begin(), nodes_.end(), node_) != nodes_.end());
@@ -134,9 +134,22 @@ namespace csci5570 {
             } else if (msg.meta.flag == Flag::kBarrier) {
                 std::unique_lock<std::mutex> lk(mu_);
                 barrier_count_ += 1;
-                if (barrier_count_ == nodes_.size()) {
+                if (barrier_count_ >= nodes_.size()) {
                     VLOG(1) << "Collected " << nodes_.size() << " barrier, Node:"
                             << node_.id << " unblocking main thread";
+                    barrier_cond_.notify_one();
+                }
+            } else if (msg.meta.flag == Flag::kForceQuit) {
+                LOG(INFO) << "Received kForceQuit from" << msg.meta.sender;
+                nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const & node) {
+                    return msg.meta.sender == node.id;
+                }), nodes_.end());
+
+                engine_->UpdateNodes(nodes_);
+
+                std::unique_lock<std::mutex> lk(mu_);
+                quit_count_ += 1;
+                if (barrier_count_ + quit_count_ >= nodes_.size()) {
                     barrier_cond_.notify_one();
                 }
             } else {
@@ -150,17 +163,27 @@ namespace csci5570 {
         std::lock_guard<std::mutex> lk(mu_);
         // find the socket
         int id;
-        if (msg.meta.flag == Flag::kBarrier || msg.meta.flag == Flag::kExit) {
-            // For kBarrier and kExit which are sent by the Mailbox directly, no need to lookup for node id.
+        if (msg.meta.flag == Flag::kBarrier || msg.meta.flag == Flag::kExit || msg.meta.flag == Flag::kForceQuit) {
+            // For kBarrier, kExit and kForceQuit which are sent by the Mailbox directly, no need to lookup for node id.
             id = msg.meta.recver;
         } else {
             id = id_mapper_->GetNodeIdForThread(msg.meta.recver);
         }
+
+        auto node_it = std::find_if(nodes_.begin(), nodes_.end(), [&](const Node & node) {
+            return node.id == id;
+        });
+        if (node_it == nodes_.end()) {
+            LOG(WARNING) << "this node already quit " << id;
+            return -1;
+        }
+
         auto it = senders_.find(id);
         if (it == senders_.end()) {
             LOG(WARNING) << "there is no socket to node " << id;
             return -1;
         }
+
         void *socket = it->second;
 
         // send meta
@@ -274,6 +297,20 @@ namespace csci5570 {
         // Very tricky. Consider to use all-one-all method instead of all-all.
         barrier_cond_.wait(lk, [this]() { return barrier_count_ >= nodes_.size(); });
         barrier_count_ -= nodes_.size();
+    }
+
+    void Mailbox::ForceQuit(uint32_t node_id) {
+        for (auto node : nodes_) {
+            Message quit_msg;
+            quit_msg.meta.sender = node_.id;
+            quit_msg.meta.recver = node.id;
+            quit_msg.meta.flag = Flag::kForceQuit;
+            Send(quit_msg);
+        }
+    }
+
+    void Mailbox::SafeQuit() {
+
     }
 
 }  // namespace csci5570

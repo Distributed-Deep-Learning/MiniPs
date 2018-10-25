@@ -49,6 +49,8 @@ namespace csci5570 {
          */
         bool CheckThreadValid(int tid) const;
 
+        void DeleteNode(uint32_t node_id);
+
     private:
         std::map<int, int> progresses_;  // {tid: progress}
         int min_clock_;                  // the slowest progress

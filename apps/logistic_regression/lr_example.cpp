@@ -100,7 +100,19 @@ namespace csci5570 {
         Engine engine(my_node, nodes);
         engine.StartEverything();
 
+        // Quit the engine if no traning data is read
+        if (data.empty()) {
+            LOG(INFO) << "ForceQuit the engine as no data allocated";
+            for (auto node : nodes) {
+                engine.ForceQuit(node.id);
+            }
+            engine.StopEverything();
+            return;
+        }
+        engine.Barrier();
+
         // 3. Create tables
+        nodes = engine.getNodes();
         std::vector<third_party::Range> range;
         uint32_t num_total_servers = nodes.size() * FLAGS_num_servers_per_node;
         for (uint32_t i = 0; i < num_total_servers - 1; ++i) {
@@ -135,7 +147,6 @@ namespace csci5570 {
         MLTask task;
         std::vector<WorkerAlloc> worker_alloc;
         for (auto &node : nodes) {
-            // each node has num_workers_per_node workers
             worker_alloc.push_back({node.id, (uint32_t) FLAGS_num_workers_per_node});
         }
         task.SetWorkerAlloc(worker_alloc);
@@ -198,7 +209,9 @@ namespace csci5570 {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
+                if (i % 5 == 0) {
+                    LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
+                }
 
                 if (FLAGS_with_injected_straggler) {
                     double r = (double) rand() / RAND_MAX;
@@ -219,11 +232,8 @@ namespace csci5570 {
             LOG(INFO) << "total time: " << total_time << " ms on worker: " << info.worker_id;
         });
 
-        // If the data is empty, do not continue
-        if (!data.empty()) {
-            // 4. Run tasks
-            engine.Run(task);
-        }
+        // 4. Run tasks
+        engine.Run(task);
 
         // 5. Stop engine
         engine.StopEverything();

@@ -99,7 +99,6 @@ namespace csci5570 {
         size_t start = 0;
         size_t nbytes = 0;
         while (start < hdfs_block_size) {
-            // only 128KB per hdfsRead
             nbytes = hdfsRead(fs_, file_, data_ + start, hdfs_block_size);
             start += nbytes;
             if (nbytes == 0)

@@ -29,6 +29,8 @@ namespace csci5570 {
 
         virtual void ResetWorker(Message &msg) override;
 
+        virtual void DeleteWorker(uint32_t node_id) override;
+
     private:
         uint32_t model_id_;
 

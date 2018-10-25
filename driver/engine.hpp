@@ -28,6 +28,7 @@ namespace csci5570 {
         Map, Vector
     };
 
+    class Mailbox;
     class Engine {
     public:
         /**
@@ -50,6 +51,8 @@ namespace csci5570 {
          */
         void StartEverything(int num_server_threads_per_node = 1);
 
+        void UpdateNodes(std::vector<Node> &nodes);
+
         void CreateIdMapper(int num_server_threads_per_node = 1);
 
         void CreateMailbox();
@@ -61,6 +64,10 @@ namespace csci5570 {
         void StartMailbox();
 
         void StartSender();
+
+        std::vector<Node> getNodes() {
+            return nodes_;
+        }
 
         /**
          * The flow of stopping the engine:
@@ -83,6 +90,8 @@ namespace csci5570 {
          * Synchronization barrier for processes
          */
         void Barrier();
+
+        void ForceQuit(uint32_t node_id);
 
         /**
          * Create the whole picture of the worker group, and register the workers in the id mapper
@@ -182,7 +191,7 @@ namespace csci5570 {
          *
          * @param task    the task to run
          */
-        void Run(const MLTask &task);
+        void Run(const MLTask &task, bool quit = false);
 
         /**
          * Returns the server thread ids

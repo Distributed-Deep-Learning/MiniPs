@@ -60,4 +60,8 @@ namespace csci5570 {
         reply_queue_->Push(reply_msg);
     }
 
+    void SSPModel::DeleteWorker(uint32_t node_id) {
+        this->progress_tracker_.DeleteNode(node_id);
+    }
+
 }  // namespace csci5570

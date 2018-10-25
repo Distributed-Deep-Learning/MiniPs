@@ -29,6 +29,14 @@ namespace csci5570 {
         }
     }
 
+    void SimpleIdMapper::Update(std::vector<Node> &nodes, int num_server_threads_per_node) {
+        nodes_ = nodes;
+        node2server_.clear();
+        node2worker_helper_.clear();
+        node2worker_.clear();
+        Init(num_server_threads_per_node);
+    }
+
     uint32_t SimpleIdMapper::AllocateWorkerThread(uint32_t node_id) {
         CHECK(node2worker_helper_.find(node_id) != node2worker_helper_.end());
         CHECK_LE(node2worker_[node_id].size(), kMaxThreadsPerNode - kMaxBgThreadsPerNode);

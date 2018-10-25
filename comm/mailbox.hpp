@@ -11,12 +11,14 @@
 #include <vector>
 
 #include <zmq.h>
+#include <driver/engine.hpp>
 
 namespace csci5570 {
 
+    class Engine;
     class Mailbox : public AbstractMailbox {
     public:
-        Mailbox(const Node &node, const std::vector<Node> &nodes, AbstractIdMapper *id_mapper);
+        Mailbox(const Node &node, const std::vector<Node> &nodes, AbstractIdMapper *id_mapper, Engine *engine = nullptr);
 
         void RegisterQueue(uint32_t queue_id, ThreadsafeQueue<Message> *const queue);
 
@@ -33,6 +35,9 @@ namespace csci5570 {
         size_t GetQueueMapSize() const;
 
         void Barrier();
+
+        void ForceQuit(uint32_t node_id);
+        void SafeQuit();
 
         // For testing only
         void ConnectAndBind();
@@ -54,6 +59,8 @@ namespace csci5570 {
         // Not owned
         AbstractIdMapper *id_mapper_;
 
+        Engine *engine_;
+
         std::thread receiver_thread_;
 
         // node
@@ -70,6 +77,9 @@ namespace csci5570 {
         std::mutex barrier_mu_;
         std::condition_variable barrier_cond_;
         int barrier_count_ = 0;
+
+        int quit_count_ = 0;
+
     };
 
 }  // namespace csci5570

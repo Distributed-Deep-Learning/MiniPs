@@ -24,6 +24,11 @@ namespace csci5570 {
         StartWorkerThreads();
     }
 
+    void Engine::UpdateNodes(std::vector<Node> &nodes) {
+        nodes_ = nodes;
+        id_mapper_->Update(nodes, 1);
+    }
+
     void Engine::StopEverything() {
         LOG(INFO) << "Engine StopEverything...";
 
@@ -39,7 +44,7 @@ namespace csci5570 {
     }
 
     void Engine::CreateMailbox() {
-        mailbox_.reset(new Mailbox(node_, nodes_, id_mapper_.get()));
+        mailbox_.reset(new Mailbox(node_, nodes_, id_mapper_.get(), this));
     }
 
     void Engine::StartServerThreads() {
@@ -87,7 +92,7 @@ namespace csci5570 {
     }
 
     void Engine::StopServerThreads() {
-        for (auto& server_thread : server_thread_group_) {
+        for (auto &server_thread : server_thread_group_) {
             server_thread->Stop();
         }
         VLOG(1) << "server_threads stop on node" << node_.id;
@@ -115,12 +120,16 @@ namespace csci5570 {
         mailbox_->Barrier();
     }
 
+    void Engine::ForceQuit(uint32_t node_id) {
+        mailbox_->ForceQuit(node_id);
+    }
+
     WorkerSpec Engine::AllocateWorkers(const std::vector<WorkerAlloc> &worker_alloc) {
         CHECK(id_mapper_);
         WorkerSpec worker_spec(worker_alloc);
 
         // Need to make sure that all the engines allocate the same set of workers
-        for (auto& kv : worker_spec.GetNodeToWorkers()) {
+        for (auto &kv : worker_spec.GetNodeToWorkers()) {
             for (int i = 0; i < kv.second.size(); ++i) {
                 uint32_t tid = id_mapper_->AllocateWorkerThread(kv.first);
                 worker_spec.InsertWorkerIdThreadId(kv.second[i], tid);
@@ -167,12 +176,12 @@ namespace csci5570 {
         id_mapper_->DeallocateWorkerThread(node_.id, id);
     }
 
-    void Engine::Run(const MLTask &task) {
+    void Engine::Run(const MLTask &task, bool quit) {
         CHECK(task.IsSetup());
         WorkerSpec worker_spec = AllocateWorkers(task.GetWorkerAlloc());
 
         // Init tables
-        const std::vector<uint32_t>& tables = task.GetTables();
+        const std::vector<uint32_t> &tables = task.GetTables();
         for (auto table : tables) {
             InitTable(table, worker_spec.GetAllThreadIds());
         }
@@ -180,15 +189,15 @@ namespace csci5570 {
 
         // Spawn user threads
         if (worker_spec.HasLocalWorkers(node_.id)) {
-            const auto& local_threads = worker_spec.GetLocalThreads(node_.id);
-            const auto& local_workers = worker_spec.GetLocalWorkers(node_.id);
+            const auto &local_threads = worker_spec.GetLocalThreads(node_.id);
+            const auto &local_workers = worker_spec.GetLocalWorkers(node_.id);
 
             CHECK_EQ(local_threads.size(), local_workers.size());
             std::vector<std::thread> thread_group(local_threads.size());
             LOG(INFO) << thread_group.size() << " workers run on proc: " << node_.id;
 
-            std::map<uint32_t, AbstractPartitionManager*> partition_manager_map;
-            for (auto& table : tables) {
+            std::map<uint32_t, AbstractPartitionManager *> partition_manager_map;
+            for (auto &table : tables) {
                 auto it = partition_manager_map_.find(table);
                 CHECK(it != partition_manager_map_.end());
                 partition_manager_map[table] = it->second.get();
@@ -207,7 +216,7 @@ namespace csci5570 {
 
                 thread_group[i] = std::thread([&task, info]() { task.RunLambda(info); });
             }
-            for (auto& th : thread_group) {
+            for (auto &th : thread_group) {
                 th.join();
             }
         }

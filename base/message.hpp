@@ -13,9 +13,10 @@ namespace csci5570 {
     };
 
     enum class Flag : char {
-        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet
+        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet, kForceQuit
     };
-    static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet"};
+    static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet", "kForceQuit",
+    };
 
     struct Meta {
         int sender;

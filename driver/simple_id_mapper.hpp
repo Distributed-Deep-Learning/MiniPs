@@ -37,6 +37,8 @@ namespace csci5570 {
          */
         void Init(int num_server_threads_per_node);
 
+        void Update(std::vector<Node> &nodes, int num_server_threads_per_node);
+
         /**
          * Allocates an id to a worker(user) thread on the specified node
          * Returns the allocated thread id on success, and -1 on failure

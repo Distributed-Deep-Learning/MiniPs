@@ -32,6 +32,8 @@ namespace csci5570 {
 
             virtual void ResetWorker(Message &msg) override {}
 
+            virtual void DeleteWorker(uint32_t node_id) override {}
+
             int clock_count_ = 0;
             int add_count_ = 0;
             int get_count_ = 0;

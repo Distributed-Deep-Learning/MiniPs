@@ -25,7 +25,6 @@ namespace csci5570 {
             Message msg;
             work_queue_.WaitAndPop(&msg);
 
-            LOG(INFO) << "WorkerThread::Main(): id:" << GetId() << ", msg:" << msg.DebugString();
             if (msg.meta.flag == Flag::kExit)
                 break;
 

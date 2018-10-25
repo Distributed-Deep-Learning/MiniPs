@@ -1,6 +1,7 @@
 #include "server/util/progress_tracker.hpp"
 
 #include "glog/logging.h"
+#include "driver/simple_id_mapper.hpp"
 
 namespace csci5570 {
 
@@ -10,6 +11,22 @@ namespace csci5570 {
             progresses_.insert({tid, 0});
         }
         min_clock_ = 0;
+    }
+
+    void ProgressTracker::DeleteNode(uint32_t node_id) {
+        auto it = progresses_.begin();
+        while (it != progresses_.end()) {
+            if (it->first < (1 + node_id) * SimpleIdMapper::kMaxThreadsPerNode &&
+                it->first >= node_id * SimpleIdMapper::kMaxThreadsPerNode) {
+                if (IsUniqueMin(it->first)) {
+                    min_clock_ += 1;
+                }
+
+                it = progresses_.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
     int ProgressTracker::AdvanceAndGetChangedMinClock(int tid) {
