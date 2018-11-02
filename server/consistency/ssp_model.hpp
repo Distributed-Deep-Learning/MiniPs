@@ -29,6 +29,8 @@ namespace csci5570 {
 
         virtual void ResetWorker(Message &msg) override;
 
+        virtual void Dump() override;
+
         /**
          * Return the number of requests waiting at the specific progress
          *

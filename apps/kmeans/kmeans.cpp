@@ -34,8 +34,8 @@ DEFINE_int32(num_nodes, 1, "num_nodes");
 DEFINE_int32(batch_size, 100, "batch size of each epoch");
 DEFINE_uint64(K, 2, "K");
 DEFINE_double(alpha, 0.1, "learning rate coefficient");
-DEFINE_string(kmeans_init_mode, "", "random/kmeans++/kmeans_parallel");
-DEFINE_int32(report_interval, 100, "report interval");
+DEFINE_string(kmeans_init_mode, "random", "random/kmeans++/kmeans_parallel");
+DEFINE_int32(report_interval, 10, "report interval");
 DEFINE_int32(report_worker, 0, "report worker");
 
 namespace csci5570 {

@@ -39,6 +39,8 @@ namespace csci5570 {
         virtual third_party::SArray<char> SubGet(const third_party::SArray <Key> &typed_keys) = 0;
 
         virtual void FinishIter() = 0;
+
+        virtual void Dump() = 0;
     };
 
 }  // namespace csci5570

@@ -41,6 +41,8 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
+        virtual void Dump() override {}
+
     private:
         std::vector<Val> storage_;
         third_party::Range range_;

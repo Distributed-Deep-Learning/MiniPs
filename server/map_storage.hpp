@@ -29,6 +29,8 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
+        virtual void Dump() override {}
+
     private:
         std::map<Key, Val> storage_;
     };

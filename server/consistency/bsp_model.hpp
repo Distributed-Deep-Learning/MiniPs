@@ -29,6 +29,8 @@ namespace csci5570 {
 
         virtual void ResetWorker(Message &msg) override;
 
+        virtual void Dump() override;
+
         int GetGetPendingSize();
 
         int GetAddPendingSize();

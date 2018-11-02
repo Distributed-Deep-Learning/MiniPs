@@ -81,4 +81,6 @@ namespace csci5570 {
         reply_queue_->Push(reply_msg);
     }
 
+    void BSPModel::Dump() {}
+
 }  // namespace csci5570
