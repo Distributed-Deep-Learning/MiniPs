@@ -16,7 +16,7 @@ params = {
     "num_dims": 18,
     "num_workers_per_node": 3,  # 3
     "num_servers_per_node": 1,
-    "num_iters": 1000,  # 1000
+    "num_iters": 300,  # 300
     "kStorageType": "Vector",  # {Vector/Map}
     "hdfs_namenode_port": 9000,
     "K": 2,

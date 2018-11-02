@@ -234,9 +234,9 @@ namespace csci5570 {
         }
 
         LOG(INFO) << "Worker " + std::to_string(cluster_id) + ", iter " + std::to_string(iter)
-                  << ": Within Set Sum of Squared Errors = " << std::to_string(sum);
-        for (int i = 0; i < K; i++)  // for tuning learning rate
-            LOG(INFO) << "Worker " + std::to_string(cluster_id) + ", count" + std::to_string(i) + ": " +
-                         std::to_string(count[i]);
+                  << ": Within Set SSError = " << std::to_string(sum);
+//        for (int i = 0; i < K; i++)  // for tuning learning rate
+//            LOG(INFO) << "Worker " + std::to_string(cluster_id) + ", count" + std::to_string(i) + ": " +
+//                         std::to_string(count[i]);
     }
 }
