@@ -257,7 +257,7 @@ namespace csci5570 {
                 table2->Clock();
                 CHECK_EQ(keys2.size(), cluster_members.size());
 
-                if (iter % 100 == 0) {
+                if (iter % 100 == 0 && info.worker_id == FLAGS_report_worker) {
                     auto now = std::chrono::steady_clock::now();
                     LOG(INFO) << "Start checkpoint...";
                     table->CheckPoint();

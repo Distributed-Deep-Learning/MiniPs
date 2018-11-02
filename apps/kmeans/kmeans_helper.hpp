@@ -233,7 +233,7 @@ namespace csci5570 {
             count[id_dist.first]++;
         }
 
-        LOG(INFO) << "Worker " + std::to_string(cluster_id) + ", iter " + std::to_string(iter)
+        LOG(INFO) << "Reporter NodeID " + std::to_string(cluster_id) + ", iter " + std::to_string(iter)
                   << ": Within Set SSError = " << std::to_string(sum);
 //        for (int i = 0; i < K; i++)  // for tuning learning rate
 //            LOG(INFO) << "Worker " + std::to_string(cluster_id) + ", count" + std::to_string(i) + ": " +
