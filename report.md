@@ -2,6 +2,14 @@
 
 ## Additional feature
 
+### Fault tolerance
+
+* Store the model parameters and configuration into the file
+
+* Detect error with heartbeat mechanism, restart the engine
+
+* Read and recover the model parameters  after restart
+
 ### HDFS Read
 
 * `Question`: When the given training data file size is too small, and the total file blocks is not enough to allocated to every working node, then some of the nodes will crash because the data is null, and finally the cluster will not continue as the barrier will block other nodes.
@@ -91,18 +99,11 @@ if (data.empty()) {
 engine.Barrier();
 ```
 
-### Fault tolerance
-
-### Multi-tasking and scheduling
-
-### Optimization on communication pattern
-
-### Scalability
-
-
 ## Application
 
 ### Logistisc Regression
 
 ### LDA
+
+### Matrix Factorization
 

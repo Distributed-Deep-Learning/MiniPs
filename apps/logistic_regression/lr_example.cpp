@@ -94,7 +94,7 @@ namespace csci5570 {
             return parser.parse_libsvm(line);
         };
         loader.load(config, my_node, nodes, parse, data);
-        LOG(INFO) << "Finished loading data!";
+        LOG(INFO) << "Finished loading data...";
 
         // 2. Start engine
         Engine engine(my_node, nodes);
