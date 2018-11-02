@@ -41,7 +41,9 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
-        virtual void Dump() override {}
+        virtual void Dump() override {
+            LOG(INFO) << "Start dump storage for checkpoint...";
+        }
 
     private:
         std::vector<Val> storage_;

@@ -257,13 +257,23 @@ namespace csci5570 {
                 table2->Clock();
                 CHECK_EQ(keys2.size(), cluster_members.size());
 
+                if (iter % 20) {
+                    auto now = std::chrono::steady_clock::now();
+                    LOG(INFO) << "Start checkpoint...";
+                    table->CheckPoint();
+                    table2->CheckPoint();
+                    auto cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start_time).count();
+                    LOG(INFO) << "Finish checkpoint, cost:" << cost << " ms";
+                }
+
                 if (iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker)
                     test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
             }
 
             auto end_time = std::chrono::steady_clock::now();
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-            LOG(INFO) << " Total cost time: " << total_time << " ms on worker: " << info.worker_id;
+            LOG(INFO) << "Total cost time: " << total_time << " ms on worker: " << info.worker_id;
         });
 
         // 5. Run tasks

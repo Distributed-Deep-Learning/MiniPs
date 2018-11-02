@@ -13,7 +13,7 @@ namespace csci5570 {
     };
 
     enum class Flag : char {
-        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet, kForceQuit
+        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet, kForceQuit, kCheckpoint
     };
     static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet", "kForceQuit",
     };

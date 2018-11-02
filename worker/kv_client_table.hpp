@@ -61,6 +61,10 @@ namespace csci5570 {
             Get_(keys, vals);
         };
 
+        void CheckPoint() {
+            CheckPoint_();
+        }
+
     private:
         template<typename V>
         void HandleFinish_(const third_party::SArray <Key> &keys, V *vals) {
@@ -120,6 +124,19 @@ namespace csci5570 {
                 msg.meta.recver = server_id;
                 msg.meta.model_id = model_id_;
                 msg.meta.flag = Flag::kClock;
+                sender_queue_->Push(std::move(msg));
+            }
+        }
+
+        void CheckPoint_() {
+            CHECK_NOTNULL(partition_manager_);
+            const auto& server_thread_ids = partition_manager_->GetServerThreadIds();
+            for (uint32_t server_id : server_thread_ids) {
+                Message msg;
+                msg.meta.sender = app_thread_id_;
+                msg.meta.recver = server_id;
+                msg.meta.model_id = model_id_;
+                msg.meta.flag = Flag::kCheckpoint;
                 sender_queue_->Push(std::move(msg));
             }
         }

@@ -60,6 +60,8 @@ namespace csci5570 {
         reply_queue_->Push(reply_msg);
     }
 
-    void SSPModel::Dump() {}
+    void SSPModel::Dump() {
+        storage_->Dump();
+    }
 
 }  // namespace csci5570
