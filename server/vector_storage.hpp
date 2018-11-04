@@ -41,8 +41,8 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
-        virtual void Dump() override {
-            LOG(INFO) << "Start dump storage for checkpoint...";
+        virtual void Dump(int server_id) override {
+            LOG(INFO) << "Start dump storage for checkpoint on node: " << (server_id % 1000);
         }
 
     private:

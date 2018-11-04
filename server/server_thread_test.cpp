@@ -32,7 +32,7 @@ namespace csci5570 {
 
             virtual void ResetWorker(Message &msg) override {}
 
-            virtual void Dump() override {}
+            virtual void Dump(Message &msg) override {}
 
             int clock_count_ = 0;
             int add_count_ = 0;

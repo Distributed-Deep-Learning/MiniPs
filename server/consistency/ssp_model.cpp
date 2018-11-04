@@ -60,8 +60,16 @@ namespace csci5570 {
         reply_queue_->Push(reply_msg);
     }
 
-    void SSPModel::Dump() {
-        storage_->Dump();
+    void SSPModel::Dump(Message &msg) {
+        storage_->Dump(msg.meta.recver);
+
+        Message reply;
+        reply.meta.recver = msg.meta.sender;
+        reply.meta.sender = msg.meta.recver;
+        reply.meta.flag = msg.meta.flag;
+        reply.meta.model_id = msg.meta.model_id;
+
+        reply_queue_->Push(reply);
     }
 
 }  // namespace csci5570

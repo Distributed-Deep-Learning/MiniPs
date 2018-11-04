@@ -29,7 +29,7 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
-        virtual void Dump() override {}
+        virtual void Dump(int server_id) override {}
 
     private:
         std::map<Key, Val> storage_;

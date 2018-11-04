@@ -17,7 +17,7 @@
 DEFINE_int32(my_id, 0, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
-DEFINE_string(input, "hdfs:///datasets/classification/a1a", "The hdfs input url");
+DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
@@ -38,7 +38,7 @@ namespace csci5570 {
 
     template<typename T>
     void test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
-        LOG(INFO) << "start test error ...";
+        LOG(INFO) << "Finish training, start test error...";
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
@@ -94,7 +94,7 @@ namespace csci5570 {
             return parser.parse_libsvm(line);
         };
         loader.load(config, my_node, nodes, parse, data);
-        LOG(INFO) << "Finished loading data...";
+        LOG(INFO) << "Finished loading data on node " << my_node.id;
 
         // 2. Start engine
         Engine engine(my_node, nodes);
@@ -209,8 +209,17 @@ namespace csci5570 {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                if (i % 5 == 0) {
-                    LOG(INFO) << "Iter: " << i << " finished on worker " << info.worker_id;
+                if (i % 200 == 0 && info.worker_id == 0) {
+                    auto now = std::chrono::steady_clock::now();
+                    LOG(INFO) << "Start checkpoint, sent by worker: 0";
+                    table->CheckPoint();
+                    auto cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start_time).count();
+                    LOG(INFO) << "Finish checkpoint, cost:" << cost << " ms";
+                }
+
+                if (i % 50 == 0 && info.worker_id == 0) {
+                    LOG(INFO) << "Iter: " << i << " finished";
                 }
 
                 if (FLAGS_with_injected_straggler) {
@@ -218,7 +227,7 @@ namespace csci5570 {
                     if (r < 0.05) {
                         double delay = (double) rand() / RAND_MAX * 100;
                         std::this_thread::sleep_for(std::chrono::milliseconds(int(delay)));
-                        LOG(INFO) << "sleep for " << int(delay) << " ms";
+                        // LOG(INFO) << "sleep for " << int(delay) << " ms";
                     }
                 }
             }

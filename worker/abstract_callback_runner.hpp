@@ -34,6 +34,13 @@ namespace csci5570 {
          * Used by the worker threads on receival of messages and to invoke callbacks
          */
         virtual void AddResponse(uint32_t app_thread_id, uint32_t model_id, Message &msg) = 0;
+
+        virtual void NewCheckPoint(uint32_t expected_responses) = 0;
+
+        virtual void WaitCheckPoint() = 0;
+
+        virtual void CheckPointResponse() = 0;
+
     };  // class AbstractCallbackRunner
 
 }  // namespace csci5570

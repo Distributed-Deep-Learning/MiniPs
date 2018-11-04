@@ -131,6 +131,10 @@ namespace csci5570 {
         void CheckPoint_() {
             CHECK_NOTNULL(partition_manager_);
             const auto& server_thread_ids = partition_manager_->GetServerThreadIds();
+
+            // create new request
+            callback_runner_->NewCheckPoint(server_thread_ids.size());
+
             for (uint32_t server_id : server_thread_ids) {
                 Message msg;
                 msg.meta.sender = app_thread_id_;
@@ -139,6 +143,9 @@ namespace csci5570 {
                 msg.meta.flag = Flag::kCheckpoint;
                 sender_queue_->Push(std::move(msg));
             }
+
+            // wait for the checkpoint finish
+            callback_runner_->WaitCheckPoint();
         }
 
         void Add_(const third_party::SArray <Key> &keys, const third_party::SArray <Val> &vals) {

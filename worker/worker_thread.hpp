@@ -28,6 +28,12 @@ namespace csci5570 {
 
         virtual void AddResponse(uint32_t app_thread_id, uint32_t model_id, Message& msg) override;
 
+        virtual void NewCheckPoint(uint32_t expected_responses) override;
+
+        virtual void WaitCheckPoint() override;
+
+        virtual void CheckPointResponse() override;
+
     protected:
         void Main() override;
         // callback on receival of a message
@@ -48,6 +54,9 @@ namespace csci5570 {
 
         // app_thread_id, model_id, <expected, current>
         std::map<uint32_t, std::map<uint32_t, std::pair<uint32_t, uint32_t>>> tracker_;
+
+        uint32_t checkpoint_expect_;
+        uint32_t checkpoint_current_;
 
         // app_thread_id, model_id, callback
         std::map<uint32_t, std::map<uint32_t, std::function<void(Message& message)>>> recv_handle_;

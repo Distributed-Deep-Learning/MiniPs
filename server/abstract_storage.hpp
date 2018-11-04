@@ -40,7 +40,7 @@ namespace csci5570 {
 
         virtual void FinishIter() = 0;
 
-        virtual void Dump() = 0;
+        virtual void Dump(int server_id) = 0;
     };
 
 }  // namespace csci5570

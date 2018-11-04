@@ -18,7 +18,7 @@ namespace csci5570 {
 
         virtual void ResetWorker(Message &msg) = 0;
 
-        virtual void Dump() = 0;
+        virtual void Dump(Message &msg) = 0;
 
         virtual ~AbstractModel() {}
     };

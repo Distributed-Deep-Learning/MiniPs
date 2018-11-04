@@ -28,6 +28,11 @@ namespace csci5570 {
             if (msg.meta.flag == Flag::kExit)
                 break;
 
+            if (msg.meta.flag == Flag::kCheckpoint) {
+                CheckPointResponse();
+                continue;
+            }
+
             AddResponse(msg.meta.recver, msg.meta.model_id, msg);
         }
     }
@@ -78,6 +83,28 @@ namespace csci5570 {
             if (recv_finish) {
                 cond_.notify_all();
             }
+        }
+    }
+
+    void WorkerThread::NewCheckPoint(uint32_t expected_responses) {
+        std::lock_guard<std::mutex> lk(mu_);
+        checkpoint_expect_ = expected_responses;
+        checkpoint_current_ = 0;
+    }
+
+    void WorkerThread::WaitCheckPoint() {
+        std::unique_lock<std::mutex> lk(mu_);
+
+        cond_.wait(lk, [this] {
+            return checkpoint_expect_ == checkpoint_current_;
+        });
+    }
+
+    void WorkerThread::CheckPointResponse() {
+        std::lock_guard<std::mutex> lk(mu_);
+        checkpoint_current_ += 1;
+        if (checkpoint_expect_ == checkpoint_current_) {
+            cond_.notify_all();
         }
     }
 

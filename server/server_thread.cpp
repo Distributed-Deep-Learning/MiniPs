@@ -42,7 +42,7 @@ namespace csci5570 {
                     break;
                 }
                 case Flag::kCheckpoint: {
-                    models_[model_id]->Dump();
+                    models_[model_id]->Dump(msg);
                     break;
                 }
                 default:

@@ -10,7 +10,7 @@ progfile = ("cmake-build-debug" if local_debug else "debug") + "/KMeans"
 
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
-    "input": "hdfs:///datasets/classification/a1a" if local_debug else "hdfs:///jasper/SUSY",
+    "input": "hdfs:///a9a" if local_debug else "hdfs:///jasper/SUSY",
     "kStaleness": 1,
     "kModelType": "SSP",  # {ASP/SSP/BSP}
     "num_dims": 18,

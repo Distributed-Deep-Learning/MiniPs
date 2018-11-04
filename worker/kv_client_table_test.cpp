@@ -102,6 +102,18 @@ namespace csci5570 {
             }
         }
 
+        void NewCheckPoint(uint32_t expected_responses) override {
+
+        }
+
+        void WaitCheckPoint() override {
+
+        }
+
+        void CheckPointResponse() override {
+
+        }
+
     private:
         std::function<void(Message &)> recv_handle_;
         std::function<void()> recv_finish_handle_;
