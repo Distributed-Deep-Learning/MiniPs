@@ -6,9 +6,15 @@
 
 * Store the model parameters and configuration into the file
 
+The checkpoint command should sent by the main node, it will not continue training until all the nodes dump the weights into persistent storage like HDFS or local directory start with `checkpoint_file_prefix`.
+
 * Detect error with heartbeat mechanism, restart the engine
 
+Since `Clock()` will wait for other nodes' response, if wait for too long, the node will notify other nodes in the cluster to quit training directly
+
 * Read and recover the model parameters  after restart
+
+The `use_weight_file` toggle and `weight_file_prefix` are used for training progress reload, the node will read and recover the training iteration according to the weight file.
 
 ### HDFS Read
 

@@ -34,6 +34,10 @@ DEFINE_int32(with_injected_straggler, 1, "with injected straggler or not, 0/1");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
 
+DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
+DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
+DEFINE_string(checkpoint_file_prefix, "dump_", "the checkpoint file prefix");
+
 namespace csci5570 {
 
     template<typename T>
@@ -140,7 +144,8 @@ namespace csci5570 {
             CHECK(false) << "storage type error: " << FLAGS_kStorageType;
         }
         // Create table
-        uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, FLAGS_kStaleness);
+        uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type,
+                FLAGS_checkpoint_file_prefix, FLAGS_kStaleness);
         engine.Barrier();
 
         // 3. Construct tasks

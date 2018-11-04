@@ -15,11 +15,12 @@ namespace csci5570 {
     public:
         VectorStorage() = delete;
 
-        VectorStorage(third_party::Range range) : range_(range), storage_(range.size(), Val()) {
+        VectorStorage(third_party::Range range, uint32_t server_id = -1, std::string checkpoint_path = "")
+                : range_(range), storage_(range.size(), Val()), AbstractStorage(server_id, checkpoint_path) {
             CHECK_LE(range_.begin(), range_.end());
         }
 
-        virtual void SubAdd(const third_party::SArray<Key> &typed_keys,
+        virtual void SubAdd(const third_party::SArray <Key> &typed_keys,
                             const third_party::SArray<char> &vals) override {
             auto typed_vals = third_party::SArray<Val>(vals);
             for (size_t index = 0; index < typed_keys.size(); index++) {
@@ -29,7 +30,7 @@ namespace csci5570 {
             }
         }
 
-        virtual third_party::SArray<char> SubGet(const third_party::SArray<Key> &typed_keys) override {
+        virtual third_party::SArray<char> SubGet(const third_party::SArray <Key> &typed_keys) override {
             third_party::SArray<Val> reply_vals(typed_keys.size());
             for (size_t i = 0; i < typed_keys.size(); i++) {
                 CHECK_GE(typed_keys[i], range_.begin());
@@ -42,7 +43,8 @@ namespace csci5570 {
         virtual void FinishIter() override {}
 
         virtual void Dump(int server_id) override {
-            LOG(INFO) << "Start dump storage for checkpoint on node: " << (server_id % 1000);
+            LOG(INFO) << "Start dump file for checkpoint on " << server_id << " into file:"
+                      << checkpoint_file_prefix_;
         }
 
     private:

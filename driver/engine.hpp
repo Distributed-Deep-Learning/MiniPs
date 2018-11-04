@@ -117,7 +117,8 @@ namespace csci5570 {
          */
         template<typename Val>
         uint32_t CreateTable(std::unique_ptr<AbstractPartitionManager> partition_manager, ModelType model_type,
-                             StorageType storage_type, const std::vector<third_party::Range> &ranges, int model_staleness = 0) {
+                             StorageType storage_type, const std::vector<third_party::Range> &ranges,
+                             std::string checkpoint_path = "", int model_staleness = 0) {
             // 1. Assign a table id (incremental and consecutive)
             // 2. Register the partition manager to the model
             RegisterPartitionManager(model_count_, std::move(partition_manager));
@@ -132,10 +133,11 @@ namespace csci5570 {
 
                 // a. Create a storage according to <storage_type>
                 if (storage_type == StorageType::Map) {
-                    storage.reset(new MapStorage<Val>());
+                    storage.reset(new MapStorage<Val>(server_thread->GetId(), checkpoint_path));
                 } else if (storage_type == StorageType::Vector) {
                     auto it = std::find(server_thread_ids.begin(), server_thread_ids.end(), server_thread->GetId());
-                    storage.reset(new VectorStorage<Val>(ranges[it - server_thread_ids.begin()]));
+                    storage.reset(new VectorStorage<Val>(
+                            ranges[it - server_thread_ids.begin()], server_thread->GetId(), checkpoint_path));
                 } else {
                     CHECK(false) << "Unknown storage_type";
                 }
@@ -169,14 +171,15 @@ namespace csci5570 {
          * @return                    the created table(model) id
          */
         template<typename Val>
-        uint32_t CreateTable(const std::vector<third_party::Range> &ranges, ModelType model_type, StorageType storage_type, int model_staleness = 0) {
+        uint32_t CreateTable(const std::vector<third_party::Range> &ranges, ModelType model_type,
+                             StorageType storage_type, std::string checkpoint_path = "", int model_staleness = 0) {
             // 1. Create a default partition manager
             CHECK(id_mapper_);
             const auto server_thread_ids = id_mapper_->GetAllServerThreads();
             std::unique_ptr<AbstractPartitionManager> partition_manager(new RangePartitionManager(server_thread_ids, ranges));
 
             // 2. Create a table with the partition manager
-            return CreateTable<Val>(std::move(partition_manager), model_type, storage_type, ranges, model_staleness);
+            return CreateTable<Val>(std::move(partition_manager), model_type, storage_type, ranges, checkpoint_path, model_staleness);
         }
 
         /**

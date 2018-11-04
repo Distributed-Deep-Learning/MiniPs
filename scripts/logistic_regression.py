@@ -31,6 +31,9 @@ params = {
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
     "kStorageType": "Vector",  # {Vector/Map}
+    "use_weight_file": False,
+    "weight_file_prefix": "",
+    "checkpoint_file_prefix": "dump_",
 }
 
 env_params = (

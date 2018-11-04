@@ -41,7 +41,7 @@ namespace csci5570 {
             range.push_back({kMaxKey / nodes.size() * i, kMaxKey / nodes.size() * (i + 1)});
         }
         range.push_back({kMaxKey / nodes.size() * (nodes.size() - 1), kMaxKey});
-        const uint32_t kTableId = engine.CreateTable<double>(range, ModelType::SSP, StorageType::Map, kStaleness);
+        const uint32_t kTableId = engine.CreateTable<double>(range, ModelType::SSP, StorageType::Map, "", kStaleness);
         engine.Barrier();
 
         // 3. Construct tasks
