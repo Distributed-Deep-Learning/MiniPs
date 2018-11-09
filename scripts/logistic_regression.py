@@ -39,7 +39,7 @@ params = {
     "kStorageType": "Vector",  # {Vector/Map}
     "use_weight_file": False,
     "weight_file_prefix": "",
-    "checkpoint_file_prefix": join(proj_dir, "local/dump_") if local_debug else "hdfs:://proj10:9000/ybai/dump_",
+    "checkpoint_file_prefix": join(proj_dir, "local/dump_") if local_debug else "hdfs://proj10:9000/ybai/dump_",
 }
 
 env_params = (

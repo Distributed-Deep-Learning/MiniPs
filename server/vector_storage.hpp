@@ -51,7 +51,7 @@ namespace csci5570 {
 
             petuum::io::ofstream w_stream(dump_file, std::ofstream::out | std::ofstream::trunc);
             CHECK(w_stream);
-            for (int i = range_.begin(); i < range_.end(); i++) {
+            for (uint64_t i = range_.begin(); i < range_.end(); i++) {
                 if (storage_[i] != 0) {
                     w_stream << i << ":" << storage_[i] << " ";
                 }
