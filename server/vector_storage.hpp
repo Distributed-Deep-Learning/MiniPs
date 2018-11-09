@@ -18,6 +18,7 @@ namespace csci5570 {
         VectorStorage() = delete;
 
         VectorStorage(third_party::Range range) : range_(range), storage_(range.size(), Val()) {
+            LOG(INFO) << "Storage allocated from " << range_.begin() << " to " << range_.end() << ", size=" << range_.size();
             CHECK_LE(range_.begin(), range_.end());
         }
 
@@ -51,7 +52,7 @@ namespace csci5570 {
 
             petuum::io::ofstream w_stream(dump_file, std::ofstream::out | std::ofstream::trunc);
             CHECK(w_stream);
-            for (uint64_t i = range_.begin(); i < range_.end(); i++) {
+            for (int i = 0; i < storage_.size(); i++) {
                 if (storage_[i] != 0) {
                     w_stream << i << ":" << storage_[i] << " ";
                 }
