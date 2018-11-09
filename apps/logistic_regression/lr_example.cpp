@@ -36,7 +36,8 @@ DEFINE_double(alpha, 0.1, "learning rate");
 
 DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
-DEFINE_string(checkpoint_file_prefix, "dump_", "the checkpoint file prefix");
+//DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/datasets/dump_", "the checkpoint file prefix");
+DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_", "the checkpoint file prefix");
 
 namespace csci5570 {
 
@@ -213,7 +214,7 @@ namespace csci5570 {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                if (i % 200 == 0 && info.worker_id == 0) {
+                if (i % 600 == 0 && info.worker_id == 0) {
                     auto now = std::chrono::steady_clock::now();
                     LOG(INFO) << "Start checkpoint, sent by worker: 0";
                     table->CheckPoint();

@@ -8,7 +8,8 @@
 #include "server/abstract_storage.hpp"
 #include "glog/logging.h"
 #include <vector>
-#include <base/context.hpp>
+#include "base/context.hpp"
+#include "base/third_party/general_fstream.hpp"
 
 namespace csci5570 {
     template<typename Val>
@@ -43,8 +44,20 @@ namespace csci5570 {
         virtual void FinishIter() override {}
 
         virtual void Dump() override {
-            LOG(INFO) << "Start dump file for checkpoint on " << Context::get_instance().get_int32("my_id") << " into file:"
-                      << Context::get_instance().get_string("checkpoint_file_prefix");
+            auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
+            auto node_id = Context::get_instance().get_int32("my_id");
+            auto dump_file = dump_prefix + std::to_string(node_id);
+            LOG(INFO) << "Dump Params Storage To " << dump_file;
+
+            petuum::io::ofstream w_stream(dump_file, std::ofstream::out | std::ofstream::trunc);
+            CHECK(w_stream);
+            for (int i = range_.begin(); i < range_.end(); i++) {
+                if (storage_[i] != 0) {
+                    w_stream << i << ":" << storage_[i] << " ";
+                }
+            }
+            w_stream << std::endl;
+            w_stream.close();
         }
 
     private:

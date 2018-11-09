@@ -40,6 +40,7 @@ namespace csci5570 {
 
         virtual void FinishIter() = 0;
 
+        // hdfs://[host:port]/path
         virtual void Dump() = 0;
 
     };

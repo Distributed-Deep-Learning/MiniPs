@@ -133,8 +133,8 @@ namespace csci5570 {
         }
         range2.push_back({FLAGS_K / num_total_servers * (num_total_servers - 1), FLAGS_K});
 
-        uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, "", FLAGS_kStaleness);
-        uint32_t kTableId2 = engine.CreateTable<double>(range2, model_type, storage_type, "", FLAGS_kStaleness);
+        uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, FLAGS_kStaleness);
+        uint32_t kTableId2 = engine.CreateTable<double>(range2, model_type, storage_type, FLAGS_kStaleness);
         engine.Barrier();
 
         // 4. Construct tasks
