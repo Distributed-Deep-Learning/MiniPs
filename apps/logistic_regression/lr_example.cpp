@@ -17,7 +17,7 @@
 DEFINE_int32(my_id, 0, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
-DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
+DEFINE_string(input, "hdfs:///a1a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
@@ -144,8 +144,7 @@ namespace csci5570 {
             CHECK(false) << "storage type error: " << FLAGS_kStorageType;
         }
         // Create table
-        uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type,
-                FLAGS_checkpoint_file_prefix, FLAGS_kStaleness);
+        uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, FLAGS_kStaleness);
         engine.Barrier();
 
         // 3. Construct tasks

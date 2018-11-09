@@ -10,12 +10,6 @@ namespace csci5570 {
  */
     class AbstractStorage {
     public:
-        AbstractStorage() = delete;
-
-        AbstractStorage(uint32_t server_id, std::string checkpoint_path)
-                : server_id_(server_id), checkpoint_file_prefix_(checkpoint_path) {
-        }
-
         void Add(Message &msg) {
             CHECK(msg.data.size() == 2);
             auto typed_keys = third_party::SArray<Key>(msg.data[0]);
@@ -46,11 +40,8 @@ namespace csci5570 {
 
         virtual void FinishIter() = 0;
 
-        virtual void Dump(int server_id) = 0;
+        virtual void Dump() = 0;
 
-    protected:
-        uint32_t server_id_;
-        std::string checkpoint_file_prefix_;
     };
 
 }  // namespace csci5570

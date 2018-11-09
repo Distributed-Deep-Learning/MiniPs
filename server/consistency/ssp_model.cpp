@@ -61,7 +61,7 @@ namespace csci5570 {
     }
 
     void SSPModel::Dump(Message &msg) {
-        storage_->Dump(msg.meta.recver);
+        storage_->Dump();
 
         Message reply;
         reply.meta.recver = msg.meta.sender;

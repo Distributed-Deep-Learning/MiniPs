@@ -10,10 +10,6 @@ namespace csci5570 {
     template<typename Val>
     class MapStorage : public AbstractStorage {
     public:
-        MapStorage(uint32_t server_id = -1, std::string checkpoint_path = "")
-                : AbstractStorage(server_id, checkpoint_path) {
-        }
-
         virtual void SubAdd(const third_party::SArray <Key> &typed_keys,
                             const third_party::SArray<char> &vals) override {
             auto typed_vals = third_party::SArray<Val>(vals);
@@ -31,7 +27,7 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
-        virtual void Dump(int server_id) override {}
+        virtual void Dump() override {}
 
     private:
         std::map<Key, Val> storage_;

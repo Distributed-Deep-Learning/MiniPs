@@ -8,6 +8,7 @@
 #include "server/abstract_storage.hpp"
 #include "glog/logging.h"
 #include <vector>
+#include <base/context.hpp>
 
 namespace csci5570 {
     template<typename Val>
@@ -15,8 +16,7 @@ namespace csci5570 {
     public:
         VectorStorage() = delete;
 
-        VectorStorage(third_party::Range range, uint32_t server_id = -1, std::string checkpoint_path = "")
-                : range_(range), storage_(range.size(), Val()), AbstractStorage(server_id, checkpoint_path) {
+        VectorStorage(third_party::Range range) : range_(range), storage_(range.size(), Val()) {
             CHECK_LE(range_.begin(), range_.end());
         }
 
@@ -42,9 +42,9 @@ namespace csci5570 {
 
         virtual void FinishIter() override {}
 
-        virtual void Dump(int server_id) override {
-            LOG(INFO) << "Start dump file for checkpoint on " << server_id << " into file:"
-                      << checkpoint_file_prefix_;
+        virtual void Dump() override {
+            LOG(INFO) << "Start dump file for checkpoint on " << Context::get_instance().get_int32("my_id") << " into file:"
+                      << Context::get_instance().get_string("checkpoint_file_prefix");
         }
 
     private:
