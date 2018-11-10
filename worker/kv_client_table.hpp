@@ -65,6 +65,10 @@ namespace csci5570 {
             CheckPoint_();
         }
 
+        void HeartBeat(uint32_t node_id, bool quit = false) {
+            HeartBeat_(node_id, quit);
+        }
+
     private:
         template<typename V>
         void HandleFinish_(const third_party::SArray <Key> &keys, V *vals) {
@@ -146,6 +150,18 @@ namespace csci5570 {
 
             // wait for the checkpoint finish
             callback_runner_->WaitCheckPoint();
+        }
+
+        void HeartBeat_(uint32_t node_id, bool quit) {
+            CHECK_NOTNULL(partition_manager_);
+            if (partition_manager_->HasMaster()) {
+                Message msg;
+                msg.meta.sender = node_id;
+                msg.meta.recver = partition_manager_->GetMasterNodeId();
+                msg.meta.model_id = model_id_;
+                msg.meta.flag = quit ? Flag::kQuitHeartBeat : Flag::kHeartBeat;
+                sender_queue_->Push(std::move(msg));
+            }
         }
 
         void Add_(const third_party::SArray <Key> &keys, const third_party::SArray <Val> &vals) {

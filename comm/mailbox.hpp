@@ -28,9 +28,9 @@ namespace csci5570 {
 
         int Recv(Message *msg);
 
-        void Start();
+        void Start(const Node &master_node = {});
 
-        void Stop();
+        void Stop(bool barrier = true);
 
         size_t GetQueueMapSize() const;
 
@@ -40,11 +40,11 @@ namespace csci5570 {
         void SafeQuit();
 
         // For testing only
-        void ConnectAndBind();
+        void ConnectAndBind(const Node &master_node = {});
 
         void StartReceiving();
 
-        void StopReceiving();
+        void StopReceiving(bool barrier = true);
 
         void CloseSockets();
 

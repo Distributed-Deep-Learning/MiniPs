@@ -82,7 +82,7 @@ namespace csci5570 {
 
     void Engine::StartMailbox() {
         CHECK(mailbox_);
-        mailbox_->Start();
+        mailbox_->Start(master_node_);
         VLOG(1) << "mailbox starts on node" << node_.id;
     }
 
@@ -110,9 +110,9 @@ namespace csci5570 {
         VLOG(1) << "sender stops on node" << node_.id;
     }
 
-    void Engine::StopMailbox() {
+    void Engine::StopMailbox(bool barrier) {
         CHECK(mailbox_);
-        mailbox_->Stop();
+        mailbox_->Stop(barrier);
         VLOG(1) << "mailbox stops on node" << node_.id;
     }
 
@@ -224,9 +224,12 @@ namespace csci5570 {
         mailbox_->Barrier();
     }
 
-    void
-    Engine::RegisterPartitionManager(uint32_t table_id, std::unique_ptr<AbstractPartitionManager> partition_manager) {
+    void Engine::RegisterPartitionManager(uint32_t table_id, std::unique_ptr<AbstractPartitionManager> partition_manager) {
         partition_manager_map_.insert(std::make_pair(table_id, std::move(partition_manager)));
+    }
+
+    void Engine::RegisterQueue(uint32_t queue_id, ThreadsafeQueue<Message> *const queue) {
+        mailbox_->RegisterQueue(queue_id, queue);
     }
 
 }  // namespace csci5570

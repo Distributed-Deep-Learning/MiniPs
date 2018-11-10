@@ -8,6 +8,7 @@ namespace csci5570 {
         uint32_t id;
         std::string hostname;
         int port;
+        bool is_master;
 
         std::string DebugString() const {
             std::stringstream ss;

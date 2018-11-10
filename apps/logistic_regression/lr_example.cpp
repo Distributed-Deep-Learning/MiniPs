@@ -13,11 +13,12 @@
 #include "server/vector_storage.hpp"
 #include "lib/batch_data_sampler.cpp"
 #include <cmath>
+#include <master/master.hpp>
 
 DEFINE_int32(my_id, 0, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
-DEFINE_string(input, "hdfs:///a1a", "The hdfs input url");
+DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
@@ -74,9 +75,17 @@ namespace csci5570 {
 
         // 0. Parse config_file
         std::vector<Node> nodes = ParseFile(FLAGS_config_file);
+        Node master_node = SelectMaster(nodes);
         CHECK(CheckValidNodeIds(nodes));
         CHECK(CheckUniquePort(nodes));
-        CHECK(CheckConsecutiveIds(nodes));
+
+        // launch master node for heartbeating
+        if (master_node.id == FLAGS_my_id && master_node.is_master) {
+            Master master(master_node, nodes);
+            master.StopMaster();
+            return;
+        }
+
         Node my_node = GetNodeById(nodes, FLAGS_my_id);
         LOG(INFO) << my_node.DebugString();
 
@@ -102,7 +111,7 @@ namespace csci5570 {
         LOG(INFO) << "Finished loading data on node " << my_node.id;
 
         // 2. Start engine
-        Engine engine(my_node, nodes);
+        Engine engine(my_node, nodes, master_node);
         engine.StartEverything();
 
         // Quit the engine if no traning data is read
@@ -214,6 +223,11 @@ namespace csci5570 {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
+                if (i % 200 == 0 && info.worker_id % FLAGS_num_workers_per_node == 0) {
+                    LOG(INFO) << "node:" << FLAGS_my_id << ", post heartbeat to master...";
+                    table->HeartBeat(FLAGS_my_id);
+                }
+
                 if (i % 600 == 0 && info.worker_id == 0) {
                     auto now = std::chrono::steady_clock::now();
                     LOG(INFO) << "Start checkpoint, sent by worker: 0";
@@ -244,6 +258,11 @@ namespace csci5570 {
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             LOG(INFO) << "total time: " << total_time << " ms on worker: " << info.worker_id;
+
+            if (info.worker_id % FLAGS_num_workers_per_node == 0) {
+                LOG(INFO) << "quit heartbeat from node:" << FLAGS_my_id;
+                table->HeartBeat(FLAGS_my_id, true);
+            }
         });
 
         // 4. Run tasks

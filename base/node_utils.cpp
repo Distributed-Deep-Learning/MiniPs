@@ -14,6 +14,20 @@
 
 namespace csci5570 {
 
+    // master node id is 1
+    Node SelectMaster(std::vector<Node> &nodes) {
+        Node master;
+        for (auto it = nodes.begin(); it != nodes.end(); it++) {
+            if ((*it).id == 1) {
+                master = nodes[it - nodes.begin()];
+                master.is_master = true;
+                it = nodes.erase(it);
+                break;
+            }
+        }
+        return master;
+    };
+
     std::vector<Node> ParseFile(const std::string &filename) {
         std::vector<Node> nodes;
         std::ifstream input_file(filename.c_str());

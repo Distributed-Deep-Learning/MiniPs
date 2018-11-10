@@ -39,7 +39,8 @@ namespace csci5570 {
          * @param node     the current node
          * @param nodes    all nodes in the cluster
          */
-        Engine(const Node &node, const std::vector<Node> &nodes) : node_(node), nodes_(nodes) {
+        Engine(const Node &node, const std::vector<Node> &nodes, const Node &master_node = {}) :
+                node_(node), nodes_(nodes), master_node_(master_node) {
             // load config into context
             Context::get_instance();
         }
@@ -89,7 +90,7 @@ namespace csci5570 {
 
         void StopSender();
 
-        void StopMailbox();
+        void StopMailbox(bool barrier = true);
 
         /**
          * Synchronization barrier for processes
@@ -181,8 +182,9 @@ namespace csci5570 {
             // 1. Create a default partition manager
             CHECK(id_mapper_);
             const auto server_thread_ids = id_mapper_->GetAllServerThreads();
+            int32_t master_node_id = master_node_.is_master ? master_node_.id : -1;
             std::unique_ptr<AbstractPartitionManager> partition_manager(
-                    new RangePartitionManager(server_thread_ids, ranges));
+                    new RangePartitionManager(server_thread_ids, ranges, master_node_id));
 
             // 2. Create a table with the partition manager
             return CreateTable<Val>(std::move(partition_manager), model_type, storage_type, ranges,
@@ -208,6 +210,8 @@ namespace csci5570 {
          */
         std::vector<uint32_t> GetServerThreadIds() { return id_mapper_->GetAllServerThreads(); }
 
+        void RegisterQueue(uint32_t queue_id, ThreadsafeQueue<Message> *const queue);
+
     private:
         /**
          * Register partition manager for a model to the engine
@@ -221,6 +225,7 @@ namespace csci5570 {
 
         // nodes
         Node node_;
+        Node master_node_;
         std::vector<Node> nodes_;
 
         // mailbox

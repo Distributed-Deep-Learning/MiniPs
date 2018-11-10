@@ -12,6 +12,8 @@
 
 namespace csci5570 {
 
+    Node SelectMaster(std::vector<Node> &nodes);
+
 /*
  * Parse a config file which should be in the format of:
  * id:hostname:port

@@ -13,9 +13,10 @@ namespace csci5570 {
     };
 
     enum class Flag : char {
-        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet, kForceQuit, kCheckpoint
+        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet, kForceQuit, kCheckpoint, kHeartBeat, kQuitHeartBeat
     };
     static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet", "kForceQuit",
+                                     "kHeartBeat", "kQuitHeartBeat"
     };
 
     struct Meta {
@@ -39,10 +40,10 @@ namespace csci5570 {
 
     struct Message {
         Meta meta;
-        std::vector<third_party::SArray<char>> data;
+        std::vector<third_party::SArray < char>> data;
 
         template<typename V>
-        void AddData(const third_party::SArray<V> &val) {
+        void AddData(const third_party::SArray <V> &val) {
             data.push_back(third_party::SArray<char>(val));
         }
 

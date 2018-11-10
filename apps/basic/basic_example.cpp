@@ -25,7 +25,6 @@ namespace csci5570 {
         std::vector<Node> nodes = ParseFile(FLAGS_config_file);
         CHECK(CheckValidNodeIds(nodes));
         CHECK(CheckUniquePort(nodes));
-        CHECK(CheckConsecutiveIds(nodes));
         Node my_node = GetNodeById(nodes, FLAGS_my_id);
         LOG(INFO) << my_node.DebugString();
 

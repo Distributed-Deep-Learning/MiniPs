@@ -17,7 +17,7 @@ namespace csci5570 {
             : node_(node), nodes_(nodes), id_mapper_(id_mapper), engine_(engine) {
         // Do some checks
         CHECK(nodes_.size());
-        CHECK(std::find(nodes_.begin(), nodes_.end(), node_) != nodes_.end());
+        // CHECK(std::find(nodes_.begin(), nodes_.end(), node_) != nodes_.end());
         CHECK_NOTNULL(id_mapper_);
         // Check for uniqueness
         for (int i = 0; i < nodes.size(); ++i) {
@@ -31,12 +31,12 @@ namespace csci5570 {
 
     size_t Mailbox::GetQueueMapSize() const { return queue_map_.size(); }
 
-    void Mailbox::Start() {
-        ConnectAndBind();
+    void Mailbox::Start(const Node &master_node) {
+        ConnectAndBind(master_node);
         StartReceiving();
     }
 
-    void Mailbox::ConnectAndBind() {
+    void Mailbox::ConnectAndBind(const Node &master_node) {
         context_ = zmq_ctx_new();
         CHECK(context_ != nullptr) << "create zmq context failed";
         zmq_ctx_set(context_, ZMQ_MAX_SOCKETS, 65536);
@@ -46,6 +46,9 @@ namespace csci5570 {
         for (const auto &node : nodes_) {
             Connect(node);
         }
+        if (master_node.is_master) {
+            Connect(master_node);
+        }
         VLOG(1) << "Finished connecting";
     }
 
@@ -53,13 +56,15 @@ namespace csci5570 {
         receiver_thread_ = std::thread(&Mailbox::Receiving, this);
     }
 
-    void Mailbox::Stop() {
-        StopReceiving();
+    void Mailbox::Stop(bool barrier) {
+        StopReceiving(barrier);
         CloseSockets();
     }
 
-    void Mailbox::StopReceiving() {
-        Barrier();
+    void Mailbox::StopReceiving(bool barrier) {
+        if (barrier) {
+            Barrier();
+        }
         Message exit_msg;
         exit_msg.meta.recver = node_.id;
         exit_msg.meta.flag = Flag::kExit;
@@ -141,7 +146,7 @@ namespace csci5570 {
                 }
             } else if (msg.meta.flag == Flag::kForceQuit) {
                 LOG(INFO) << "Received kForceQuit from" << msg.meta.sender;
-                nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const & node) {
+                nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
                     return msg.meta.sender == node.id;
                 }), nodes_.end());
 
@@ -163,20 +168,24 @@ namespace csci5570 {
         std::lock_guard<std::mutex> lk(mu_);
         // find the socket
         int id;
-        if (msg.meta.flag == Flag::kBarrier || msg.meta.flag == Flag::kExit || msg.meta.flag == Flag::kForceQuit) {
+        if (msg.meta.flag == Flag::kBarrier || msg.meta.flag == Flag::kExit ||
+            msg.meta.flag == Flag::kForceQuit || msg.meta.flag == Flag::kHeartBeat ||
+            msg.meta.flag == Flag::kQuitHeartBeat) {
             // For kBarrier, kExit and kForceQuit which are sent by the Mailbox directly, no need to lookup for node id.
             id = msg.meta.recver;
         } else {
             id = id_mapper_->GetNodeIdForThread(msg.meta.recver);
         }
 
-        auto node_it = std::find_if(nodes_.begin(), nodes_.end(), [&](const Node & node) {
-            return node.id == id;
-        });
-        if (node_it == nodes_.end()) {
-            LOG(WARNING) << "this node already quit " << id;
-            return -1;
-        }
+//        if (msg.meta.flag != Flag::kHeartBeat && msg.meta.flag != Flag::kQuitHeartBeat) {
+//            auto node_it = std::find_if(nodes_.begin(), nodes_.end(), [&](const Node &node) {
+//                return node.id == id;
+//            });
+//            if (node_it == nodes_.end()) {
+//                LOG(WARNING) << "this node already quit " << id;
+//                return -1;
+//            }
+//        }
 
         auto it = senders_.find(id);
         if (it == senders_.end()) {

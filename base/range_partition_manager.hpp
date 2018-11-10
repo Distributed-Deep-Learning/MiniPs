@@ -14,8 +14,8 @@ namespace csci5570 {
     class RangePartitionManager : public AbstractPartitionManager {
     public:
         RangePartitionManager(const std::vector<uint32_t> &server_thread_ids,
-                              const std::vector<third_party::Range> &ranges)
-                : AbstractPartitionManager(server_thread_ids), ranges_(ranges) {
+                              const std::vector<third_party::Range> &ranges, int32_t master_node_id = -1)
+                : AbstractPartitionManager(server_thread_ids, master_node_id), ranges_(ranges) {
             CHECK_EQ(ranges_.size(), server_thread_ids_.size());
         }
 
