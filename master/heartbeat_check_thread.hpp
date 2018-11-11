@@ -7,24 +7,21 @@
 
 #include "base/actor_model.hpp"
 #include "base/node.hpp"
+#include "master_thread.hpp"
 
 namespace csci5570 {
 
     class HeartBeatCheckThread : public Actor {
     public:
-        HeartBeatCheckThread(uint32_t checker_thread_id, std::unordered_map<uint32_t, time_t> &heartbeats,
-                             const std::vector<Node> &nodes, bool &serving, uint32_t interval = 20) : Actor(checker_thread_id),
-                                                                                      heartbeats_(heartbeats),
-                                                                                      nodes_(nodes), serving_(serving),
-                                                                                      interval_threshold_(interval) {}
+        HeartBeatCheckThread(uint32_t checker_thread_id, const std::vector<Node> &nodes,
+                             MasterThread *const master_thread)
+                : Actor(checker_thread_id), nodes_(nodes), master_thread_(master_thread) {}
 
     protected:
         virtual void Main() override;
 
-        std::unordered_map<uint32_t, time_t> heartbeats_;
-        uint32_t interval_threshold_;
         std::vector<Node> nodes_;
-        bool &serving_;
+        MasterThread *const master_thread_;
     };
 
 }

@@ -67,6 +67,29 @@ namespace csci5570 {
 
         void StartWorkerThreads();
 
+        void HeartBeat(uint32_t node_id, bool quit = false) {
+            CHECK_NOTNULL(sender_);
+            if (HasMaster()) {
+                Message msg;
+                msg.meta.sender = node_id;
+                msg.meta.recver = GetMasterNodeId();
+                msg.meta.flag = quit ? Flag::kQuitHeartBeat : Flag::kHeartBeat;
+                sender_->GetMessageQueue()->Push(std::move(msg));
+            }
+        }
+
+        bool HasMaster() {
+            return master_node_.is_master && master_node_.id == 1;
+        }
+
+        int32_t GetMasterNodeId() {
+            return master_node_.id;
+        }
+
+        void StartHeartbeatThread();
+
+        void StopHeartbeatThread();
+
         void StartMailbox();
 
         void StartSender();
@@ -239,6 +262,9 @@ namespace csci5570 {
         // server elements
         std::vector<std::unique_ptr<ServerThread>> server_thread_group_;
         size_t model_count_ = 0;
+
+        bool heartbeat_running_;
+        std::thread heartbeat_thread_;
     };
 
 }  // namespace csci5570

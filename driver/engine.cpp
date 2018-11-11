@@ -22,6 +22,7 @@ namespace csci5570 {
         StartSender();
         StartServerThreads();
         StartWorkerThreads();
+        StartHeartbeatThread();
     }
 
     void Engine::UpdateNodes(std::vector<Node> &nodes) {
@@ -32,6 +33,7 @@ namespace csci5570 {
     void Engine::StopEverything() {
         LOG(INFO) << "Engine StopEverything...";
 
+        StopHeartbeatThread();
         StopMailbox();
         StopSender();
         StopServerThreads();
@@ -78,6 +80,30 @@ namespace csci5570 {
         mailbox_->RegisterQueue(worker_thread_->GetId(), worker_thread_->GetWorkQueue());
         worker_thread_->Start();
         VLOG(1) << "worker_thread:" << worker_thread_ids[0] << " starts on node:" << node_.id;
+    }
+
+    void Engine::StartHeartbeatThread() {
+        if (HasMaster()) {
+            heartbeat_running_ = true;
+            heartbeat_thread_ = std::thread([this]{
+                int32_t interval = Context::get_instance().get_int32("heartbeat_interval");
+                LOG(INFO) << "node:" << node_.id << ", heartbeat started...";
+                while (interval > 0 && heartbeat_running_) {
+                    std::this_thread::sleep_for(std::chrono::seconds(interval));
+                    HeartBeat(node_.id);
+                    LOG(INFO) << "node:" << node_.id << ", post heartbeat to master...";
+                }
+                LOG(INFO) << "node:" << node_.id << ", heartbeat stopped...";
+                HeartBeat(node_.id, true);
+            });
+        }
+    }
+
+    void Engine::StopHeartbeatThread() {
+        if (HasMaster()) {
+            heartbeat_running_ = false;
+            heartbeat_thread_.join();
+        }
     }
 
     void Engine::StartMailbox() {

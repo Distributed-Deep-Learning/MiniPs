@@ -3,13 +3,15 @@
 // Created by aiyongbiao on 2018/11/10.
 //
 
+#include <base/node.hpp>
 #include "master_thread.hpp"
 #include "glog/logging.h"
 
 namespace csci5570 {
 
     void MasterThread::Main() {
-        quit_count_ = 0;
+        Init();
+
         while (serving_) {
             Message msg;
             work_queue_.WaitAndPop(&msg);

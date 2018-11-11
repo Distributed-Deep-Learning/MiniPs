@@ -16,7 +16,7 @@
 #include <master/master.hpp>
 
 DEFINE_int32(my_id, 0, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes1", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -39,6 +39,7 @@ DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 //DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/datasets/dump_", "the checkpoint file prefix");
 DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_", "the checkpoint file prefix");
+DEFINE_int32(heartbeat_interval, 30, "the heatbeat check interval");
 
 namespace csci5570 {
 
@@ -223,11 +224,6 @@ namespace csci5570 {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                if (i % 200 == 0 && info.worker_id % FLAGS_num_workers_per_node == 0) {
-                    LOG(INFO) << "node:" << FLAGS_my_id << ", post heartbeat to master...";
-                    table->HeartBeat(FLAGS_my_id);
-                }
-
                 if (i % 600 == 0 && info.worker_id == 0) {
                     auto now = std::chrono::steady_clock::now();
                     LOG(INFO) << "Start checkpoint, sent by worker: 0";
@@ -258,11 +254,6 @@ namespace csci5570 {
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             LOG(INFO) << "total time: " << total_time << " ms on worker: " << info.worker_id;
-
-            if (info.worker_id % FLAGS_num_workers_per_node == 0) {
-                LOG(INFO) << "quit heartbeat from node:" << FLAGS_my_id;
-                table->HeartBeat(FLAGS_my_id, true);
-            }
         });
 
         // 4. Run tasks
