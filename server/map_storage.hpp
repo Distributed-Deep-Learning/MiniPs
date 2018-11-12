@@ -29,6 +29,10 @@ namespace csci5570 {
 
         virtual void Dump() override {}
 
+        virtual void Update(third_party::Range &range) override {
+
+        }
+
     private:
         std::map<Key, Val> storage_;
     };

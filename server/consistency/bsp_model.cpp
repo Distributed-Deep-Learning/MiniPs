@@ -1,6 +1,7 @@
 #include "server/consistency/bsp_model.hpp"
 #include "glog/logging.h"
 #include <base/utils.hpp>
+#include <base/node.hpp>
 
 namespace csci5570 {
 
@@ -82,5 +83,7 @@ namespace csci5570 {
     }
 
     void BSPModel::Dump(Message &msg) {}
+
+    void BSPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {}
 
 }  // namespace csci5570

@@ -16,9 +16,11 @@
 namespace csci5570 {
 
     class Engine;
+
     class Mailbox : public AbstractMailbox {
     public:
-        Mailbox(const Node &node, const std::vector<Node> &nodes, AbstractIdMapper *id_mapper, Engine *engine = nullptr);
+        Mailbox(const Node &node, const std::vector<Node> &nodes, AbstractIdMapper *id_mapper,
+                Engine *engine = nullptr);
 
         void RegisterQueue(uint32_t queue_id, ThreadsafeQueue<Message> *const queue);
 
@@ -32,11 +34,16 @@ namespace csci5570 {
 
         void Stop(bool barrier = true);
 
+        void Update(std::vector<Node> nodes) {
+            nodes_ = nodes;
+        }
+
         size_t GetQueueMapSize() const;
 
         void Barrier();
 
         void ForceQuit(uint32_t node_id);
+
         void SafeQuit();
 
         // For testing only

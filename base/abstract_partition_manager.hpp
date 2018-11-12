@@ -35,6 +35,8 @@ namespace csci5570 {
             return master_node_id_ >= 0;
         }
 
+        virtual void Update(const std::vector<third_party::Range> &ranges, const std::vector<uint32_t> &server_thread_ids) = 0;
+
         // slice keys into <server_id, key_partition> pairs
         virtual void Slice(const Keys &keys, std::vector<std::pair<int, Keys>> *sliced) const = 0;
 

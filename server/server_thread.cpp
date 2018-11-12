@@ -14,6 +14,12 @@ namespace csci5570 {
         return models_[model_id].get();
     }
 
+    void ServerThread::UpdateModel(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {
+        for (auto it = models_.begin(); it != models_.end(); it++) {
+            it->second->Update(failed_node_id, nodes, range);
+        }
+    }
+
     void ServerThread::Main() {
         while (true) {
             Message msg;

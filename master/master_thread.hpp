@@ -30,6 +30,19 @@ namespace csci5570 {
             return serving_;
         }
 
+        void RollBack(int32_t failed_node_id) {
+            rollback_func_(failed_node_id);
+        }
+
+        void SetRollBack(std::function<void(int32_t)> func) {
+            rollback_func_ = func;
+        }
+
+        void UpdateNodes(std::vector<Node> &nodes, int32_t failed_node_id) {
+            nodes_ = nodes;
+            heartbeats_.erase(failed_node_id);
+        }
+
     protected:
         virtual void Main() override;
 
@@ -37,6 +50,8 @@ namespace csci5570 {
         bool serving_;
         int32_t quit_count_;
         std::vector<Node> nodes_;
+
+        std::function<void(int32_t)> rollback_func_;
     };
 
 }

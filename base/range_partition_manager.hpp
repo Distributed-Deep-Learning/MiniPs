@@ -52,15 +52,23 @@ namespace csci5570 {
                 iterator = std::lower_bound(iterator, kvs.first.end(), ranges_[i].end());
                 auto cur_split_end_index = iterator - kvs.first.begin();
 
+//                LOG(INFO) << "Slice servercount: " << server_count;
                 if (cur_split_end_index > cur_split_start_index) {
                     KVPairs kv;
                     kv.first = kvs.first.segment(cur_split_start_index, cur_split_end_index);
                     kv.second = kvs.second.segment(cur_split_start_index * values_ratio,
                                                    cur_split_end_index * values_ratio);
+//                    LOG(INFO) << "server_thread_ids_:" << server_thread_ids_[i];
                     sliced->push_back(std::make_pair(server_thread_ids_[i], std::move(kv)));
                 }
                 cur_split_start_index = cur_split_end_index;
             }
+        }
+
+        void Update(const std::vector<third_party::Range> &ranges, const std::vector<uint32_t> &server_thread_ids) override {
+            LOG(INFO) << "RangePartitionManager Update...";
+            ranges_ = ranges;
+            server_thread_ids_ = server_thread_ids;
         }
 
     private:

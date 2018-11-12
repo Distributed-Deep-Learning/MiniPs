@@ -43,6 +43,8 @@ namespace csci5570 {
         // hdfs://[host:port]/path
         virtual void Dump() = 0;
 
+        virtual void Update(third_party::Range &range) = 0;
+
     };
 
 }  // namespace csci5570

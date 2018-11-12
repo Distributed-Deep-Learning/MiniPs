@@ -45,6 +45,8 @@ namespace csci5570 {
             sliced->at(1).second.second = kvs.second.segment(pos, n);
         }
 
+        void Update(const std::vector<third_party::Range> &ranges, const std::vector<uint32_t> &server_thread_ids) override {}
+
     private:
         int split_ = 0;
     };

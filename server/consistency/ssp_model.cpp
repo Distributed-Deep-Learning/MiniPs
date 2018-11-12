@@ -1,6 +1,7 @@
 #include "server/consistency/ssp_model.hpp"
 #include "glog/logging.h"
 #include <base/utils.hpp>
+#include <base/node.hpp>
 
 namespace csci5570 {
 
@@ -13,12 +14,16 @@ namespace csci5570 {
     void SSPModel::Clock(Message &msg) {
         int updated_min_clock = progress_tracker_.AdvanceAndGetChangedMinClock(msg.meta.sender);
         if (updated_min_clock != -1) {  // min clock updated
-            auto reqs_blocked_at_this_min_clock = buffer_.Pop(updated_min_clock);
-            for (auto req : reqs_blocked_at_this_min_clock) {
-                reply_queue_->Push(storage_->Get(req));
-            }
-            storage_->FinishIter();
+            Flush(updated_min_clock);
         }
+    }
+
+    void SSPModel::Flush(int updated_min_clock) {
+        auto reqs_blocked_at_this_min_clock = buffer_.Pop(updated_min_clock);
+        for (auto req : reqs_blocked_at_this_min_clock) {
+            reply_queue_->Push(storage_->Get(req));
+        }
+        storage_->FinishIter();
     }
 
     void SSPModel::Add(Message &msg) {
@@ -30,6 +35,8 @@ namespace csci5570 {
 
         int progress = progress_tracker_.GetProgress(msg.meta.sender);
         int min_clock = progress_tracker_.GetMinClock();
+//        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
+//        progress_tracker_.DebugString();
         if (progress > min_clock + staleness_) {
             buffer_.Push(progress - staleness_, msg);
         } else {
@@ -70,6 +77,15 @@ namespace csci5570 {
         reply.meta.model_id = msg.meta.model_id;
 
         reply_queue_->Push(reply);
+    }
+
+    void SSPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {
+        storage_->Update(range);
+
+        int result = progress_tracker_.Update(failed_node_id, nodes);
+        if (result != -1) {
+            Flush(result);
+        }
     }
 
 }  // namespace csci5570

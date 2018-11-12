@@ -2,6 +2,8 @@
 
 #include <map>
 #include <vector>
+#include "base/node.hpp"
+#include "glog/logging.h"
 
 namespace csci5570 {
 
@@ -49,7 +51,15 @@ namespace csci5570 {
          */
         bool CheckThreadValid(int tid) const;
 
-        void DeleteNode(uint32_t node_id);
+        int DeleteNode(uint32_t node_id);
+
+        int Update(int failed_node_id, std::vector<Node> &nodes);
+
+        void DebugString() {
+            for (auto it = progresses_.begin(); it != progresses_.end(); it++) {
+                LOG(INFO) << "tid:" << it->first << ", progress:" << it->second;
+            }
+        }
 
     private:
         std::map<int, int> progresses_;  // {tid: progress}

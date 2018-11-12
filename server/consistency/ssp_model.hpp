@@ -21,6 +21,8 @@ namespace csci5570 {
 
         virtual void Clock(Message &msg) override;
 
+        virtual void Flush(int updated_min_clock);
+
         virtual void Add(Message &msg) override;
 
         virtual void Get(Message &msg) override;
@@ -30,6 +32,8 @@ namespace csci5570 {
         virtual void ResetWorker(Message &msg) override;
 
         virtual void Dump(Message &msg) override;
+
+        virtual void Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) override;
 
         /**
          * Return the number of requests waiting at the specific progress

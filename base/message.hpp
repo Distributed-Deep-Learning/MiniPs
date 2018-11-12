@@ -13,16 +13,27 @@ namespace csci5570 {
     };
 
     enum class Flag : char {
-        kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet, kForceQuit, kCheckpoint, kHeartBeat, kQuitHeartBeat
+        kExit,
+        kBarrier,
+        kResetWorkerInModel,
+        kClock,
+        kAdd,
+        kGet,
+        kForceQuit,
+        kCheckpoint,
+        kHeartBeat,
+        kQuitHeartBeat,
+        kRollBack
     };
     static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet", "kForceQuit",
-                                     "kHeartBeat", "kQuitHeartBeat"
+                                     "kHeartBeat", "kQuitHeartBeat", "kRollBack"
     };
 
     struct Meta {
         int sender;
         int recver;
         int model_id;
+        int failed_node_id;
         Flag flag;  // {kExit, kBarrier, kResetWorkerInModel, kClock, kAdd, kGet}
 
         std::string DebugString() const {

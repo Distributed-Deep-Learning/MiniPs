@@ -15,8 +15,8 @@
 #include <cmath>
 #include <master/master.hpp>
 
-DEFINE_int32(my_id, 0, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes1", "The config file path");
+DEFINE_int32(my_id, 2, "The process id of this program");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -24,7 +24,7 @@ DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
 DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP/SparseSSP");
 DEFINE_string(kStorageType, "Vector", "Map/Vector");
-DEFINE_int32(num_dims, 54686452, "number of dimensions");
+DEFINE_int32(num_dims, 1000, "number of dimensions");
 DEFINE_int32(batch_size, 1, "batch size of each epoch");
 DEFINE_int32(num_iters, 1000, "number of iters");
 DEFINE_int32(kStaleness, 0, "stalness");
@@ -38,14 +38,14 @@ DEFINE_double(alpha, 0.1, "learning rate");
 DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 //DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/datasets/dump_", "the checkpoint file prefix");
-DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_", "the checkpoint file prefix");
+DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_",
+              "the checkpoint file prefix");
 DEFINE_int32(heartbeat_interval, 30, "the heatbeat check interval");
 
 namespace csci5570 {
 
     template<typename T>
     void test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
-        LOG(INFO) << "Finish training, start test error...";
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
@@ -69,27 +69,7 @@ namespace csci5570 {
         LOG(INFO) << " accuracy is " << std::to_string(c_count / count);
     }
 
-    void Run() {
-        CHECK_NE(FLAGS_my_id, -1);
-        CHECK(!FLAGS_config_file.empty());
-        VLOG(1) << FLAGS_my_id << " " << FLAGS_config_file;
-
-        // 0. Parse config_file
-        std::vector<Node> nodes = ParseFile(FLAGS_config_file);
-        Node master_node = SelectMaster(nodes);
-        CHECK(CheckValidNodeIds(nodes));
-        CHECK(CheckUniquePort(nodes));
-
-        // launch master node for heartbeating
-        if (master_node.id == FLAGS_my_id && master_node.is_master) {
-            Master master(master_node, nodes);
-            master.StopMaster();
-            return;
-        }
-
-        Node my_node = GetNodeById(nodes, FLAGS_my_id);
-        LOG(INFO) << my_node.DebugString();
-
+    void Training(Node &my_node, std::vector<Node> &nodes, Node &master_node) {
         // 1. Load data
         HDFSManager::Config config;
         config.url = FLAGS_input;
@@ -114,6 +94,8 @@ namespace csci5570 {
         // 2. Start engine
         Engine engine(my_node, nodes, master_node);
         engine.StartEverything();
+        std::function<void(Node &, std::vector<Node> &, Node &)> restarter_func = Training;
+        engine.SetRestarter(restarter_func);
 
         // Quit the engine if no traning data is read
         if (data.empty()) {
@@ -128,12 +110,7 @@ namespace csci5570 {
 
         // 3. Create tables
         nodes = engine.getNodes();
-        std::vector<third_party::Range> range;
-        uint32_t num_total_servers = nodes.size() * FLAGS_num_servers_per_node;
-        for (uint32_t i = 0; i < num_total_servers - 1; ++i) {
-            range.push_back({FLAGS_num_dims / num_total_servers * i, FLAGS_num_dims / num_total_servers * (i + 1)});
-        }
-        range.push_back({FLAGS_num_dims / num_total_servers * (num_total_servers - 1), (uint64_t) FLAGS_num_dims});
+        std::vector<third_party::Range> range = engine.getRanges();
 
         ModelType model_type;
         if (FLAGS_kModelType == "ASP") {
@@ -197,7 +174,7 @@ namespace csci5570 {
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
                 table->Get(keys, &params);
-                CHECK_EQ(keys.size(), params.size());
+                // CHECK_EQ(keys.size(), params.size());
                 deltas.resize(keys.size(), 0.0);
 
                 for (auto data : future_data_ptrs[i]) {  // iterate over the data in the batch
@@ -222,7 +199,7 @@ namespace csci5570 {
                 }
                 table->Add(keys, deltas);
                 table->Clock();
-                CHECK_EQ(params.size(), keys.size());
+                //CHECK_EQ(params.size(), keys.size());
 
                 if (i % 600 == 0 && info.worker_id == 0) {
                     auto now = std::chrono::steady_clock::now();
@@ -233,7 +210,7 @@ namespace csci5570 {
                     LOG(INFO) << "Finish checkpoint, cost:" << cost << " ms";
                 }
 
-                if (i % 50 == 0 && info.worker_id == 0) {
+                if (i % 100 == 0 && info.worker_id == 0) {
                     LOG(INFO) << "Iter: " << i << " finished";
                 }
 
@@ -249,8 +226,11 @@ namespace csci5570 {
             end_time = std::chrono::steady_clock::now();
 
             // test error
-            table->Get(all_keys, &params);
-            test_error<SVMItem>(params, data);
+            if (info.worker_id % FLAGS_num_workers_per_node == 0) {
+                LOG(INFO) << "Finish training, start test error on worker:" << info.worker_id;
+                table->Get(all_keys, &params);
+                test_error<SVMItem>(params, data);
+            }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             LOG(INFO) << "total time: " << total_time << " ms on worker: " << info.worker_id;
@@ -263,6 +243,29 @@ namespace csci5570 {
         engine.StopEverything();
     }
 
+    void Run() {
+        CHECK_NE(FLAGS_my_id, -1);
+        CHECK(!FLAGS_config_file.empty());
+        VLOG(1) << FLAGS_my_id << " " << FLAGS_config_file;
+
+        // 0. Parse config_file
+        std::vector<Node> nodes = ParseFile(FLAGS_config_file);
+        Node master_node = SelectMaster(nodes);
+        CHECK(CheckValidNodeIds(nodes));
+        CHECK(CheckUniquePort(nodes));
+
+        // launch master node for heartbeating
+        if (master_node.id == FLAGS_my_id && master_node.is_master) {
+            Master master(master_node, nodes);
+            master.StopMaster();
+            return;
+        }
+
+        Node my_node = GetNodeById(nodes, FLAGS_my_id);
+        LOG(INFO) << my_node.DebugString();
+
+        Training(my_node, nodes, master_node);
+    }
 }
 
 int main(int argc, char **argv) {

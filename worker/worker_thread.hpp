@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 #include <unordered_map>
+#include "base/node.hpp"
 
 namespace csci5570 {
 
@@ -33,6 +34,8 @@ namespace csci5570 {
         virtual void WaitCheckPoint() override;
 
         virtual void CheckPointResponse() override;
+
+        virtual void Update();
 
     protected:
         void Main() override;

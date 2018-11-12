@@ -31,8 +31,6 @@ namespace csci5570 {
     }
 
     void Engine::StopEverything() {
-        LOG(INFO) << "Engine StopEverything...";
-
         StopHeartbeatThread();
         StopMailbox();
         StopSender();
@@ -82,18 +80,35 @@ namespace csci5570 {
         VLOG(1) << "worker_thread:" << worker_thread_ids[0] << " starts on node:" << node_.id;
     }
 
+    void Engine::UpdateAndRestart(int failed_node_id, const std::vector<csci5570::Node> &nodes) {
+        LOG(INFO) << "Engine UpdateAndRestart on node:" << node_.id;
+        nodes_ = nodes;
+        for (Node node : nodes_) {
+            LOG(INFO) << "Engine UpdateAndRestart new node:" << node.id;
+        }
+
+        std::vector<third_party::Range> ranges = getRanges();
+        mailbox_->Update(nodes_);
+        id_mapper_->Update(nodes_, 1);
+
+        // worker, partition, id_mapper...etc.
+        UpdateServerThreads(failed_node_id, nodes_, ranges[0]);
+        UpdateWorkerThreads(nodes_);
+        UpdatePartitionManagers(ranges);
+        // restarter_(node_, nodes_, master_node_);
+    }
+
     void Engine::StartHeartbeatThread() {
         if (HasMaster()) {
             heartbeat_running_ = true;
             heartbeat_thread_ = std::thread([this]{
                 int32_t interval = Context::get_instance().get_int32("heartbeat_interval");
-                LOG(INFO) << "node:" << node_.id << ", heartbeat started...";
                 while (interval > 0 && heartbeat_running_) {
                     std::this_thread::sleep_for(std::chrono::seconds(interval));
                     HeartBeat(node_.id);
-                    LOG(INFO) << "node:" << node_.id << ", post heartbeat to master...";
+                    LOG(INFO) << "[Slave] post heartbeat to master from node:" << node_.id;
                 }
-                LOG(INFO) << "node:" << node_.id << ", heartbeat stopped...";
+                LOG(INFO) << "[Slave] node:" << node_.id << ", heartbeat service stopped...";
                 HeartBeat(node_.id, true);
             });
         }
@@ -242,8 +257,10 @@ namespace csci5570 {
 
                 thread_group[i] = std::thread([&task, info]() { task.RunLambda(info); });
             }
+            LOG(INFO) << "thread_group join start";
             for (auto &th : thread_group) {
                 th.join();
+                LOG(INFO) << "thread_group join end";
             }
         }
         // Let all the on-the-fly messages be recevied based on TCP/IP assumption

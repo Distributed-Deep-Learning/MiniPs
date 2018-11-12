@@ -2,6 +2,7 @@
 
 #include "glog/logging.h"
 #include "driver/simple_id_mapper.hpp"
+#include <algorithm>
 
 namespace csci5570 {
 
@@ -13,24 +14,37 @@ namespace csci5570 {
         min_clock_ = 0;
     }
 
-    void ProgressTracker::DeleteNode(uint32_t node_id) {
+    int ProgressTracker::DeleteNode(uint32_t node_id) {
         auto it = progresses_.begin();
+        int result = -1;
         while (it != progresses_.end()) {
             if (it->first < (1 + node_id) * SimpleIdMapper::kMaxThreadsPerNode &&
                 it->first >= node_id * SimpleIdMapper::kMaxThreadsPerNode) {
                 if (IsUniqueMin(it->first)) {
                     min_clock_ += 1;
+                    result = min_clock_;
                 }
 
+                LOG(INFO) << "DeleteNode: tid:" << it->first << ", progress:" << it->second;
                 it = progresses_.erase(it);
             } else {
                 ++it;
             }
         }
+        return result;
+    }
+
+    int ProgressTracker::Update(int failed_node_id, std::vector<Node> &nodes) {
+        int result = -1;
+        if (failed_node_id >= 0) {
+            LOG(INFO) << "ProgressTracker::Update delete failed node:" << failed_node_id;
+            result = DeleteNode(failed_node_id);
+        }
+        return result;
     }
 
     int ProgressTracker::AdvanceAndGetChangedMinClock(int tid) {
-        CHECK(CheckThreadValid(tid));
+        CHECK(CheckThreadValid(tid)) << "tid:" << tid;
         if (IsUniqueMin(tid)) {
             min_clock_ += 1;
             progresses_[tid] += 1;

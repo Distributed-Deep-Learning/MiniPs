@@ -20,6 +20,8 @@ namespace csci5570 {
 
                 if (cur_time - last_time > interval * 5) {
                     LOG(INFO) << "node:" << node.id << ", fault detected...";
+                    master_thread_->RollBack(node.id);
+                    break;
                 }
             }
         }

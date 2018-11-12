@@ -18,17 +18,17 @@ namespace csci5570 {
 
             if (msg.meta.flag == Flag::kQuitHeartBeat) {
                 quit_count_++;
-                LOG(INFO) << "MasterThread heartbeat quit with count:" << quit_count_;
                 if (quit_count_ >= heartbeats_.size()) {
                     serving_ = false;
                     LOG(INFO) << "MasterThread heartbeat quit serving...";
-                    return;
+                    exit(0);
+//                    return;
                 }
             }
 
             if (msg.meta.flag == Flag::kHeartBeat) {
                 heartbeats_[msg.meta.sender] = time(NULL);
-                LOG(INFO) << "node:" << msg.meta.sender << ", heartbeat updated...";
+                LOG(INFO) << "[Master] heartbeat updated on node:" << msg.meta.sender;
             }
         }
     }

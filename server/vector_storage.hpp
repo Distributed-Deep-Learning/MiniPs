@@ -61,6 +61,10 @@ namespace csci5570 {
             w_stream.close();
         }
 
+        virtual void Update(third_party::Range &range) override {
+            range_ = range;
+        }
+
     private:
         std::vector<Val> storage_;
         third_party::Range range_;

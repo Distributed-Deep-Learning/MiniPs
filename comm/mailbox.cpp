@@ -157,6 +157,14 @@ namespace csci5570 {
                 if (barrier_count_ + quit_count_ >= nodes_.size()) {
                     barrier_cond_.notify_one();
                 }
+            } else if (msg.meta.flag == Flag::kRollBack) {
+                nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
+                    return msg.meta.sender == node.id;
+                }), nodes_.end());
+
+                int failed_node_id = msg.meta.sender;
+                LOG(INFO) << "Receving node dead msg:" << failed_node_id;
+                engine_->UpdateAndRestart(failed_node_id, nodes_);
             } else {
                 CHECK(queue_map_.find(msg.meta.recver) != queue_map_.end());
                 queue_map_[msg.meta.recver]->Push(std::move(msg));
@@ -170,7 +178,7 @@ namespace csci5570 {
         int id;
         if (msg.meta.flag == Flag::kBarrier || msg.meta.flag == Flag::kExit ||
             msg.meta.flag == Flag::kForceQuit || msg.meta.flag == Flag::kHeartBeat ||
-            msg.meta.flag == Flag::kQuitHeartBeat) {
+            msg.meta.flag == Flag::kQuitHeartBeat || msg.meta.flag == Flag::kRollBack) {
             // For kBarrier, kExit and kForceQuit which are sent by the Mailbox directly, no need to lookup for node id.
             id = msg.meta.recver;
         } else {

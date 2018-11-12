@@ -17,6 +17,10 @@ namespace csci5570 {
                              MasterThread *const master_thread)
                 : Actor(checker_thread_id), nodes_(nodes), master_thread_(master_thread) {}
 
+        void UpdateNodes(std::vector<Node> &nodes) {
+            nodes_ = nodes;
+        }
+
     protected:
         virtual void Main() override;
 

@@ -18,6 +18,8 @@ namespace csci5570 {
 
         AbstractModel *GetModel(uint32_t model_id);
 
+        void UpdateModel(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range);
+
     protected:
         virtual void Main() override;                                  // where the actor polls events and reacts
 

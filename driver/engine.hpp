@@ -78,6 +78,25 @@ namespace csci5570 {
             }
         }
 
+        void RollBack(uint32_t failed_node_id) const {
+            CHECK_NOTNULL(sender_);
+            for (Node node : nodes_) {
+                Message msg;
+                msg.meta.sender = failed_node_id;
+                msg.meta.failed_node_id = failed_node_id;
+                msg.meta.recver = node.id;
+                msg.meta.flag = Flag::kRollBack;
+                sender_->GetMessageQueue()->Push(std::move(msg));
+            }
+        }
+
+        // update rather than fully restart
+        void UpdateAndRestart(int failed_node_id, const std::vector<Node> &nodes);
+
+        void SetRestarter(std::function<void(Node &, std::vector<Node> &, Node &)> &func) {
+            restarter_ = func;
+        }
+
         bool HasMaster() {
             return master_node_.is_master && master_node_.id == 1;
         }
@@ -98,6 +117,19 @@ namespace csci5570 {
             return nodes_;
         }
 
+        std::vector<third_party::Range> getRanges() {
+            int32_t num_servers_per_node = Context::get_instance().get_int32("num_servers_per_node");
+            int32_t num_dims = Context::get_instance().get_int32("num_dims");
+
+            std::vector<third_party::Range> range;
+            uint32_t num_total_servers = nodes_.size() * num_servers_per_node;
+            for (uint32_t i = 0; i < num_total_servers - 1; ++i) {
+                range.push_back({num_dims / num_total_servers * i, num_dims / num_total_servers * (i + 1)});
+            }
+            range.push_back({num_dims / num_total_servers * (num_total_servers - 1), (uint64_t) num_dims});
+            return range;
+        }
+
         /**
          * The flow of stopping the engine:
          * 1. Stop the Sender
@@ -108,6 +140,26 @@ namespace csci5570 {
         void StopEverything();
 
         void StopServerThreads();
+
+        void UpdateServerThreads(int failed_node_id, std::vector<Node> &nodes, third_party::Range range) {
+            LOG(INFO) << "ServerThreadGroup Update start";
+
+            for (auto &server_thread : server_thread_group_) {
+                server_thread->UpdateModel(failed_node_id, nodes, range);
+            }
+        };
+
+        void UpdateWorkerThreads(std::vector<Node> &nodes) {
+            LOG(INFO) << "WorkerThread Update start";
+
+            worker_thread_->Update();
+        };
+
+        void UpdatePartitionManagers(std::vector<third_party::Range> &ranges) {
+            for (auto it = partition_manager_map_.begin(); it != partition_manager_map_.end(); it++) {
+                it->second->Update(ranges, id_mapper_->GetAllServerThreads());
+            }
+        };
 
         void StopWorkerThreads();
 
@@ -265,6 +317,8 @@ namespace csci5570 {
 
         bool heartbeat_running_;
         std::thread heartbeat_thread_;
+
+        std::function<void(Node &, std::vector<Node> &, Node &)> restarter_;
     };
 
 }  // namespace csci5570

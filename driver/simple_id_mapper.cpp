@@ -30,6 +30,8 @@ namespace csci5570 {
     }
 
     void SimpleIdMapper::Update(std::vector<Node> &nodes, int num_server_threads_per_node) {
+        LOG(INFO) << "SimpleIdMapper Update start";
+
         nodes_ = nodes;
         node2server_.clear();
         node2worker_helper_.clear();

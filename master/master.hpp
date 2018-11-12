@@ -14,7 +14,7 @@ namespace csci5570 {
     class Master {
 
     public:
-        Master(const Node &master_node, const std::vector<Node> &nodes) {
+        Master(const Node &master_node, const std::vector<Node> &nodes) : nodes_(nodes) {
             engine_.reset(new Engine(master_node, nodes, master_node));
             StartMaster(master_node, nodes);
         }
@@ -28,6 +28,10 @@ namespace csci5570 {
 
             // receving heartbeats update from slave nodes
             master_thread_.reset(new MasterThread(master_node.id, nodes));
+            std::function<void(int32_t)> func = [this](int32_t failed_node_id){
+                RollBack(failed_node_id);
+            };
+            master_thread_->SetRollBack(func);
             engine_->RegisterQueue(master_thread_->GetId(), master_thread_->GetWorkQueue());
             master_thread_->Start();
 
@@ -45,10 +49,24 @@ namespace csci5570 {
             LOG(INFO) << "StopMaster and heatbeat detecting completed.";
         }
 
+        void RollBack(int failed_node_id) {
+            LOG(INFO) << "Rollback with failed node:" << failed_node_id;
+            engine_->RollBack(failed_node_id);
+
+            nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
+                return failed_node_id == node.id;
+            }), nodes_.end());
+
+            master_thread_->UpdateNodes(nodes_, failed_node_id);
+            heartbeat_thread_->UpdateNodes(nodes_);
+        }
+
     private:
         std::unique_ptr<Engine> engine_;
         std::unique_ptr<MasterThread> master_thread_;
         std::unique_ptr<HeartBeatCheckThread> heartbeat_thread_;
+
+        std::vector<Node> nodes_;
     };
 
 }

@@ -3,6 +3,7 @@
 #include <cinttypes>
 #include "base/message.hpp"
 #include "base/threadsafe_queue.hpp"
+#include "base/node.hpp"
 
 namespace csci5570 {
 
@@ -19,6 +20,8 @@ namespace csci5570 {
         virtual void ResetWorker(Message &msg) = 0;
 
         virtual void Dump(Message &msg) = 0;
+
+        virtual void Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) = 0;
 
         virtual ~AbstractModel() {}
     };

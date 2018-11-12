@@ -1,6 +1,7 @@
 #include "server/consistency/asp_model.hpp"
 #include "glog/logging.h"
 #include <base/utils.hpp>
+#include <base/node.hpp>
 
 namespace csci5570 {
 
@@ -44,5 +45,7 @@ namespace csci5570 {
     }
 
     void ASPModel::Dump(Message &msg) {}
+
+    void ASPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {}
 
 }  // namespace csci5570
