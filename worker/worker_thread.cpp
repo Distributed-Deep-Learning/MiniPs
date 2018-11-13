@@ -59,12 +59,12 @@ namespace csci5570 {
         Check(app_thread_id, model_id);
         std::unique_lock<std::mutex> lk(mu_);
 
-//        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---start";
+        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---start";
         cond_.wait(lk, [this, app_thread_id, model_id] {
-//            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---middle, " << tracker_[app_thread_id][model_id].first << "," << tracker_[app_thread_id][model_id].second;
-            return tracker_[app_thread_id][model_id].first == tracker_[app_thread_id][model_id].second;
+            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---middle, " << tracker_[app_thread_id][model_id].first << "," << tracker_[app_thread_id][model_id].second;
+            return tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second;
         });
-//        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---end";
+        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---end";
     }
 
     void WorkerThread::AddResponse(uint32_t app_thread_id, uint32_t model_id, Message &msg) {
@@ -131,7 +131,7 @@ namespace csci5570 {
                     if (pair.first > 0) {
                         tracker_[app_thread_id][model_id].first -= 1;
                         LOG(INFO) << "WorkThread Update:" << app_thread_id << "," << model_id << "," << pair.first << ", " << pair.second;
-                        if (tracker_[app_thread_id][model_id].first == tracker_[app_thread_id][model_id].second) {
+                        if (tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second) {
                             //recv_finish_handle_[app_thread_id][model_id]();
                             cond_.notify_all();
                         }

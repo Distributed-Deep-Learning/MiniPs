@@ -18,7 +18,7 @@
 DEFINE_int32(my_id, 2, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
-DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
+DEFINE_string(input, "hdfs:///a2a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 

@@ -58,7 +58,9 @@ namespace csci5570 {
 
     void Mailbox::Stop(bool barrier) {
         StopReceiving(barrier);
+        LOG(INFO) << "Mailbox::Stop CloseSockets...start";
         CloseSockets();
+        LOG(INFO) << "Mailbox::Stop CloseSockets...end";
     }
 
     void Mailbox::StopReceiving(bool barrier) {
@@ -86,11 +88,14 @@ namespace csci5570 {
         CHECK(rc == 0 || errno == ETERM);
         CHECK_EQ(zmq_close(receiver_), 0);
         for (auto &it : senders_) {
+            LOG(INFO) << "CloseSockets on node:" << node_.id << ", for sender:" << it.first;
             int rc = zmq_setsockopt(it.second, ZMQ_LINGER, &linger, sizeof(linger));
             CHECK(rc == 0 || errno == ETERM);
             CHECK_EQ(zmq_close(it.second), 0);
         }
-        zmq_ctx_destroy(context_);
+        //LOG(INFO) << "zmq_ctx_destroy on node:" << node_.id << ", start";
+        // zmq_ctx_destroy(context_);
+        //LOG(INFO) << "zmq_ctx_destroy on node:" << node_.id << ", end";
     }
 
     void Mailbox::Connect(const Node &node) {

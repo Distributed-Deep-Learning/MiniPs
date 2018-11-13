@@ -67,7 +67,7 @@ namespace csci5570 {
         for (int i = 0; i < num_files; ++i) {
             if (file_info[i].mKind == kObjectKindFile) {
                 hdfs_block_size = file_info[i].mBlockSize;
-                LOG(INFO) << "Init Block Size:" << hdfs_block_size;
+                // LOG(INFO) << "Init Block Size:" << hdfs_block_size;
                 hdfsFreeFileInfo(file_info, num_files);
                 return;
             }

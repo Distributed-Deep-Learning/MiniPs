@@ -18,6 +18,7 @@ namespace csci5570 {
 
             if (msg.meta.flag == Flag::kQuitHeartBeat) {
                 quit_count_++;
+                LOG(INFO) << "MasterThread heartbeat quit serving on process:" << quit_count_;
                 if (quit_count_ >= heartbeats_.size()) {
                     serving_ = false;
                     LOG(INFO) << "MasterThread heartbeat quit serving...";
