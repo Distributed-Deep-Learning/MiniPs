@@ -227,9 +227,11 @@ namespace csci5570 {
 
             // test error
             if (info.worker_id % FLAGS_num_workers_per_node == 0) {
-                LOG(INFO) << "Finish training, start test error on worker:" << info.worker_id;
+                LOG(INFO) << "Finish training, start test error...1";
                 table->Get(all_keys, &params);
+                LOG(INFO) << "Finish training, start test error...2";
                 test_error<SVMItem>(params, data);
+                LOG(INFO) << "Finish training, start test error...3";
             }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
