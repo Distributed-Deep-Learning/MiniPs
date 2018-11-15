@@ -31,12 +31,32 @@ namespace csci5570 {
 
         void set(std::string key, std::string value);
 
+        void set(std::string key, std::unordered_map<int, int> map);
+
+        void SetIteration(int worker_id, int cur_iter) {
+            iteration_map_[worker_id] = cur_iter;
+        }
+
+        std::unordered_map<int, int> GetIterationMap() {
+            return iteration_map_;
+        };
+
+        int GetIteration(int worker_id) {
+            int result = 0;
+            if (iteration_map_.count(worker_id)) {
+                result = iteration_map_[worker_id];
+            }
+            return result;
+        }
+
     private:
         // Private constructor. Store all the gflags values.
         Context();
 
         // Underlying data structure
         std::unordered_map<std::string, std::string> ctx_;
+
+        std::unordered_map<int, int> iteration_map_;
     };
 
 }   // namespace csci5570

@@ -2,6 +2,8 @@
 #include "glog/logging.h"
 #include <base/utils.hpp>
 #include <base/node.hpp>
+#include <lib/svm_dumper.hpp>
+#include <thread>
 
 namespace csci5570 {
 
@@ -9,6 +11,9 @@ namespace csci5570 {
                        ThreadsafeQueue<Message> *reply_queue)
             : model_id_(model_id), staleness_(staleness), reply_queue_(reply_queue) {
         this->storage_ = std::move(storage_ptr);
+        if (Context::get_instance().get_bool("use_weight_file")) {
+            Restore();
+        }
     }
 
     void SSPModel::Clock(Message &msg) {
@@ -26,6 +31,15 @@ namespace csci5570 {
         storage_->FinishIter();
     }
 
+    void SSPModel::FlushAll() {
+        LOG(INFO) << "SSPModel::FlushAll";
+        auto reqs = buffer_.PopAll();
+        for (auto req : reqs) {
+            reply_queue_->Push(storage_->Get(req));
+        }
+        storage_->FinishIter();
+    }
+
     void SSPModel::Add(Message &msg) {
         storage_->Add(msg);
     }
@@ -35,8 +49,8 @@ namespace csci5570 {
 
         int progress = progress_tracker_.GetProgress(msg.meta.sender);
         int min_clock = progress_tracker_.GetMinClock();
-//        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
-//        progress_tracker_.DebugString();
+        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
+        progress_tracker_.DebugString();
         if (progress > min_clock + staleness_) {
             buffer_.Push(progress - staleness_, msg);
         } else {
@@ -55,10 +69,12 @@ namespace csci5570 {
     void SSPModel::ResetWorker(Message &msg) {
         CHECK_EQ(msg.data.size(), 1);
 
-        third_party::SArray<uint32_t> sArray;
-        sArray = msg.data[0];
-        std::vector<uint32_t> vec = SArrayToVector<uint32_t >(sArray);
-        this->progress_tracker_.Init(vec);
+        if (!Context::get_instance().get_bool("use_weight_file")) {
+            third_party::SArray<uint32_t> sArray;
+            sArray = msg.data[0];
+            std::vector<uint32_t> vec = SArrayToVector<uint32_t>(sArray);
+            this->progress_tracker_.Init(vec);
+        }
 
         Message reply_msg;
         reply_msg.meta.model_id = model_id_;
@@ -69,6 +85,9 @@ namespace csci5570 {
 
     void SSPModel::Dump(Message &msg) {
         storage_->Dump();
+        progress_tracker_.Dump();
+        SVMDumper dumper;
+        dumper.DumpConfigData(Context::get_instance().GetIterationMap());
 
         Message reply;
         reply.meta.recver = msg.meta.sender;
@@ -77,6 +96,18 @@ namespace csci5570 {
         reply.meta.model_id = msg.meta.model_id;
 
         reply_queue_->Push(reply);
+    }
+
+    void SSPModel::Restore() {
+        storage_->Restore();
+        progress_tracker_.Restore();
+
+//        std::this_thread::sleep_for(std::chrono::seconds(int(5)));
+        FlushAll();
+
+        int min_clock = progress_tracker_.GetMinClock();
+        LOG(INFO) << "SSPModel min_clock=" << min_clock;
+        progress_tracker_.DebugString();
     }
 
     void SSPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {

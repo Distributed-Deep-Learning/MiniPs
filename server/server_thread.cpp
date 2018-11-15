@@ -29,7 +29,7 @@ namespace csci5570 {
                 break;
 
             uint32_t model_id = msg.meta.model_id;
-            CHECK(models_.find(model_id) != models_.end()) << "Unknown model_id: " << model_id;
+            CHECK(models_.find(model_id) != models_.end()) << "Unknown model_id: " << model_id << "Debug msg" << msg.DebugString();
             switch (msg.meta.flag) {
                 case Flag::kClock: {
                     models_[model_id]->Clock(msg);

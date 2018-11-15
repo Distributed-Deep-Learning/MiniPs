@@ -102,13 +102,18 @@ namespace csci5570 {
         if (HasMaster()) {
             heartbeat_running_ = true;
             heartbeat_thread_ = std::thread([this]{
+//                if (Context::get_instance().get_bool("use_weight_file")) {
+//                    LOG(INFO) << "Send heartbeat right now after restart...";
+//                    HeartBeat(node_.id);
+//                }
+
                 int32_t interval = Context::get_instance().get_int32("heartbeat_interval");
                 while (interval > 0 && heartbeat_running_) {
                     std::this_thread::sleep_for(std::chrono::seconds(interval));
                     HeartBeat(node_.id);
-                    LOG(INFO) << "[Slave] post heartbeat to master from node:" << node_.id;
+                    //LOG(INFO) << "[Slave] post heartbeat to master from node:" << node_.id;
                 }
-                LOG(INFO) << "[Slave] node:" << node_.id << ", heartbeat service stopped...";
+                //LOG(INFO) << "[Slave] node:" << node_.id << ", heartbeat service stopped...";
                 HeartBeat(node_.id, true);
             });
         }
@@ -157,8 +162,8 @@ namespace csci5570 {
         VLOG(1) << "mailbox stops on node" << node_.id;
     }
 
-    void Engine::Barrier() {
-        mailbox_->Barrier();
+    void Engine::Barrier(bool send) {
+        mailbox_->Barrier(send);
     }
 
     void Engine::ForceQuit(uint32_t node_id) {
@@ -226,7 +231,10 @@ namespace csci5570 {
         for (auto table : tables) {
             InitTable(table, worker_spec.GetAllThreadIds());
         }
-        mailbox_->Barrier();
+
+        if (!Context::get_instance().get_bool("use_weight_file")) {
+            mailbox_->Barrier();
+        }
 
         // Spawn user threads
         if (worker_spec.HasLocalWorkers(node_.id)) {
@@ -257,10 +265,10 @@ namespace csci5570 {
 
                 thread_group[i] = std::thread([&task, info]() { task.RunLambda(info); });
             }
-            LOG(INFO) << "thread_group join start";
+            // LOG(INFO) << "thread_group join start";
             for (auto &th : thread_group) {
                 th.join();
-                LOG(INFO) << "thread_group join end";
+                // LOG(INFO) << "thread_group join end";
             }
         }
         // Let all the on-the-fly messages be recevied based on TCP/IP assumption

@@ -14,9 +14,10 @@
 #include "lib/batch_data_sampler.cpp"
 #include <cmath>
 #include <master/master.hpp>
+#include <lib/svm_dumper.hpp>
 
-DEFINE_int32(my_id, 2, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
+DEFINE_int32(my_id, 0, "The process id of this program");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///a2a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -24,7 +25,7 @@ DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
 DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP/SparseSSP");
 DEFINE_string(kStorageType, "Vector", "Map/Vector");
-DEFINE_int32(num_dims, 1000, "number of dimensions");
+DEFINE_int32(num_dims, 54686452, "number of dimensions");
 DEFINE_int32(batch_size, 1, "batch size of each epoch");
 DEFINE_int32(num_iters, 1000, "number of iters");
 DEFINE_int32(kStaleness, 0, "stalness");
@@ -35,12 +36,15 @@ DEFINE_int32(with_injected_straggler, 1, "with injected straggler or not, 0/1");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
 
-DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
+DEFINE_bool(use_weight_file, true, "use weight file to restore progress");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 //DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/datasets/dump_", "the checkpoint file prefix");
 DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_",
               "the checkpoint file prefix");
-DEFINE_int32(heartbeat_interval, 30, "the heatbeat check interval");
+DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
+DEFINE_string(relaunch_cmd,
+              "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
+              "the restart cmd");
 
 namespace csci5570 {
 
@@ -69,26 +73,41 @@ namespace csci5570 {
         LOG(INFO) << " accuracy is " << std::to_string(c_count / count);
     }
 
+    void RecoverIteration() {
+        SVMDumper dumper;
+        std::unordered_map<int, int> map = dumper.LoadConfigData();
+        for (auto it = map.begin(); it != map.end(); it++) {
+            Context::get_instance().SetIteration(it->first, it->second);
+        }
+    }
+
     void Training(Node &my_node, std::vector<Node> &nodes, Node &master_node) {
         // 1. Load data
-        HDFSManager::Config config;
-        config.url = FLAGS_input;
-        config.worker_host = my_node.hostname;
-        config.worker_port = my_node.port;
-        config.master_port = FLAGS_assigner_master_port;
-        config.master_host = nodes[0].hostname;
-        config.hdfs_namenode = FLAGS_hdfs_namenode;
-        config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
-        config.num_local_load_thread = FLAGS_num_workers_per_node;
-
         std::vector<SVMItem> data;
-        lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
-        lib::Parser<SVMItem> parser;
-        std::function<SVMItem(boost::string_ref)> parse = [parser](boost::string_ref line) {
-            // parse data
-            return parser.parse_libsvm(line);
-        };
-        loader.load(config, my_node, nodes, parse, data);
+        bool recovering = FLAGS_use_weight_file;
+        if (recovering) {
+            LOG(INFO) << "using weight file to recover data";
+            SVMDumper dumper;
+            data = dumper.LoadSVMData();
+        } else {
+            HDFSManager::Config config;
+            config.url = FLAGS_input;
+            config.worker_host = my_node.hostname;
+            config.worker_port = my_node.port;
+            config.master_port = FLAGS_assigner_master_port;
+            config.master_host = nodes[0].hostname;
+            config.hdfs_namenode = FLAGS_hdfs_namenode;
+            config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
+            config.num_local_load_thread = FLAGS_num_workers_per_node;
+
+            lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
+            lib::Parser<SVMItem> parser;
+            std::function<SVMItem(boost::string_ref)> parse = [parser](boost::string_ref line) {
+                // parse data
+                return parser.parse_libsvm(line);
+            };
+            loader.load(config, my_node, nodes, parse, data);
+        }
         LOG(INFO) << "Finished loading data on node " << my_node.id;
 
         // 2. Start engine
@@ -96,6 +115,10 @@ namespace csci5570 {
         engine.StartEverything();
         std::function<void(Node &, std::vector<Node> &, Node &)> restarter_func = Training;
         engine.SetRestarter(restarter_func);
+
+        if (recovering) {
+            RecoverIteration();
+        }
 
         // Quit the engine if no traning data is read
         if (data.empty()) {
@@ -106,7 +129,10 @@ namespace csci5570 {
             engine.StopEverything();
             return;
         }
-        engine.Barrier();
+
+        if (!recovering) {
+            engine.Barrier();
+        }
 
         // 3. Create tables
         nodes = engine.getNodes();
@@ -133,7 +159,16 @@ namespace csci5570 {
         }
         // Create table
         uint32_t kTableId = engine.CreateTable<double>(range, model_type, storage_type, FLAGS_kStaleness);
-        engine.Barrier();
+
+        if (!recovering) {
+            engine.Barrier();
+        }
+
+        // Init CheckPoint Dump callback
+        engine.SetDumpCallback([&data]() {
+            SVMDumper dumper;
+            dumper.DumpSVMData(data);
+        });
 
         // 3. Construct tasks
         MLTask task;
@@ -143,7 +178,14 @@ namespace csci5570 {
         }
         task.SetWorkerAlloc(worker_alloc);
         task.SetTables({kTableId});  // Use table 0
-        task.SetLambda([kTableId, &data](const Info &info) {
+
+        if (recovering) {
+            LOG(INFO) << "Wait Fault Barrier on Node=" << FLAGS_my_id;
+            engine.Barrier();
+            LOG(INFO) << "Pass Fault Barrier on Node=" << FLAGS_my_id;
+        }
+
+        task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
             LOG(INFO) << info.DebugString();
 
             BatchDataSampler<SVMItem> batch_data_sampler(data, FLAGS_batch_size);
@@ -170,11 +212,30 @@ namespace csci5570 {
             auto table = info.CreateKVClientTable<double>(kTableId);
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
-            for (int i = 0; i < FLAGS_num_iters; i++) {
+
+            for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
+                LOG(INFO) << "Current Iteration:" << i << ", on worker:" << info.worker_id;
+
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
+//                LOG(INFO) << "table->Get on worker=" << info.worker_id << ", start";
                 table->Get(keys, &params);
-                // CHECK_EQ(keys.size(), params.size());
+//                LOG(INFO) << "table->Get on worker=" << info.worker_id << ", end";
+                if (engine.IsNeedRollBack()) {
+                    engine.IncRollBackCount();
+
+                    if (info.worker_id % FLAGS_num_workers_per_node == 0) {
+                        RecoverIteration();
+                        engine.Barrier();
+                        engine.RecoverEnd();
+                    } else {
+                        engine.WaitRecover();
+                    }
+                    i = Context::get_instance().GetIteration(info.worker_id) - 1;
+                    continue;
+                }
+
+                CHECK_EQ(keys.size(), params.size());
                 deltas.resize(keys.size(), 0.0);
 
                 for (auto data : future_data_ptrs[i]) {  // iterate over the data in the batch
@@ -199,9 +260,9 @@ namespace csci5570 {
                 }
                 table->Add(keys, deltas);
                 table->Clock();
-                //CHECK_EQ(params.size(), keys.size());
+                CHECK_EQ(params.size(), keys.size());
 
-                if (i % 600 == 0 && info.worker_id == 0) {
+                if (i > 0 && i % 300 == 0 && info.worker_id == 0) {
                     auto now = std::chrono::steady_clock::now();
                     LOG(INFO) << "Start checkpoint, sent by worker: 0";
                     table->CheckPoint();
@@ -222,16 +283,15 @@ namespace csci5570 {
                         // LOG(INFO) << "sleep for " << int(delay) << " ms";
                     }
                 }
+
+                Context::get_instance().SetIteration(info.worker_id, i);
             }
             end_time = std::chrono::steady_clock::now();
 
             // test error
             if (info.worker_id % FLAGS_num_workers_per_node == 0) {
-                LOG(INFO) << "Finish training, start test error...1";
                 table->Get(all_keys, &params);
-                LOG(INFO) << "Finish training, start test error...2";
                 test_error<SVMItem>(params, data);
-                LOG(INFO) << "Finish training, start test error...3";
             }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();

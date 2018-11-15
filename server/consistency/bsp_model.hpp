@@ -31,6 +31,8 @@ namespace csci5570 {
 
         virtual void Dump(Message &msg) override;
 
+        virtual void Restore() override;
+
         virtual void Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) override;
 
         int GetGetPendingSize();

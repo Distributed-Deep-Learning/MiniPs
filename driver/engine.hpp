@@ -141,6 +141,12 @@ namespace csci5570 {
 
         void StopServerThreads();
 
+        void RollBackServer() {
+            for (auto &server_thread : server_thread_group_) {
+                server_thread->RollbackModel();
+            }
+        };
+
         void UpdateServerThreads(int failed_node_id, std::vector<Node> &nodes, third_party::Range range) {
             LOG(INFO) << "ServerThreadGroup Update start";
 
@@ -167,10 +173,49 @@ namespace csci5570 {
 
         void StopMailbox(bool barrier = true);
 
+        void SetDumpCallback(std::function<void()> dump_callback) {
+            dump_callback_ = dump_callback;
+        }
+
+        /**
+         * CheckPoint Dump:
+         * 1. Dump worker thread training data
+         * 2. Dump the training progress
+         */
+        void RunDumpCallback() {
+            dump_callback_();
+        }
+
+        void SetNeedRollBack(bool need) {
+            if (need) {
+                rollback_counter_ = 0;
+            }
+        }
+
+        bool IsNeedRollBack() {
+            return rollback_counter_ < Context::get_instance().get_int32("num_workers_per_node");
+        }
+
+        void IncRollBackCount() {
+            rollback_counter_ += 1;
+        }
+
+        void RecoverEnd() {
+            recover_end_ = true;
+            recover_cond_.notify_all();
+        }
+
+        void WaitRecover() {
+            std::unique_lock<std::mutex> lk(mu_);
+            recover_cond_.wait(lk, [this]() {
+                return recover_end_;
+            });
+        }
+
         /**
          * Synchronization barrier for processes
          */
-        void Barrier();
+        void Barrier(bool send = true);
 
         void ForceQuit(uint32_t node_id);
 
@@ -319,6 +364,13 @@ namespace csci5570 {
         std::thread heartbeat_thread_;
 
         std::function<void(Node &, std::vector<Node> &, Node &)> restarter_;
+        std::function<void()> dump_callback_;
+
+        int rollback_counter_ = 1000;
+
+        std::condition_variable recover_cond_;
+        bool recover_end_ = false;
+        std::mutex mu_;
     };
 
 }  // namespace csci5570

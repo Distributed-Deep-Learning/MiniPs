@@ -5,6 +5,7 @@ import os
 import os.path
 from os.path import dirname, join
 from launch_utils import launch_util
+from launch_utils import relaunch_nodes
 
 # [Local]
 # python logistic_regression.py local
@@ -13,12 +14,19 @@ from launch_utils import launch_util
 # python logistic_regression.py
 
 local_debug = True if len(sys.argv) >= 2 and sys.argv[1] == "local" else False
+relaunch = True if len(sys.argv) >= 2 and sys.argv[1] == "relaunch" else False
+failed_node_id = -1
+
+if relaunch:
+    local_debug = True
+    failed_node_id = sys.argv[2]
 
 hostfile = "config/localnodes" if local_debug else "config/clusternodes"
 progfile = ("cmake-build-debug" if local_debug else "debug") + "/LRExample"
 
 script_path = os.path.realpath(__file__)
 proj_dir = dirname(dirname(script_path))
+relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
 
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
@@ -41,6 +49,7 @@ params = {
     "weight_file_prefix": "",
     "heartbeat_interval": 10,
     "checkpoint_file_prefix": join(proj_dir, "local/dump_") if local_debug else "hdfs://proj10:9000/ybai/dump_",
+    "relaunch_cmd": relaunch_cmd,
 }
 
 env_params = (
@@ -55,4 +64,7 @@ env_params = (
 if (local_debug is False):
     env_params += "LIBHDFS3_CONF=/data/opt/course/hadoop/etc/hadoop/hdfs-site.xml"
 
-launch_util(progfile, hostfile, env_params, params, sys.argv)
+if relaunch is False:
+    launch_util(progfile, hostfile, env_params, params, sys.argv)
+else:
+    relaunch_nodes(progfile, hostfile, env_params, params, failed_node_id)

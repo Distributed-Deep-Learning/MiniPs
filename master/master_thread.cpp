@@ -29,6 +29,11 @@ namespace csci5570 {
 
             if (msg.meta.flag == Flag::kHeartBeat) {
                 heartbeats_[msg.meta.sender] = time(NULL);
+                if (msg.meta.sender == recovering_node_id_) {
+                    LOG(INFO) << "recovering success node:" << recovering_node_id_ << ", reset recoving node";
+                    SetRecoveringNodeId(-1);
+                    RollBack(msg.meta.sender);
+                }
                 LOG(INFO) << "[Master] heartbeat updated on node:" << msg.meta.sender;
             }
         }

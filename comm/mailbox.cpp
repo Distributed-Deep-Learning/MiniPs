@@ -1,6 +1,7 @@
 #include "comm/mailbox.hpp"
 
 #include <algorithm>
+#include <lib/svm_dumper.hpp>
 #include "glog/logging.h"
 
 namespace csci5570 {
@@ -144,7 +145,7 @@ namespace csci5570 {
                 if (barrier_count_ >= nodes_.size()) {
                     VLOG(1) << "Collected " << nodes_.size() << " barrier, Node:"
                             << node_.id << " unblocking main thread";
-                    barrier_cond_.notify_one();
+                    barrier_cond_.notify_all();
                 }
             } else if (msg.meta.flag == Flag::kForceQuit) {
                 LOG(INFO) << "Received kForceQuit from" << msg.meta.sender;
@@ -160,16 +161,35 @@ namespace csci5570 {
                     barrier_cond_.notify_one();
                 }
             } else if (msg.meta.flag == Flag::kRollBack) {
-                nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
-                    return msg.meta.sender == node.id;
-                }), nodes_.end());
+//                nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
+//                    return msg.meta.sender == node.id;
+//                }), nodes_.end());
 
                 int failed_node_id = msg.meta.sender;
-                LOG(INFO) << "Receving node dead msg:" << failed_node_id;
-                engine_->UpdateAndRestart(failed_node_id, nodes_);
-            } else {
+                if (failed_node_id != node_.id) {
+                    LOG(INFO) << "Receving node dead msg:" << failed_node_id << ", on node=" << node_.id;
+                    SVMDumper dumper;
+                    std::unordered_map<int, int> map = dumper.LoadConfigData();
+                    for (auto it = map.begin(); it != map.end(); it++) {
+                        Context::get_instance().SetIteration(it->first, it->second);
+                        LOG(INFO) << "Restore iteration on worker=" << it->first << ", with iter=" << it->second;
+                    }
+
+                    engine_->SetNeedRollBack(true);
+                    engine_->RollBackServer();
+                }
+//                engine_->UpdateAndRestart(failed_node_id, nodes_);
+
+            } else if (msg.meta.flag == Flag::kCheckpoint) {
+                LOG(INFO) << "Run Checkpoint on node=" << node_.id;
+                engine_->RunDumpCallback();
                 CHECK(queue_map_.find(msg.meta.recver) != queue_map_.end());
                 queue_map_[msg.meta.recver]->Push(std::move(msg));
+            } else {
+                // CHECK(queue_map_.find(msg.meta.recver) != queue_map_.end()) << msg.DebugString();
+                if (queue_map_.find(msg.meta.recver) != queue_map_.end()) {
+                    queue_map_[msg.meta.recver]->Push(std::move(msg));
+                }
             }
         }
     }
@@ -304,18 +324,24 @@ namespace csci5570 {
         return recv_bytes;
     }
 
-    void Mailbox::Barrier() {
-        for (auto &node : nodes_) {
-            Message barrier_msg;
-            barrier_msg.meta.sender = node_.id;
-            barrier_msg.meta.recver = node.id;
-            barrier_msg.meta.flag = Flag::kBarrier;
-            Send(barrier_msg);
+    void Mailbox::Barrier(bool send) {
+        if (send) {
+            for (auto &node : nodes_) {
+                Message barrier_msg;
+                barrier_msg.meta.sender = node_.id;
+                barrier_msg.meta.recver = node.id;
+                barrier_msg.meta.flag = Flag::kBarrier;
+                Send(barrier_msg);
+            }
         }
+
         std::unique_lock<std::mutex> lk(mu_);
         // Very tricky. Consider to use all-one-all method instead of all-all.
         barrier_cond_.wait(lk, [this]() { return barrier_count_ >= nodes_.size(); });
-        barrier_count_ -= nodes_.size();
+
+        if (send) {
+            barrier_count_ -= nodes_.size();
+        }
     }
 
     void Mailbox::ForceQuit(uint32_t node_id) {

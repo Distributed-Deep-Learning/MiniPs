@@ -84,6 +84,8 @@ namespace csci5570 {
 
     void BSPModel::Dump(Message &msg) {}
 
+    void BSPModel::Restore() {}
+
     void BSPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {}
 
 }  // namespace csci5570

@@ -21,6 +21,8 @@ namespace csci5570 {
 
         virtual void Dump(Message &msg) = 0;
 
+        virtual void Restore() = 0;
+
         virtual void Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) = 0;
 
         virtual ~AbstractModel() {}

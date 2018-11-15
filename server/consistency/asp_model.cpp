@@ -46,6 +46,8 @@ namespace csci5570 {
 
     void ASPModel::Dump(Message &msg) {}
 
+    void ASPModel::Restore() {}
+
     void ASPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {}
 
 }  // namespace csci5570

@@ -43,6 +43,14 @@ namespace csci5570 {
             heartbeats_.erase(failed_node_id);
         }
 
+        void SetRecoveringNodeId(int32_t recovering_node_id) {
+            recovering_node_id_ = recovering_node_id;
+        }
+
+        bool IsRecovering() {
+            return recovering_node_id_ != -1;
+        }
+
     protected:
         virtual void Main() override;
 
@@ -52,6 +60,8 @@ namespace csci5570 {
         std::vector<Node> nodes_;
 
         std::function<void(int32_t)> rollback_func_;
+
+        int32_t recovering_node_id_ = -1;
     };
 
 }

@@ -20,6 +20,12 @@ namespace csci5570 {
 
         void UpdateModel(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range);
 
+        void RollbackModel() {
+            for (auto it = models_.begin(); it != models_.end(); it++) {
+                it->second->Restore();
+            }
+        }
+
     protected:
         virtual void Main() override;                                  // where the actor polls events and reacts
 

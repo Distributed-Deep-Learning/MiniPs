@@ -11,8 +11,8 @@
 
 namespace csci5570 {
 
-    template <typename T>
-    std::vector<T> SArrayToVector(third_party::SArray<T> &sArray) {
+    template<typename T>
+    std::vector<T> SArrayToVector(third_party::SArray <T> &sArray) {
         std::vector<T> vec;
         for (T item : sArray) {
             vec.push_back(item);

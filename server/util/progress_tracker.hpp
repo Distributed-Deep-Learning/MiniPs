@@ -4,6 +4,10 @@
 #include <vector>
 #include "base/node.hpp"
 #include "glog/logging.h"
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <base/context.hpp>
+#include "base/third_party/general_fstream.hpp"
 
 namespace csci5570 {
 
@@ -55,7 +59,60 @@ namespace csci5570 {
 
         int Update(int failed_node_id, std::vector<Node> &nodes);
 
+        int32_t RoundHundred(uint32_t input) {
+            return 100 * round(input / 100.0);
+        }
+
+        void Dump() {
+            auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
+            auto node_id = Context::get_instance().get_int32("my_id");
+            auto dump_file = dump_prefix + "server_progress_" + std::to_string(node_id);
+            LOG(INFO) << "Dump Progress Storage To " << dump_file;
+
+            petuum::io::ofstream w_stream(dump_file, std::ofstream::out | std::ofstream::trunc);
+            w_stream << "min_clock" << ":" << RoundHundred(min_clock_) << " ";
+            CHECK(w_stream);
+            for (auto it = progresses_.begin(); it != progresses_.end(); it++) {
+                w_stream << it->first << ":" << RoundHundred(it->second) << " ";
+            }
+            w_stream.close();
+        }
+
+        void Restore() {
+            auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
+            auto node_id = Context::get_instance().get_int32("my_id");
+            auto dump_file = dump_prefix + "server_progress_" + std::to_string(node_id);
+            LOG(INFO) << "Restore Progress Storage From: " << dump_file;
+
+            std::ifstream input(dump_file.c_str());
+            std::string line;
+            while (std::getline(input, line)) {
+                std::vector<std::string> pairs;
+                boost::split(pairs, line, [](char c){return c == ' ';});
+                for (std::string str : pairs) {
+                    std::vector<std::string> pair;
+                    boost::split(pair, str, [](char c){return c == ':';});
+
+                    if (pair.size() < 2) {
+                        continue;
+                    }
+
+                    if (pair[0].compare("min_clock") == 0) {
+                        min_clock_ = std::atoi(pair[1].c_str());
+                        // LOG(INFO) << "Restore min clock to:" << min_clock_;
+                    } else {
+                        int model_id = std::atoi(pair[0].c_str());
+                        progresses_[model_id] = std::atoi(pair[1].c_str());
+                        // LOG(INFO) << "Restore progress model id=" << model_id << ", progress=" << progresses_[model_id];
+                    }
+                }
+            }
+            input.close();
+        }
+
         void DebugString() {
+            auto node_id = Context::get_instance().get_int32("my_id");
+            LOG(INFO) << "DebugString on node=" << std::to_string(node_id);
             for (auto it = progresses_.begin(); it != progresses_.end(); it++) {
                 LOG(INFO) << "tid:" << it->first << ", progress:" << it->second;
             }

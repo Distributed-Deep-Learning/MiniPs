@@ -10,6 +10,45 @@ ssh_cmd = (
   "-o UserKnownHostsFile=/dev/null "
 )
 
+def relaunch_nodes(progfile, hostfile, env_params, params, failed_node_id) :
+  prog_path, hostfile_path = parse_file(progfile, hostfile)
+  params["config_file"] = hostfile_path
+  params["use_weight_file"] = True
+  relaunch(prog_path, hostfile_path, env_params, params, failed_node_id)
+
+def relaunch(prog_path, hostfile_path, env_params, params, failed_node_id):
+  assert os.path.isfile(prog_path)
+  assert os.path.isfile(hostfile_path)
+
+  clear_cmd = "ls " + hostfile_path + " > /dev/null; ls " + prog_path + " > /dev/null; "
+  # use the following to allow core dumping
+  # clear_cmd = "ls " + hostfile_path + " > /dev/null; ls " + prog_path + " > /dev/null; ulimit -c unlimited; "
+  with open(hostfile_path, "r") as f:
+    hostlist = []
+    hostlines = f.read().splitlines()
+    for line in hostlines:
+      if not line.startswith("#"):
+        hostlist.append(line.split(":"))
+
+    for [node_id, host, port] in hostlist:
+      if node_id != failed_node_id:
+        print failed_node_id
+        continue
+
+      print "node_id:%s, host:%s, port:%s" %(node_id, host, port)
+      cmd = ssh_cmd + host + " "  # Start ssh command
+      cmd += "\""  # Remote command starts
+      cmd += clear_cmd
+      # Command to run program
+      cmd += env_params + " " + prog_path
+      cmd += " --my_id="+node_id
+      cmd += "".join([" --%s=%s" % (k,v) for k,v in params.items()])
+
+      cmd += "\""  # Remote Command ends
+      cmd += " &"
+      print cmd
+      os.system(cmd)
+
 def launch_nodes(prog_path, hostfile_path, env_params, params):
   assert os.path.isfile(prog_path)
   assert os.path.isfile(hostfile_path)

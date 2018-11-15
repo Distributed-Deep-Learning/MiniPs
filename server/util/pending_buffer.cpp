@@ -11,6 +11,22 @@ namespace csci5570 {
         return pop_msg;
     }
 
+    std::vector<Message> PendingBuffer::PopAll() {
+        std::vector<Message> pop_msg;
+        for (auto it = buffer_.begin(); it != buffer_.end(); it++) {
+            std::vector<Message> msgs = it->second;
+            for (Message msg : msgs) {
+                pop_msg.push_back(msg);
+            }
+        }
+        buffer_.clear();
+        return pop_msg;
+    }
+
+    void PendingBuffer::EraseAll() {
+        buffer_.clear();
+    }
+
     void PendingBuffer::Push(const int clock, Message &msg) {
         // TODO: check the clock passed in is less than the minimum clock in the buffer
         buffer_[clock].push_back(std::move(msg));

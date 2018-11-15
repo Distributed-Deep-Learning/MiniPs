@@ -40,7 +40,7 @@ namespace csci5570 {
 
         size_t GetQueueMapSize() const;
 
-        void Barrier();
+        void Barrier(bool send = true);
 
         void ForceQuit(uint32_t node_id);
 
