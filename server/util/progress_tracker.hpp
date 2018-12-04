@@ -63,6 +63,10 @@ namespace csci5570 {
             return 100 * round(input / 100.0);
         }
 
+        double round(double toRound) {
+            return std::ceil(toRound - 0.5);
+        }
+
         void Dump() {
             auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
             auto node_id = Context::get_instance().get_int32("my_id");
