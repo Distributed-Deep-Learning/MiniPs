@@ -8,6 +8,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <base/context.hpp>
 #include "base/third_party/general_fstream.hpp"
+#include <math.h>
 
 namespace csci5570 {
 
@@ -60,11 +61,7 @@ namespace csci5570 {
         int Update(int failed_node_id, std::vector<Node> &nodes);
 
         int32_t RoundHundred(uint32_t input) {
-            return 100 * round(input / 100.0);
-        }
-
-        double round(double toRound) {
-            return std::ceil(toRound - 0.5);
+            return 100 * ::round(input / 100.0);
         }
 
         void Dump() {
