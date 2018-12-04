@@ -91,7 +91,7 @@ namespace csci5570 {
         // Their ids are [0, 100) for node id 0.
         static const uint32_t kMaxBgThreadsPerNode = 100;
         // The server thread id for node 0 is in [0, 50)
-        // The worker thread id for node id 0 is in [50, 100)
+        // The worker thread id for node id 0 is in [100, 1000)
         static const uint32_t kWorkerHelperThreadId = 50;
 
     private:

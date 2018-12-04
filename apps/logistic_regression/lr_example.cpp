@@ -170,7 +170,7 @@ namespace csci5570 {
             dumper.DumpSVMData(data);
         });
 
-        // 3. Construct tasks
+        // 4. Construct tasks
         MLTask task;
         std::vector<WorkerAlloc> worker_alloc;
         for (auto &node : nodes) {
