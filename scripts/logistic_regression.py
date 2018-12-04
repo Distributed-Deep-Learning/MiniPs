@@ -47,7 +47,7 @@ params = {
     "kStorageType": "Vector",  # {Vector/Map}
     "use_weight_file": False,
     "weight_file_prefix": "",
-    "heartbeat_interval": 10,
+    "heartbeat_interval": 10 if local_debug else 200,
     "checkpoint_file_prefix": join(proj_dir, "local/dump_") if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "relaunch_cmd": relaunch_cmd,
 }
