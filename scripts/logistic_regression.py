@@ -21,7 +21,7 @@ if relaunch:
     local_debug = True
     failed_node_id = sys.argv[2]
 
-hostfile = "config/localnodes" if local_debug else "config/wl5"
+hostfile = "config/localnodes" if local_debug else "config/clusternodes"
 progfile = ("cmake-build-debug" if local_debug else "debug") + "/LRExample"
 
 script_path = os.path.realpath(__file__)
@@ -32,7 +32,7 @@ params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
     "hdfs_namenode_port": 9000,
     "assigner_master_port": 19201,
-    "input": "hdfs:///a2a" if local_debug else "hdfs:///jasper/kdd12",
+    "input": "hdfs:///a2a" if local_debug else "hdfs:///datasets/classification/kdd12",
     "kStaleness": 0,
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}

@@ -48,6 +48,10 @@ namespace csci5570 {
         virtual void FinishIter() override {}
 
         virtual void Dump() override {
+            if (!Context::get_instance().get_string("use_weight_file")) {
+                return;
+            }
+
             auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
             auto node_id = Context::get_instance().get_int32("my_id");
             auto dump_file = dump_prefix + "server_params_" + std::to_string(node_id);
