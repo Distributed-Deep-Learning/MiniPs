@@ -21,7 +21,7 @@ if relaunch:
     local_debug = True
     failed_node_id = sys.argv[2]
 
-hostfile = "config/localnodes" if local_debug else "config/clusternodes"
+hostfile = "config/localnodes" if local_debug else "config/wl5"
 progfile = ("cmake-build-debug" if local_debug else "debug") + "/LRExample"
 
 script_path = os.path.realpath(__file__)
