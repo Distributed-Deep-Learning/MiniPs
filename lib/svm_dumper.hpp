@@ -20,7 +20,7 @@ namespace csci5570 {
     public:
         // std::pair<std::vector<std::pair<int, double>>, double>
         void DumpSVMData(std::vector<SVMItem> data) {
-            if (!Context::get_instance().get_string("use_weight_file")) {
+            if (!Context::get_instance().get_bool("use_weight_file")) {
                 return;
             }
             auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
@@ -46,7 +46,7 @@ namespace csci5570 {
         }
 
         void DumpConfigData(std::unordered_map<int, int> iter_map) {
-            if (!Context::get_instance().get_string("use_weight_file")) {
+            if (!Context::get_instance().get_bool("use_weight_file")) {
                 return;
             }
             auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");

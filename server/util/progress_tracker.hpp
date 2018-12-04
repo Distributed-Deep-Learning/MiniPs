@@ -65,6 +65,10 @@ namespace csci5570 {
         }
 
         void Dump() {
+            if (!Context::get_instance().get_bool("use_weight_file")) {
+                return;
+            }
+
             auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
             auto node_id = Context::get_instance().get_int32("my_id");
             auto dump_file = dump_prefix + "server_progress_" + std::to_string(node_id);

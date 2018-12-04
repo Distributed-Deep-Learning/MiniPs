@@ -48,7 +48,7 @@ namespace csci5570 {
         virtual void FinishIter() override {}
 
         virtual void Dump() override {
-            if (!Context::get_instance().get_string("use_weight_file")) {
+            if (!Context::get_instance().get_bool("use_weight_file")) {
                 return;
             }
 
