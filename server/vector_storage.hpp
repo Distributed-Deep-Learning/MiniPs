@@ -74,7 +74,7 @@ namespace csci5570 {
             std::string line;
             while (std::getline(input, line)) {
                 std::vector<std::string> pair;
-                boost::split(pair, line, [](char c){return c == ' ';});
+                boost::split(pair, line, boost::is_any_of(" "));
                 int index = std::atoi(pair[0].c_str());
                 storage_[index] = std::atoi(pair[1].c_str());
             }

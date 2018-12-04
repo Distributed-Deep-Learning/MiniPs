@@ -35,8 +35,10 @@ namespace csci5570 {
 
     std::string Context::get_string(std::string key) {
         auto it = ctx_.find(key);
-        LOG_IF(FATAL, it == ctx_.end())
-        << "Failed to lookup " << key << " in context.";
+        if (it == ctx_.end()) {
+            LOG(INFO) << "Failed to lookup " << key << " in context.";
+            return "";
+        }
         return it->second;
     }
 

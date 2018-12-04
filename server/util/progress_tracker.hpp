@@ -88,10 +88,10 @@ namespace csci5570 {
             std::string line;
             while (std::getline(input, line)) {
                 std::vector<std::string> pairs;
-                boost::split(pairs, line, [](char c){return c == ' ';});
+                boost::split(pairs, line, boost::is_any_of(" "));
                 for (std::string str : pairs) {
                     std::vector<std::string> pair;
-                    boost::split(pair, str, [](char c){return c == ':';});
+                    boost::split(pair, str, boost::is_any_of(":"));
 
                     if (pair.size() < 2) {
                         continue;

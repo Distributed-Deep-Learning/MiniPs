@@ -67,10 +67,10 @@ namespace csci5570 {
             std::string line;
             while (std::getline(input, line)) {
                 std::vector<std::string> tokens;
-                boost::split(tokens, line, [](char c){return c == ' ';});
+                boost::split(tokens, line, boost::is_any_of(" "));
                 for (int i = 0; i < tokens.size(); i++) {
                     std::vector<std::string> pair_items;
-                    boost::split(pair_items, tokens[i], [](char c){return c == ':';});
+                    boost::split(pair_items, tokens[i], boost::is_any_of(":"));
                     if (pair_items.size() < 2) {
                         continue;
                     }
@@ -96,13 +96,13 @@ namespace csci5570 {
             while (std::getline(input, line)) {
                 SVMItem item;
                 std::vector<std::string> tokens;
-                boost::split(tokens, line, [](char c){return c == ' ';});
+                boost::split(tokens, line, boost::is_any_of(" "));
                 for (int i = 0; i < tokens.size(); i++) {
                     if (i == 0) {
                         item.second = std::atof(tokens[i].c_str());
                     } else {
                         std::vector<std::string> pair_items;
-                        boost::split(pair_items, tokens[i], [](char c){return c == ':';});
+                        boost::split(pair_items, tokens[i], boost::is_any_of(":"));
                         if (pair_items.size() < 2) {
                             continue;
                         }
