@@ -99,7 +99,14 @@ namespace csci5570 {
             std::vector<SVMItem> data;
             std::ifstream input(dump_file.c_str());
             std::string line;
+
+            bool print = true;
             while (std::getline(input, line)) {
+                if (print) {
+                    LOG(INFO) << "LoadSVMData enter loop";
+                    print = false;
+                }
+
                 SVMItem item;
                 std::vector<std::string> tokens;
                 boost::split(tokens, line, boost::is_any_of(" "));
