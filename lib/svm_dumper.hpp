@@ -69,7 +69,7 @@ namespace csci5570 {
             LOG(INFO) << "Load Config From: " << dump_file;
 
             std::unordered_map<int, int> result_map;
-            std::ifstream input(dump_file.c_str());
+            petuum::io::ifstream input(dump_file.c_str());
             std::string line;
             while (std::getline(input, line)) {
                 std::vector<std::string> tokens;
@@ -97,16 +97,11 @@ namespace csci5570 {
             LOG(INFO) << "Load Data From: " << dump_file;
 
             std::vector<SVMItem> data;
-            std::ifstream input(dump_file.c_str());
+            petuum::io::ifstream input(dump_file.c_str());
             std::string line;
 
             bool print = true;
             while (std::getline(input, line)) {
-                if (print) {
-                    LOG(INFO) << "LoadSVMData enter loop";
-                    print = false;
-                }
-
                 SVMItem item;
                 std::vector<std::string> tokens;
                 boost::split(tokens, line, boost::is_any_of(" "));

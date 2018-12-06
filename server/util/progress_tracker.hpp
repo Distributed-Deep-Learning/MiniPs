@@ -89,7 +89,7 @@ namespace csci5570 {
             auto dump_file = dump_prefix + "server_progress_" + std::to_string(node_id);
             LOG(INFO) << "Restore Progress Storage From: " << dump_file;
 
-            std::ifstream input(dump_file.c_str());
+            petuum::io::ifstream input(dump_file.c_str());
             std::string line;
             while (std::getline(input, line)) {
                 std::vector<std::string> pairs;
@@ -104,11 +104,9 @@ namespace csci5570 {
 
                     if (pair[0].compare("min_clock") == 0) {
                         min_clock_ = std::atoi(pair[1].c_str());
-                        // LOG(INFO) << "Restore min clock to:" << min_clock_;
                     } else {
                         int model_id = std::atoi(pair[0].c_str());
                         progresses_[model_id] = std::atoi(pair[1].c_str());
-                        // LOG(INFO) << "Restore progress model id=" << model_id << ", progress=" << progresses_[model_id];
                     }
                 }
             }

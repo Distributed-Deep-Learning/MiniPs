@@ -13,11 +13,9 @@ from launch_utils import relaunch_nodes
 # [Cluster]
 # python logistic_regression.py
 
-local_debug = True if len(sys.argv) >= 2 and sys.argv[1] == "local" else False
-relaunch = True if len(sys.argv) >= 2 and sys.argv[1] == "relaunch" else False
+local_debug = True if len(sys.argv) >= 2 and (sys.argv[1] == "local" or sys.argv[1] == "relocal") else False
+relaunch = True if len(sys.argv) >= 2 and (sys.argv[1] == "relaunch" or sys.argv[1] == "relocal") else False
 
-if relaunch and len(sys.argv) >= 3 and sys.argv[2] == "local":
-    local_debug = True
 failed_node_id = -1
 if relaunch:
     failed_node_id = sys.argv[2]
@@ -29,7 +27,7 @@ script_path = os.path.realpath(__file__)
 proj_dir = dirname(dirname(script_path))
 
 if local_debug:
-    relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch local \'"
+    relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relocal \'"
 else:
     relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
 
@@ -42,11 +40,11 @@ params = {
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}
     "kSparseSSPRecorderType": "Vector",  # {Vector/Map}
-    "num_dims": 16609143,
+    "num_dims": 123 if local_debug else 16609143,
     "batch_size": 1,
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
-    "num_local_load_thread": 100,
+    "num_local_load_thread": 2 if local_debug else 100,
     "num_iters": 1000,
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
@@ -55,7 +53,7 @@ params = {
     "use_weight_file": False,
     "weight_file_prefix": "",
     "heartbeat_interval": 10,
-    "checkpoint_file_prefix": join(proj_dir, "local/dump_") if local_debug else "hdfs://proj10:9000/ybai/dump_",
+    "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "relaunch_cmd": relaunch_cmd,
 }
 

@@ -172,12 +172,12 @@ namespace csci5570 {
 //            dumper.DumpSVMData(data);
         });
 
-//        if (Context::get_instance().get_bool("checkpoint_toggle")) {
-//            LOG(INFO) << "Dump Data for backup start...";
-//            SVMDumper dumper;
-//            dumper.DumpSVMData(data);
-//            LOG(INFO) << "Dump Data for backup end";
-//        }
+        if (Context::get_instance().get_bool("checkpoint_toggle")) {
+            LOG(INFO) << "Dump Data for backup start...";
+            SVMDumper dumper;
+            dumper.DumpSVMData(data);
+            LOG(INFO) << "Dump Data for backup end";
+        }
 
         // 4. Construct tasks
         MLTask task;

@@ -74,7 +74,7 @@ namespace csci5570 {
             auto dump_file = dump_prefix + "server_params_" + std::to_string(node_id);
             LOG(INFO) << "Restore Params Storage From " << dump_file;
 
-            std::ifstream input(dump_file.c_str());
+            petuum::io::ifstream input(dump_file.c_str());
             std::string line;
             while (std::getline(input, line)) {
                 std::vector<std::string> pair;
