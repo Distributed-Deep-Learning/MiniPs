@@ -32,16 +32,16 @@ params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
     "hdfs_namenode_port": 9000,
     "assigner_master_port": 19201,
-    "input": "hdfs:///a2a" if local_debug else "hdfs:///datasets/classification/kdd12",
+    "input": "hdfs:///a2a" if local_debug else "hdfs:///datasets/classification/webspam",
     "kStaleness": 0,
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}
     "kSparseSSPRecorderType": "Vector",  # {Vector/Map}
-    "num_dims": 54686452,
+    "num_dims": 16609143,
     "batch_size": 1,
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
-    "num_local_load_thread": 100,
+    "num_local_load_thread": 5,
     "num_iters": 1000,
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
