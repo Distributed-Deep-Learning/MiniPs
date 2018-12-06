@@ -88,7 +88,7 @@ namespace csci5570 {
         std::vector<SVMItem> data;
         bool recovering = FLAGS_use_weight_file;
         if (recovering) {
-            LOG(INFO) << "using weight file to recover data";
+            LOG(INFO) << "Recovering data...";
             SVMDumper dumper;
             data = dumper.LoadSVMData();
         } else {
@@ -172,12 +172,12 @@ namespace csci5570 {
 //            dumper.DumpSVMData(data);
         });
 
-//        if (Context::get_instance().get_bool("checkpoint_toggle")) {
-//            LOG(INFO) << "Dump Data for backup start...";
-//            SVMDumper dumper;
-//            dumper.DumpSVMData(data);
-//            LOG(INFO) << "Dump Data for backup end";
-//        }
+        if (Context::get_instance().get_bool("checkpoint_toggle")) {
+            LOG(INFO) << "Dump Data for backup start...";
+            SVMDumper dumper;
+            dumper.DumpSVMData(data);
+            LOG(INFO) << "Dump Data for backup end";
+        }
 
         // 4. Construct tasks
         MLTask task;
