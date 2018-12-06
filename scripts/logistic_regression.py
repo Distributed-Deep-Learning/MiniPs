@@ -46,7 +46,7 @@ params = {
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
     "kStorageType": "Vector",  # {Vector/Map}
-    "checkpoint_toggle": False,
+    "checkpoint_toggle": True,
     "use_weight_file": False,
     "weight_file_prefix": "",
     "heartbeat_interval": 10 if local_debug else 200,

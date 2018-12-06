@@ -168,9 +168,16 @@ namespace csci5570 {
 
         // Init CheckPoint Dump callback
         engine.SetDumpCallback([&data]() {
+//            SVMDumper dumper;
+//            dumper.DumpSVMData(data);
+        });
+
+        if (Context::get_instance().get_bool("checkpoint_toggle")) {
+            LOG(INFO) << "Start DumpSVMData for backup...";
             SVMDumper dumper;
             dumper.DumpSVMData(data);
-        });
+            LOG(INFO) << "End DumpSVMData for backup.";
+        }
 
         // 4. Construct tasks
         MLTask task;
