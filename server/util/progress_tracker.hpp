@@ -65,7 +65,7 @@ namespace csci5570 {
         }
 
         void Dump() {
-            if (!Context::get_instance().get_bool("use_weight_file")) {
+            if (!Context::get_instance().get_bool("checkpoint_toggle")) {
                 return;
             }
 

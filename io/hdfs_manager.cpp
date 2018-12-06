@@ -34,13 +34,12 @@ namespace csci5570 {
     }
 
     void HDFSManager::Run(const std::function<void(InputFormat *, int)> &func) {
-        LOG(INFO) << "HDFS Manager Running...";
-
         int num_threads = nodes_.size() * config_.num_local_load_thread;
         coordinator_ = new Coordinator(node_.id, config_.worker_host, zmq_context_, config_.master_host,
                                        config_.master_port);
         coordinator_->serve();
         std::vector<std::thread> threads;
+        LOG(INFO) << "HDFS Manager Running with " << config_.num_local_load_thread << " load thread.";
         for (int i = 0; i < config_.num_local_load_thread; ++i) {
             std::thread load_thread = std::thread([this, num_threads, i, func] {
                 InputFormat input_format(config_, coordinator_, num_threads);

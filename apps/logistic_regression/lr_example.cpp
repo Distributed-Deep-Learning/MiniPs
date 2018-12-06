@@ -32,11 +32,13 @@ DEFINE_int32(kStaleness, 0, "stalness");
 DEFINE_int32(kSpeculation, 5, "speculation");
 DEFINE_string(kSparseSSPRecorderType, "Vector", "None/Map/Vector");
 DEFINE_int32(num_workers_per_node, 2, "num_workers_per_node");
+DEFINE_int32(num_local_load_thread, 100, "num_local_load_thread");
 DEFINE_int32(with_injected_straggler, 1, "with injected straggler or not, 0/1");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
 
 DEFINE_bool(use_weight_file, true, "use weight file to restore progress");
+DEFINE_bool(checkpoint_toggle, true, "open checkpoint");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 //DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/datasets/dump_", "the checkpoint file prefix");
 DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_",
@@ -98,7 +100,7 @@ namespace csci5570 {
             config.master_host = nodes[0].hostname;
             config.hdfs_namenode = FLAGS_hdfs_namenode;
             config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
-            config.num_local_load_thread = FLAGS_num_workers_per_node;
+            config.num_local_load_thread = FLAGS_num_local_load_thread;
 
             lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
             lib::Parser<SVMItem> parser;
@@ -218,9 +220,7 @@ namespace csci5570 {
 
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
-//                LOG(INFO) << "table->Get on worker=" << info.worker_id << ", start";
                 table->Get(keys, &params);
-//                LOG(INFO) << "table->Get on worker=" << info.worker_id << ", end";
                 if (engine.IsNeedRollBack()) {
                     engine.IncRollBackCount();
 

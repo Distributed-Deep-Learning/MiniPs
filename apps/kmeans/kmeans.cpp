@@ -30,6 +30,7 @@ DEFINE_string(kStorageType, "Vector", "Map/Vector");
 DEFINE_int32(kStaleness, 0, "stalness");
 DEFINE_uint32(num_workers_per_node, 1, "num_workers_per_node");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
+DEFINE_int32(num_local_load_thread, 100, "num_local_load_thread");
 DEFINE_int32(num_nodes, 1, "num_nodes");
 DEFINE_int32(batch_size, 100, "batch size of each epoch");
 DEFINE_uint64(K, 2, "K");
@@ -81,7 +82,7 @@ namespace csci5570 {
         config.master_host = nodes[0].hostname;
         config.hdfs_namenode = FLAGS_hdfs_namenode;
         config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
-        config.num_local_load_thread = FLAGS_num_workers_per_node;
+        config.num_local_load_thread = FLAGS_num_local_load_thread;
 
         // parse data
         std::vector<SVMItem> data;
