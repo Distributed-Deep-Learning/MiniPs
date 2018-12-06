@@ -41,13 +41,12 @@ namespace csci5570 {
                         }
 
                         auto item = input_format->GetNextItem();
-                        if (item.empty()) {
-                            return;
-                        }
+                        if (item.empty()) return;
 
                         // 3. Put samples into datastore
+                        auto data = parse(item);
                         lock.lock();
-                        datastore.push_back(parse(item));
+                        datastore.push_back(data);
                         count++;
                         lock.unlock();
                     }
