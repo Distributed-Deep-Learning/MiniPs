@@ -15,10 +15,11 @@ from launch_utils import relaunch_nodes
 
 local_debug = True if len(sys.argv) >= 2 and sys.argv[1] == "local" else False
 relaunch = True if len(sys.argv) >= 2 and sys.argv[1] == "relaunch" else False
-failed_node_id = -1
 
-if relaunch:
+if relaunch and len(sys.argv) >= 3 and sys.argv[2] == "local":
     local_debug = True
+failed_node_id = -1
+if relaunch:
     failed_node_id = sys.argv[2]
 
 hostfile = "config/localnodes" if local_debug else "config/clusternodes"
@@ -26,7 +27,11 @@ progfile = ("cmake-build-debug" if local_debug else "debug") + "/LRExample"
 
 script_path = os.path.realpath(__file__)
 proj_dir = dirname(dirname(script_path))
-relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
+
+if local_debug:
+    relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch local \'"
+else:
+    relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
 
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
@@ -49,7 +54,7 @@ params = {
     "checkpoint_toggle": True,
     "use_weight_file": False,
     "weight_file_prefix": "",
-    "heartbeat_interval": 10 if local_debug else 200,
+    "heartbeat_interval": 10,
     "checkpoint_file_prefix": join(proj_dir, "local/dump_") if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "relaunch_cmd": relaunch_cmd,
 }
