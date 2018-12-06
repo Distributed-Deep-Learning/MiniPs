@@ -36,10 +36,6 @@ namespace csci5570 {
                     // 2. Extract and parse lines
                     int count = 0;
                     while (input_format->HasNext()) {
-                        if (count == 0) {
-                            LOG(INFO) << "Start load data on node=" << my_node.id << " with tid=" << local_tid;
-                        }
-
                         auto item = input_format->GetNextItem();
                         if (item.empty()) return;
 
@@ -50,8 +46,6 @@ namespace csci5570 {
                         count++;
                         lock.unlock();
                     }
-                    LOG(INFO) << count << " lines in (node, thread):("
-                              << my_node.id << "," << local_tid << ")";
                 });
                 hdfs_manager.Stop();
             }

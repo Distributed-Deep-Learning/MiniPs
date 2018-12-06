@@ -39,7 +39,7 @@ namespace csci5570 {
                                        config_.master_port);
         coordinator_->serve();
         std::vector<std::thread> threads;
-        LOG(INFO) << "HDFS Manager Running with " << config_.num_local_load_thread << " load thread.";
+        LOG(INFO) << "Start load data with " << config_.num_local_load_thread << " threads...";
         for (int i = 0; i < config_.num_local_load_thread; ++i) {
             std::thread load_thread = std::thread([this, num_threads, i, func] {
                 InputFormat input_format(config_, coordinator_, num_threads);
