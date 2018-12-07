@@ -30,11 +30,11 @@ if local_debug:
     relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relocal \'"
 else:
     relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
-
+[]
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
     "hdfs_namenode_port": 9000,
-    "assigner_master_port": 19201,
+    "assigner_master_port": 18011,
     "input": "hdfs:///a2a" if local_debug else "hdfs:///datasets/classification/webspam",
     "kStaleness": 0,
     "kSpeculation": 5,
@@ -53,7 +53,7 @@ params = {
     "use_weight_file": False,
     "init_dump": True if local_debug else False,
     "weight_file_prefix": "",
-    "heartbeat_interval": 10 if local_debug else 30, # join(proj_dir, "local/dump_")
+    "heartbeat_interval": 10 if local_debug else 15, # join(proj_dir, "local/dump_")
     "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_

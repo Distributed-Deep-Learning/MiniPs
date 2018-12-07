@@ -1,3 +1,4 @@
+#include <base/context.hpp>
 #include "hdfs_assigner.hpp"
 
 #include "glog/logging.h"
@@ -22,11 +23,17 @@ namespace csci5570 {
 
     void HDFSBlockAssigner::Serve() {
         while (running_) {
+            if (Context::get_instance().get_bool("use_weight_file")) {
+                LOG(INFO) << "HDFSBlockAssigner::Serve() start 1";
+            }
             zmq::message_t msg1, msg2, msg3;
             zmq_recv_common(master_socket_.get(), &msg1);
             std::string cur_client = std::string(reinterpret_cast<char *>(msg1.data()), msg1.size());
             zmq_recv_common(master_socket_.get(), &msg2);
             zmq_recv_common(master_socket_.get(), &msg3);
+            if (Context::get_instance().get_bool("use_weight_file")) {
+                LOG(INFO) << "HDFSBlockAssigner::Serve() received 2";
+            }
             int msg_int = *reinterpret_cast<int32_t *>(msg3.data());
             if (msg_int == kBlockRequest) {
                 handle_block_request(cur_client);
@@ -61,7 +68,9 @@ namespace csci5570 {
     }
 
     void HDFSBlockAssigner::handle_block_request(const std::string &cur_client) {
-        LOG(INFO) << "HDFSBlockAssigner::handle_block_request...start";
+        if (Context::get_instance().get_bool("use_weight_file")) {
+            LOG(INFO) << "HDFSBlockAssigner::handle_block_request...start";
+        }
         std::string url, host, load_type;
         int num_threads, id;
 
@@ -76,7 +85,9 @@ namespace csci5570 {
         std::pair<std::string, size_t> ret = answer(host, url, id);
         stream.clear();
         stream << ret.first << ret.second;
-        LOG(INFO) << "HDFSBlockAssigner::handle_block_request...end";
+        if (Context::get_instance().get_bool("use_weight_file")) {
+            LOG(INFO) << "HDFSBlockAssigner::handle_block_request...end";
+        }
 
         zmq_send_common(master_socket_.get(), cur_client.data(), cur_client.length(), ZMQ_SNDMORE);
         zmq_send_common(master_socket_.get(), nullptr, 0, ZMQ_SNDMORE);
