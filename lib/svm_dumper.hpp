@@ -98,7 +98,7 @@ namespace csci5570 {
             auto dump_file = dump_prefix + "worker_" + std::to_string(node_id);
             LOG(INFO) << "Load Data From: " << dump_file;
             config.url = dump_file;
-            config.master_host = "localhost"
+            config.master_host = node.hostname;
 
             zmq::context_t *zmq_context = new zmq::context_t(1);
             std::vector<Node> nodes;
