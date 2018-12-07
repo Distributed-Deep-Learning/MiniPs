@@ -9,10 +9,12 @@
 #include <base/context.hpp>
 #include <base/third_party/general_fstream.hpp>
 #include <iostream>
+#include <io/hdfs_manager.hpp>
 #include <vector>
 #include <string>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include "boost/utility/string_ref.hpp"
 
 namespace csci5570 {
 
@@ -26,7 +28,7 @@ namespace csci5570 {
             auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
             auto node_id = Context::get_instance().get_int32("my_id");
             auto dump_file = dump_prefix + "worker_" + std::to_string(node_id);
-            LOG(INFO) << "Dump Data To: " << dump_file;
+            LOG(INFO) << "Dump Data To: " << dump_file << ", Size=" << data.size();
 
             petuum::io::ofstream w_stream(dump_file, std::ofstream::out | std::ofstream::trunc);
             CHECK(w_stream);
@@ -89,41 +91,67 @@ namespace csci5570 {
             return result_map;
         }
 
-        std::vector<SVMItem> LoadSVMData() {
-            auto dump_prefix = Context::get_instance().get_string("checkpoint_file_prefix");
+        std::vector<SVMItem> LoadSVMData(Node node, HDFSManager::Config config,
+                                         std::vector<SVMItem> &datastore) {
+            auto dump_prefix = Context::get_instance().get_string("checkpoint_raw_prefix");
             auto node_id = Context::get_instance().get_int32("my_id");
             auto dump_file = dump_prefix + "worker_" + std::to_string(node_id);
             LOG(INFO) << "Load Data From: " << dump_file;
+            config.url = dump_file;
 
-            std::vector<SVMItem> data;
-            petuum::io::ifstream input(dump_file.c_str());
-            std::string line;
+            zmq::context_t *zmq_context = new zmq::context_t(1);
+            std::vector<Node> nodes;
+            nodes.push_back(node);
+            HDFSManager hdfs_manager(node, nodes, config, zmq_context);
 
-            bool print = true;
-            while (std::getline(input, line)) {
-                SVMItem item;
-                std::vector<std::string> tokens;
-                boost::split(tokens, line, boost::is_any_of(" "));
-                for (int i = 0; i < tokens.size(); i++) {
-                    if (i == 0) {
-                        item.second = std::atof(tokens[i].c_str());
-                    } else {
-                        std::vector<std::string> pair_items;
-                        boost::split(pair_items, tokens[i], boost::is_any_of(":"));
-                        if (pair_items.size() < 2) {
-                            continue;
-                        }
+            std::thread master_thread = std::thread([this, config, zmq_context] {
+                HDFSBlockAssigner hdfs_block_assigner(config.hdfs_namenode, config.hdfs_namenode_port, zmq_context,
+                                                      config.master_port);
+                hdfs_block_assigner.Serve();
+            });
 
-                        std::pair<int, double> pair_item;
-                        pair_item.first = std::atoi(pair_items[0].c_str());;
-                        pair_item.second = std::atof(pair_items[1].c_str());
-                        item.first.push_back(pair_item);
-                    }
+            std::mutex lock;
+            hdfs_manager.Run([this, node, &datastore, &lock](HDFSManager::InputFormat *input_format, int local_tid) {
+                int count = 0;
+                while (input_format->HasNext()) {
+                    auto item = input_format->GetNextItem();
+                    if (item.empty()) return;
+
+                    // 3. Put samples into datastore
+                    auto data = parse(item);
+                    lock.lock();
+                    datastore.push_back(data);
+                    count++;
+                    lock.unlock();
                 }
-                data.push_back(item);
+            });
+            master_thread.join();
+            LOG(INFO) << "Load Data Done With Size=" << datastore.size();
+
+            return datastore;
+        }
+
+        SVMItem parse(boost::string_ref line) {
+            SVMItem item;
+            std::vector<std::string> tokens;
+            boost::split(tokens, line, boost::is_any_of(" "));
+            for (int i = 0; i < tokens.size(); i++) {
+                if (i == 0) {
+                    item.second = std::atof(tokens[i].c_str());
+                } else {
+                    std::vector<std::string> pair_items;
+                    boost::split(pair_items, tokens[i], boost::is_any_of(":"));
+                    if (pair_items.size() < 2) {
+                        continue;
+                    }
+
+                    std::pair<int, double> pair_item;
+                    pair_item.first = std::atoi(pair_items[0].c_str());;
+                    pair_item.second = std::atof(pair_items[1].c_str());
+                    item.first.push_back(pair_item);
+                }
             }
-            input.close();
-            return data;
+            return item;
         }
 
     };

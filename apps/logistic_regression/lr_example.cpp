@@ -25,14 +25,14 @@ DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
 DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP/SparseSSP");
 DEFINE_string(kStorageType, "Vector", "Map/Vector");
-DEFINE_int32(num_dims, 54686452, "number of dimensions");
+DEFINE_int32(num_dims, 123, "number of dimensions");
 DEFINE_int32(batch_size, 1, "batch size of each epoch");
 DEFINE_int32(num_iters, 1000, "number of iters");
 DEFINE_int32(kStaleness, 0, "stalness");
 DEFINE_int32(kSpeculation, 5, "speculation");
 DEFINE_string(kSparseSSPRecorderType, "Vector", "None/Map/Vector");
 DEFINE_int32(num_workers_per_node, 2, "num_workers_per_node");
-DEFINE_int32(num_local_load_thread, 100, "num_local_load_thread");
+DEFINE_int32(num_local_load_thread, 2, "num_local_load_thread");
 DEFINE_int32(with_injected_straggler, 1, "with injected straggler or not, 0/1");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
@@ -41,9 +41,8 @@ DEFINE_bool(init_dump, true, "init_dump");
 DEFINE_bool(use_weight_file, true, "use weight file to restore progress");
 DEFINE_bool(checkpoint_toggle, true, "open checkpoint");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
-//DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/datasets/dump_", "the checkpoint file prefix");
-DEFINE_string(checkpoint_file_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/dump_",
-              "the checkpoint file prefix");
+DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/dump/dump_", "the checkpoint file prefix");
+DEFINE_string(checkpoint_raw_prefix, "hdfs:///dump/dump_", "the checkpoint raw prefix");
 DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
 DEFINE_string(relaunch_cmd,
               "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
@@ -87,28 +86,28 @@ namespace csci5570 {
     void Training(Node &my_node, std::vector<Node> &nodes, Node &master_node) {
         // 1. Load data
         std::vector<SVMItem> data;
+        HDFSManager::Config config;
+        config.url = FLAGS_input;
+        config.worker_host = my_node.hostname;
+        config.worker_port = my_node.port;
+        config.master_port = FLAGS_assigner_master_port;
+        config.master_host = nodes[0].hostname;
+        config.hdfs_namenode = FLAGS_hdfs_namenode;
+        config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
+        config.num_local_load_thread = FLAGS_num_local_load_thread;
+
         bool recovering = FLAGS_use_weight_file;
         if (recovering) {
             LOG(INFO) << "Recovering data...";
             SVMDumper dumper;
-            data = dumper.LoadSVMData();
+            dumper.LoadSVMData(my_node, config, data);
         } else {
-            HDFSManager::Config config;
-            config.url = FLAGS_input;
-            config.worker_host = my_node.hostname;
-            config.worker_port = my_node.port;
-            config.master_port = FLAGS_assigner_master_port;
-            config.master_host = nodes[0].hostname;
-            config.hdfs_namenode = FLAGS_hdfs_namenode;
-            config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
-            config.num_local_load_thread = FLAGS_num_local_load_thread;
-
-            lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
             lib::Parser<SVMItem> parser;
             std::function<SVMItem(boost::string_ref)> parse = [parser](boost::string_ref line) {
                 // parse data
                 return parser.parse_libsvm(line);
             };
+            lib::AbstractDataLoader<SVMItem, std::vector<SVMItem>> loader;
             loader.load(config, my_node, nodes, parse, data);
         }
         LOG(INFO) << "Finished loading data on node " << my_node.id;

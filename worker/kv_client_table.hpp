@@ -145,7 +145,6 @@ namespace csci5570 {
                 msg.meta.recver = server_id;
                 msg.meta.model_id = model_id_;
                 msg.meta.flag = Flag::kCheckpoint;
-                LOG(INFO) << "CheckPoint_ msg=" << msg.DebugString();
                 sender_queue_->Push(std::move(msg));
             }
 

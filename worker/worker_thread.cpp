@@ -60,12 +60,12 @@ namespace csci5570 {
         Check(app_thread_id, model_id);
         std::unique_lock<std::mutex> lk(mu_);
 
-//        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---start";
+        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---start";
         cond_.wait(lk, [this, app_thread_id, model_id] {
-//            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---middle, " << tracker_[app_thread_id][model_id].first << "," << tracker_[app_thread_id][model_id].second;
+            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---middle, " << tracker_[app_thread_id][model_id].first << "," << tracker_[app_thread_id][model_id].second;
             return tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second;
         });
-//        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---end";
+        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---end";
     }
 
     void WorkerThread::AddResponse(uint32_t app_thread_id, uint32_t model_id, Message &msg) {

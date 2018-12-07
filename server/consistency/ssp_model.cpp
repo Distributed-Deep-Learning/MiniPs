@@ -50,7 +50,7 @@ namespace csci5570 {
         int progress = progress_tracker_.GetProgress(msg.meta.sender);
         int min_clock = progress_tracker_.GetMinClock();
 //        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
-//        progress_tracker_.DebugString();
+        progress_tracker_.DebugString();
         if (progress > min_clock + staleness_) {
             buffer_.Push(progress - staleness_, msg);
         } else {
