@@ -147,6 +147,10 @@ namespace csci5570 {
             }
         };
 
+        void RollBackWorker() {
+            worker_thread_->RollBackWorker();
+        }
+
         void UpdateServerThreads(int failed_node_id, std::vector<Node> &nodes, third_party::Range range) {
             LOG(INFO) << "ServerThreadGroup Update start";
 

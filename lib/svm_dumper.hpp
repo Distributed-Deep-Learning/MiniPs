@@ -83,7 +83,6 @@ namespace csci5570 {
 
                     int worker_id = std::atoi(pair_items[0].c_str());
                     int iter = std::atoi(pair_items[1].c_str());
-                    LOG(INFO) << "Load iter on worker:" << worker_id << ", with iter:" << iter;
                     result_map[worker_id] = iter;
                 }
             }

@@ -177,11 +177,11 @@ namespace csci5570 {
 
                     engine_->SetNeedRollBack(true);
                     engine_->RollBackServer();
+                    engine_->RollBackWorker();
                 }
 //                engine_->UpdateAndRestart(failed_node_id, nodes_);
 
             } else if (msg.meta.flag == Flag::kCheckpoint) {
-                LOG(INFO) << "Run Checkpoint on node=" << node_.id;
                 engine_->RunDumpCallback();
                 CHECK(queue_map_.find(msg.meta.recver) != queue_map_.end());
                 queue_map_[msg.meta.recver]->Push(std::move(msg));

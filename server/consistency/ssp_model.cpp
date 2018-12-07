@@ -32,8 +32,8 @@ namespace csci5570 {
     }
 
     void SSPModel::FlushAll() {
-        LOG(INFO) << "SSPModel::FlushAll";
         auto reqs = buffer_.PopAll();
+        LOG(INFO) << "SSPModel::FlushAll with message size=" << reqs.size();
         for (auto req : reqs) {
             reply_queue_->Push(storage_->Get(req));
         }
@@ -49,8 +49,8 @@ namespace csci5570 {
 
         int progress = progress_tracker_.GetProgress(msg.meta.sender);
         int min_clock = progress_tracker_.GetMinClock();
-        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
-        progress_tracker_.DebugString();
+//        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
+//        progress_tracker_.DebugString();
         if (progress > min_clock + staleness_) {
             buffer_.Push(progress - staleness_, msg);
         } else {

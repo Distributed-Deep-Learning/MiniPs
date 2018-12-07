@@ -3,6 +3,7 @@
 // Created by aiyongbiao on 2018/9/28.
 //
 
+#include <base/context.hpp>
 #include "worker_thread.hpp"
 #include "glog/logging.h"
 
@@ -76,13 +77,14 @@ namespace csci5570 {
         }
 
         recv_handle_[app_thread_id][model_id](msg);
-        if (recv_finish) {
+        if (recv_finish && recv_finish_handle_[app_thread_id][model_id]) {
             recv_finish_handle_[app_thread_id][model_id]();
         }
 
         {
             std::lock_guard<std::mutex> lk(mu_);
             tracker_[app_thread_id][model_id].second += 1;
+//            LOG(INFO) << "AddResponse finish=" << recv_finish << ",id=" << app_thread_id << ",cur=" << tracker_[app_thread_id][model_id].second;
             if (recv_finish) {
                 cond_.notify_all();
             }
@@ -108,6 +110,31 @@ namespace csci5570 {
         checkpoint_current_ += 1;
         if (checkpoint_expect_ == checkpoint_current_) {
             cond_.notify_all();
+        }
+    }
+
+    void WorkerThread::RollBackWorker() {
+        LOG(INFO) << "RollBackWorker On Node=" << Context::get_instance().get_int32("my_id");
+        for (auto app_it = tracker_.begin(); app_it != tracker_.end(); app_it++) {
+            uint32_t app_thread_id = app_it->first;
+            auto models = app_it->second;
+            for (auto model_it = models.begin(); model_it != models.end(); model_it++) {
+                uint32_t model_id = model_it->first;
+                auto pair = model_it->second;
+
+                {
+                    std::lock_guard<std::mutex> lk(mu_);
+                    if (pair.first > 0) {
+                        tracker_[app_thread_id][model_id].second = pair.first;
+                        recv_finish_handle_[app_thread_id][model_id] = 0;
+                        LOG(INFO) << "WorkThread Update:" << app_thread_id << "," << model_id << "," << pair.first << ", " << pair.second;
+                        if (tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second) {
+                            //recv_finish_handle_[app_thread_id][model_id]();
+                            cond_.notify_all();
+                        }
+                    }
+                }
+            }
         }
     }
 

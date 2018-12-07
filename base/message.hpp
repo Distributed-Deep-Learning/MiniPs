@@ -26,7 +26,7 @@ namespace csci5570 {
         kRollBack
     };
     static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet", "kForceQuit",
-                                     "kHeartBeat", "kQuitHeartBeat", "kRollBack"
+                                     "kCheckpoint", "kHeartBeat", "kQuitHeartBeat", "kRollBack"
     };
 
     struct Meta {

@@ -37,6 +37,8 @@ namespace csci5570 {
 
         virtual void Update();
 
+        virtual void RollBackWorker();
+
     protected:
         void Main() override;
         // callback on receival of a message

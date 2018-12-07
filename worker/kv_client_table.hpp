@@ -145,6 +145,7 @@ namespace csci5570 {
                 msg.meta.recver = server_id;
                 msg.meta.model_id = model_id_;
                 msg.meta.flag = Flag::kCheckpoint;
+                LOG(INFO) << "CheckPoint_ msg=" << msg.DebugString();
                 sender_queue_->Push(std::move(msg));
             }
 
@@ -173,6 +174,9 @@ namespace csci5570 {
 
         template<typename V>
         void Get_(const third_party::SArray <Key> &keys, V *vals) {
+            // clear buffer
+            recv_kvs_.clear();
+
             // Slice the data, vals should be empty, as it will return in the HandleFinish_
             std::vector<std::pair<int, KVPairs>> sliced;
             partition_manager_->Slice(std::make_pair(keys, third_party::SArray<Val>()), &sliced);

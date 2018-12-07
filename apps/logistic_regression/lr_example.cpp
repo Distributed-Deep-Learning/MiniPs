@@ -37,6 +37,7 @@ DEFINE_int32(with_injected_straggler, 1, "with injected straggler or not, 0/1");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
 
+DEFINE_bool(init_dump, true, "init_dump");
 DEFINE_bool(use_weight_file, true, "use weight file to restore progress");
 DEFINE_bool(checkpoint_toggle, true, "open checkpoint");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
@@ -172,11 +173,10 @@ namespace csci5570 {
 //            dumper.DumpSVMData(data);
         });
 
-        if (Context::get_instance().get_bool("checkpoint_toggle")) {
-            LOG(INFO) << "Dump Data for backup start...";
+        if (Context::get_instance().get_bool("checkpoint_toggle") &&
+            Context::get_instance().get_bool("init_dump")) {
             SVMDumper dumper;
             dumper.DumpSVMData(data);
-            LOG(INFO) << "Dump Data for backup end";
         }
 
         // 4. Construct tasks
@@ -189,9 +189,9 @@ namespace csci5570 {
         task.SetTables({kTableId});  // Use table 0
 
         if (recovering) {
-            LOG(INFO) << "Wait Fault Barrier on Node=" << FLAGS_my_id;
+            LOG(INFO) << "Wait Fault Barrier on Failed Node=" << FLAGS_my_id;
             engine.Barrier();
-            LOG(INFO) << "Pass Fault Barrier on Node=" << FLAGS_my_id;
+            LOG(INFO) << "Pass Fault Barrier on Failed Node=" << FLAGS_my_id;
         }
 
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
@@ -223,20 +223,24 @@ namespace csci5570 {
             third_party::SArray<double> deltas;
 
             for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
-                LOG(INFO) << "Current Iteration:" << i << ", on worker:" << info.worker_id;
-
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
+//                LOG(INFO) << "Start Get With Iter=" << i << " On Node:" << Context::get_instance().get_int32("my_id");
                 table->Get(keys, &params);
+//                LOG(INFO) << "End Get With Iter=" << i << " On Node:" << Context::get_instance().get_int32("my_id");
                 if (engine.IsNeedRollBack()) {
                     engine.IncRollBackCount();
 
                     if (info.worker_id % FLAGS_num_workers_per_node == 0) {
+                        LOG(INFO) << "Start RecoverIteration On Node:" << Context::get_instance().get_int32("my_id");
                         RecoverIteration();
                         engine.Barrier();
                         engine.RecoverEnd();
+                        LOG(INFO) << "End RecoverIteration On Node:" << Context::get_instance().get_int32("my_id");
                     } else {
+                        LOG(INFO) << "Start Wait Recover On Worker:" << info.worker_id;
                         engine.WaitRecover();
+                        LOG(INFO) << "End Wait Recover On Worker:" << info.worker_id;
                     }
                     i = Context::get_instance().GetIteration(info.worker_id) - 1;
                     continue;
