@@ -61,6 +61,7 @@ namespace csci5570 {
     }
 
     void HDFSBlockAssigner::handle_block_request(const std::string &cur_client) {
+        LOG(INFO) << "HDFSBlockAssigner::handle_block_request...start";
         std::string url, host, load_type;
         int num_threads, id;
 
@@ -75,6 +76,7 @@ namespace csci5570 {
         std::pair<std::string, size_t> ret = answer(host, url, id);
         stream.clear();
         stream << ret.first << ret.second;
+        LOG(INFO) << "HDFSBlockAssigner::handle_block_request...end";
 
         zmq_send_common(master_socket_.get(), cur_client.data(), cur_client.length(), ZMQ_SNDMORE);
         zmq_send_common(master_socket_.get(), nullptr, 0, ZMQ_SNDMORE);

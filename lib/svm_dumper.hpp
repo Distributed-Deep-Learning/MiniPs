@@ -107,12 +107,15 @@ namespace csci5570 {
             std::thread master_thread = std::thread([this, config, zmq_context] {
                 HDFSBlockAssigner hdfs_block_assigner(config.hdfs_namenode, config.hdfs_namenode_port, zmq_context,
                                                       config.master_port);
+                LOG(INFO) << "hdfs_block_assigner.Serve() start";
                 hdfs_block_assigner.Serve();
+                LOG(INFO) << "hdfs_block_assigner.Serve() end";
             });
 
             std::mutex lock;
             hdfs_manager.Run([this, node, &datastore, &lock](HDFSManager::InputFormat *input_format, int local_tid) {
                 int count = 0;
+                LOG(INFO) << "start thread with tid" << local_tid;
                 while (input_format->HasNext()) {
                     auto item = input_format->GetNextItem();
                     if (item.empty()) return;
@@ -125,6 +128,7 @@ namespace csci5570 {
                     lock.unlock();
                 }
             });
+            LOG(INFO) << "threads complete...";
             master_thread.join();
             LOG(INFO) << "Load Data Done With Size=" << datastore.size();
 

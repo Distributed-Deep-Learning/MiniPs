@@ -44,6 +44,7 @@ namespace csci5570 {
     }
 
     BinStream Coordinator::ask_master(BinStream &question, size_t type) {
+        LOG(INFO) << "Coordinator::ask_master..start";
         std::lock_guard<std::mutex> lock(coord_lock_);
         zmq_send_common(zmq_coord_, nullptr, 0, ZMQ_SNDMORE);
         // Question type
@@ -59,6 +60,7 @@ namespace csci5570 {
         zmq_recv_common(zmq_coord_, &msg2);
         answer.push_back_bytes(reinterpret_cast<char *>(msg2.data()), msg2.size());
 
+        LOG(INFO) << "Coordinator::ask_master..end";
         return answer;
     }
 
