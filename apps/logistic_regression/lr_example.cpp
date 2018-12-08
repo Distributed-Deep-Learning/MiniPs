@@ -223,6 +223,7 @@ namespace csci5570 {
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
 
+            bool after_checkpoint = false;
             for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
@@ -247,6 +248,9 @@ namespace csci5570 {
 //                        LOG(INFO) << "Start Wait Recover On Worker:" << info.worker_id;
                         engine.WaitRecover();
 //                        LOG(INFO) << "End Wait Recover On Worker:" << info.worker_id;
+                    }
+                    if (info.worker_id == 0) {
+                        after_checkpoint = true;
                     }
                     i = Context::get_instance().GetIteration(info.worker_id) - 1;
                     continue;
@@ -280,12 +284,16 @@ namespace csci5570 {
                 CHECK_EQ(params.size(), keys.size());
 
                 if (i > 0 && i % 300 == 0 && info.worker_id == 0) {
-                    auto now = std::chrono::steady_clock::now();
-                    LOG(INFO) << "[CheckPoint] Start checkpoint...";
-                    table->CheckPoint();
-                    auto cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::steady_clock::now() - start_time).count();
-                    LOG(INFO) << "[CheckPoint] Finish checkpoint, cost time:" << cost << " ms";
+                    if (after_checkpoint) {
+                        after_checkpoint = false;
+                    } else {
+                        auto now = std::chrono::steady_clock::now();
+                        LOG(INFO) << "[CheckPoint] Start checkpoint...";
+                        table->CheckPoint();
+                        auto cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::steady_clock::now() - start_time).count();
+                        LOG(INFO) << "[CheckPoint] Finish checkpoint, cost time:" << cost << " ms";
+                    }
                 }
 
                 if (i % 20 == 0 && info.worker_id == 0) {

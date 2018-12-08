@@ -20,11 +20,11 @@ The `use_weight_file` toggle and `weight_file_prefix` are used for training prog
 
 |Phase|From|To|Time Cost|Percentage|
 |---|---|---|---|---|
-|0|Start CheckPoint|End CheckPoint|9583ms||
-|1|Kill A Running Process|Master Detect Process Failure|7013ms||
-|2|Master Detect Process Failure|Failed Process Restart Success|10ms||
-|3|Failed Process Restart Success|Failed Process Recover Success|3800ms||
-|4|Failed Process Recover Success|All Process Recover Success|3200ms||
+|1|Start CheckPoint|End CheckPoint|9583ms||
+|2|Kill A Running Process|Master Detect Process Failure|7013ms||
+|3|Master Detect Process Failure|Failed Process Restart Success|10ms||
+|4|Failed Process Restart Success|Failed Process Recover Success|3823ms||
+|5|Failed Process Recover Success|All Process Recover Success|3256ms||
 
 ### HDFS Read
 
