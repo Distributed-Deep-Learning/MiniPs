@@ -288,7 +288,7 @@ namespace csci5570 {
                     LOG(INFO) << "[CheckPoint] Finish checkpoint, cost time:" << cost << " ms";
                 }
 
-                if (i % 100 == 0 && info.worker_id == 0) {
+                if (i % 20 == 0 && info.worker_id == 0) {
                     LOG(INFO) << "Current training iteration=" << i;
                 }
 
