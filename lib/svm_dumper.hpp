@@ -15,6 +15,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include "boost/utility/string_ref.hpp"
+#include "lib/parser.hpp"
 
 namespace csci5570 {
 
@@ -113,8 +114,9 @@ namespace csci5570 {
                 LOG(INFO) << "hdfs_block_assigner.Serve() end";
             });
 
+            lib::Parser<SVMItem> parser;
             std::mutex lock;
-            hdfs_manager.Run([this, node, &datastore, &lock](HDFSManager::InputFormat *input_format, int local_tid) {
+            hdfs_manager.Run([this, node, &parser, &datastore, &lock](HDFSManager::InputFormat *input_format, int local_tid) {
                 int count = 0;
 //                LOG(INFO) << "start thread with tid" << local_tid;
                 while (input_format->HasNext()) {
@@ -122,7 +124,8 @@ namespace csci5570 {
                     if (item.empty()) return;
 
                     // 3. Put samples into datastore
-                    auto data = parse(item);
+//                    auto data = parse(item);
+                    auto data = parser.parse_libsvm(item);
                     lock.lock();
                     datastore.push_back(data);
                     count++;
