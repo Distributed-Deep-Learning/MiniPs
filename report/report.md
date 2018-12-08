@@ -16,6 +16,16 @@ Since `Clock()` will wait for other nodes' response, if wait for too long, the n
 
 The `use_weight_file` toggle and `weight_file_prefix` are used for training progress reload, the node will read and recover the training iteration according to the weight file.
 
+### Fault Tolerance Performance
+
+|Phase|From|To|Time Cost|Percentage|
+|---|---|---|---|---|
+|1|Kill A Running Process|Master Detect Process Failure|||
+|2|Master Detect Process Failure|Failed Process Restart Success|||
+|3|Failed Process Restart Success|Failed Process Recover Success|||
+|4|Failed Process Recover Success|Other Process Recover Success|||
+|5|Other Process Recover Success|All Process Recover Success|||
+
 ### HDFS Read
 
 * `Question`: When the given training data file size is too small, and the total file blocks is not enough to allocated to every working node, then some of the nodes will crash because the data is null, and finally the cluster will not continue as the barrier will block other nodes.
@@ -109,7 +119,5 @@ engine.Barrier();
 
 ### Logistisc Regression
 
-### LDA
-
-### Matrix Factorization
+### K-Means
 

@@ -8,6 +8,7 @@
 #include "glog/logging.h"
 #include <iostream>
 #include <string>
+#include <base/utils.hpp>
 
 namespace csci5570 {
 
@@ -26,10 +27,11 @@ namespace csci5570 {
                 time_t last_time = master_thread_->GetHeartBeat(node.id);
 
                 if (cur_time - last_time > interval * 3) {
-                    LOG(INFO) << "node:" << node.id << ", fault detected, start to relaunch the node...";
+                    CheckFaultTolerance(2);
+//                    LOG(INFO) << "node:" << node.id << ", fault detected, start to relaunch the node...";
                     std::string cmd = Context::get_instance().get_string("relaunch_cmd");
                     cmd.append(std::to_string(node.id));
-                    LOG(INFO) << "restart with command:" << cmd;
+//                    LOG(INFO) << "restart with command:" << cmd;
                     system(cmd.c_str());
                     master_thread_->SetRecoveringNodeId(node.id);
                     break;

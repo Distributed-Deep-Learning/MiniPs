@@ -15,6 +15,7 @@
 #include <cmath>
 #include <master/master.hpp>
 #include <lib/svm_dumper.hpp>
+#include <base/utils.hpp>
 
 DEFINE_int32(my_id, 0, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
@@ -98,7 +99,7 @@ namespace csci5570 {
 
         bool recovering = FLAGS_use_weight_file;
         if (recovering) {
-            LOG(INFO) << "Recovering data...";
+            CheckFaultTolerance(3);
             SVMDumper dumper;
             dumper.LoadSVMData(my_node, config, data);
         } else {
@@ -188,6 +189,7 @@ namespace csci5570 {
         task.SetTables({kTableId});  // Use table 0
 
         if (recovering) {
+            CheckFaultTolerance(4);
             LOG(INFO) << "Wait Fault Barrier on Failed Node=" << FLAGS_my_id;
             engine.Barrier();
             LOG(INFO) << "Pass Fault Barrier on Failed Node=" << FLAGS_my_id;
@@ -226,6 +228,11 @@ namespace csci5570 {
                 auto &keys = future_keys[i];
 //                LOG(INFO) << "Start Get With Iter=" << i << " On Node:" << Context::get_instance().get_int32("my_id");
                 table->Get(keys, &params);
+
+                if (recovering) {
+                    CheckFaultTolerance(5);
+                    recovering = false;
+                }
 //                LOG(INFO) << "End Get With Iter=" << i << " On Node:" << Context::get_instance().get_int32("my_id");
                 if (engine.IsNeedRollBack()) {
                     engine.IncRollBackCount();
@@ -300,12 +307,13 @@ namespace csci5570 {
 
             // test error
             if (info.worker_id % FLAGS_num_workers_per_node == 0) {
+                LOG(INFO) << "Start Test Accuracy...";
                 table->Get(all_keys, &params);
                 test_error<SVMItem>(params, data);
             }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-            LOG(INFO) << "total time: " << total_time << " ms on worker: " << info.worker_id;
+            LOG(INFO) << "Total training time: " << total_time << " ms on worker: " << info.worker_id;
         });
 
         // 4. Run tasks
