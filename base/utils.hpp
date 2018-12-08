@@ -43,9 +43,6 @@ namespace csci5570 {
                 output.append("Failed Process Recover Success");
                 break;
             case 5:
-                output.append("Master Send RollBack Message");
-                break;
-            case 6:
                 output.append("Other Process Recover Success");
                 break;
             default:

@@ -42,7 +42,7 @@ namespace csci5570 {
         int linger = 2000;
         zmq_coord_->setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
         zmq_coord_->connect("tcp://" + master_host_ + ":" + std::to_string(master_port_));
-        LOG(INFO) << "Coordinator connect success on:" << "tcp://" + master_host_ + ":" + std::to_string(master_port_);
+//        LOG(INFO) << "Coordinator connect success on:" << "tcp://" + master_host_ + ":" + std::to_string(master_port_);
     }
 
     BinStream Coordinator::ask_master(BinStream &question, size_t type) {

@@ -20,7 +20,7 @@ namespace csci5570 {
         }
 
         void StartMaster(const Node &master_node, const std::vector<Node> &nodes) {
-            LOG(INFO) << "StartMaster for heartbeat...";
+            LOG(INFO) << "[Master] startMaster for heartbeat...";
             engine_->CreateIdMapper(1);
             engine_->CreateMailbox();
             engine_->StartMailbox();

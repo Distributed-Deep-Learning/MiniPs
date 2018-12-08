@@ -23,7 +23,7 @@ namespace csci5570 {
     }
 
     void HDFSManager::Start() {
-        LOG(INFO) << "HDFS Manager Start...";
+//        LOG(INFO) << "HDFS Manager Start...";
         if (node_.id == 0) {
             hdfs_main_thread_ = std::thread([this] {
                 HDFSBlockAssigner hdfs_block_assigner(config_.hdfs_namenode, config_.hdfs_namenode_port, zmq_context_,
@@ -35,7 +35,7 @@ namespace csci5570 {
 
     void HDFSManager::Run(const std::function<void(InputFormat *, int)> &func) {
         int num_threads = nodes_.size() * config_.num_local_load_thread;
-        LOG(INFO) << "HDFSManager num_threads=" << num_threads;
+//        LOG(INFO) << "HDFSManager num_threads=" << num_threads;
         coordinator_ = new Coordinator(node_.id, config_.worker_host, zmq_context_, config_.master_host,
                                        config_.master_port);
         coordinator_->serve();

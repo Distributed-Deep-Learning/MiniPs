@@ -127,7 +127,7 @@ namespace csci5570 {
                     if (pair.first > 0) {
                         tracker_[app_thread_id][model_id].second = pair.first;
                         recv_finish_handle_[app_thread_id][model_id] = 0;
-                        LOG(INFO) << "WorkThread Update:" << app_thread_id << "," << model_id << "," << pair.first << ", " << pair.second;
+//                        LOG(INFO) << "WorkThread Update:" << app_thread_id << "," << model_id << "," << pair.first << ", " << pair.second;
                         if (tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second) {
                             //recv_finish_handle_[app_thread_id][model_id]();
                             cond_.notify_all();
@@ -157,7 +157,7 @@ namespace csci5570 {
                     std::lock_guard<std::mutex> lk(mu_);
                     if (pair.first > 0) {
                         tracker_[app_thread_id][model_id].first -= 1;
-                        LOG(INFO) << "WorkThread Update:" << app_thread_id << "," << model_id << "," << pair.first << ", " << pair.second;
+//                        LOG(INFO) << "WorkThread Update:" << app_thread_id << "," << model_id << "," << pair.first << ", " << pair.second;
                         if (tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second) {
                             //recv_finish_handle_[app_thread_id][model_id]();
                             cond_.notify_all();

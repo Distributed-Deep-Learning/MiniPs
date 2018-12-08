@@ -73,7 +73,7 @@ namespace csci5570 {
                 c_count += 1;
             }
         }
-        LOG(INFO) << " accuracy is " << std::to_string(c_count / count);
+        LOG(INFO) << "The accuracy is " << std::to_string(c_count / count);
     }
 
     void RecoverIteration() {
@@ -196,7 +196,7 @@ namespace csci5570 {
         }
 
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
-            LOG(INFO) << info.DebugString();
+//            LOG(INFO) << info.DebugString();
 
             BatchDataSampler<SVMItem> batch_data_sampler(data, FLAGS_batch_size);
             //prepare all_keys
@@ -244,9 +244,9 @@ namespace csci5570 {
                         engine.RecoverEnd();
                         LOG(INFO) << "End RecoverIteration On Node:" << Context::get_instance().get_int32("my_id");
                     } else {
-                        LOG(INFO) << "Start Wait Recover On Worker:" << info.worker_id;
+//                        LOG(INFO) << "Start Wait Recover On Worker:" << info.worker_id;
                         engine.WaitRecover();
-                        LOG(INFO) << "End Wait Recover On Worker:" << info.worker_id;
+//                        LOG(INFO) << "End Wait Recover On Worker:" << info.worker_id;
                     }
                     i = Context::get_instance().GetIteration(info.worker_id) - 1;
                     continue;
@@ -281,15 +281,15 @@ namespace csci5570 {
 
                 if (i > 0 && i % 300 == 0 && info.worker_id == 0) {
                     auto now = std::chrono::steady_clock::now();
-                    LOG(INFO) << "Start checkpoint, sent by worker: 0";
+                    LOG(INFO) << "[CheckPoint] Start checkpoint...";
                     table->CheckPoint();
                     auto cost = std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::steady_clock::now() - start_time).count();
-                    LOG(INFO) << "Finish checkpoint, cost:" << cost << " ms";
+                    LOG(INFO) << "[CheckPoint] Finish checkpoint, cost time:" << cost << " ms";
                 }
 
                 if (i % 100 == 0 && info.worker_id == 0) {
-                    LOG(INFO) << "Iter: " << i << " finished";
+                    LOG(INFO) << "Current training iteration=" << i;
                 }
 
                 if (FLAGS_with_injected_straggler) {
@@ -307,7 +307,7 @@ namespace csci5570 {
 
             // test error
             if (info.worker_id % FLAGS_num_workers_per_node == 0) {
-                LOG(INFO) << "Start Test Accuracy...";
+                LOG(INFO) << "Start test accuracy on node=" << Context::get_instance().get_int32("my_id");
                 table->Get(all_keys, &params);
                 test_error<SVMItem>(params, data);
             }
@@ -342,7 +342,7 @@ namespace csci5570 {
         }
 
         Node my_node = GetNodeById(nodes, FLAGS_my_id);
-        LOG(INFO) << my_node.DebugString();
+//        LOG(INFO) << my_node.DebugString();
 
         Training(my_node, nodes, master_node);
     }

@@ -18,10 +18,10 @@ namespace csci5570 {
 
             if (msg.meta.flag == Flag::kQuitHeartBeat) {
                 quit_count_++;
-                LOG(INFO) << "MasterThread heartbeat quit serving on process:" << quit_count_;
+//                LOG(INFO) << "MasterThread heartbeat quit serving on process:" << quit_count_;
                 if (quit_count_ >= heartbeats_.size()) {
                     serving_ = false;
-                    LOG(INFO) << "MasterThread heartbeat quit serving...";
+                    LOG(INFO) << "[Master] master process quit.";
                     exit(0);
 //                    return;
                 }
@@ -30,7 +30,7 @@ namespace csci5570 {
             if (msg.meta.flag == Flag::kHeartBeat) {
                 heartbeats_[msg.meta.sender] = time(NULL);
                 if (msg.meta.sender == recovering_node_id_) {
-                    LOG(INFO) << "recovering success node:" << recovering_node_id_ << ", reset recoving node";
+                    LOG(INFO) << "[Master] send rollback message to other nodes.";
                     SetRecoveringNodeId(-1);
                     RollBack(msg.meta.sender);
                 }

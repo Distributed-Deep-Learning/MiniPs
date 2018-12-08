@@ -243,7 +243,7 @@ namespace csci5570 {
 
             CHECK_EQ(local_threads.size(), local_workers.size());
             std::vector<std::thread> thread_group(local_threads.size());
-            LOG(INFO) << thread_group.size() << " workers run on proc: " << node_.id;
+//            LOG(INFO) << thread_group.size() << " workers run on proc: " << node_.id;
 
             std::map<uint32_t, AbstractPartitionManager *> partition_manager_map;
             for (auto &table : tables) {
