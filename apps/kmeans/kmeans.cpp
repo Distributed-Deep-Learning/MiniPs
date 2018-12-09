@@ -162,7 +162,7 @@ namespace csci5570 {
         init_task.SetTables({kTableId});  // Use table 0
         init_task.SetLambda([&data, kTableId](const Info &info) {
             if (info.worker_id == 0) {
-                LOG(INFO) << info.DebugString();
+                LOG(INFO) << "Start Initalization for KMeans...";
 
                 auto start_time = std::chrono::steady_clock::now();
 
@@ -194,8 +194,9 @@ namespace csci5570 {
         task.SetWorkerAlloc(worker_alloc);
         task.SetTables({kTableId, kTableId2});  // Use table 0,1
         task.SetLambda([data, kTableId, kTableId2](const Info &info) {
-            LOG(INFO) << "Start KMeans Training...";
-            LOG(INFO) << info.DebugString();
+            if (info.worker_id == 0) {
+                LOG(INFO) << "Start KMeans Training...";
+            }
 
             auto start_time = std::chrono::steady_clock::now();
             srand(time(0));

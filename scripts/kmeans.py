@@ -24,7 +24,7 @@ params = {
     "batch_size": 1000,  # 100
     "alpha": 0.1,
     "kmeans_init_mode": "random",
-    "report_interval": "10",
+    "report_interval": 10,
     "checkpoint_toggle": False,
     "use_weight_file": False,
     "init_dump": True if local_debug else False,

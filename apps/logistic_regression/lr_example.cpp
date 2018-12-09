@@ -85,6 +85,14 @@ namespace csci5570 {
     }
 
     void Training(Node &my_node, std::vector<Node> &nodes, Node &master_node) {
+        if (FLAGS_my_id == 0) {
+            LOG(INFO) << "Running in " << FLAGS_kModelType << " mode";
+            LOG(INFO) << "num_dims: " << FLAGS_num_dims;
+            LOG(INFO) << "num_iters: " << FLAGS_num_iters;
+            LOG(INFO) << "num_workers_per_node: " << FLAGS_num_workers_per_node;
+            LOG(INFO) << "num_servers_per_node: " << FLAGS_num_servers_per_node;
+        }
+
         // 1. Load data
         std::vector<SVMItem> data;
         HDFSManager::Config config;
@@ -197,6 +205,9 @@ namespace csci5570 {
 
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
 //            LOG(INFO) << info.DebugString();
+            if (info.worker_id == 0) {
+                LOG(INFO) << "Start KMeans Training...";
+            }
 
             BatchDataSampler<SVMItem> batch_data_sampler(data, FLAGS_batch_size);
             //prepare all_keys
