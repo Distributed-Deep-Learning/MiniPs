@@ -10,10 +10,10 @@ progfile = ("cmake-build-debug" if local_debug else "debug") + "/KMeans"
 
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
-    "input": "hdfs:///a9a" if local_debug else "hdfs:///jasper/SUSY",
+    "input": "hdfs:///a9a" if local_debug else "hdfs:///datasets/classification/webspam",
     "kStaleness": 1,
     "kModelType": "SSP",  # {ASP/SSP/BSP}
-    "num_dims": 18,
+    "num_dims": 123 if local_debug else 16609143,
     "num_workers_per_node": 3,  # 3
     "num_servers_per_node": 1,
     "num_local_load_thread": 100,
@@ -25,6 +25,14 @@ params = {
     "alpha": 0.1,
     "kmeans_init_mode": "random",
     "report_interval": "10",
+    "checkpoint_toggle": False,
+    "use_weight_file": False,
+    "init_dump": True if local_debug else False,
+    "weight_file_prefix": "",
+    "heartbeat_interval": 10 if local_debug else 15, # join(proj_dir, "local/dump_")
+    "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
+    "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
+    "relaunch_cmd": "",
 }
 
 env_params = (

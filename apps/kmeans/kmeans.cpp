@@ -22,22 +22,34 @@ DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
-DEFINE_uint64(num_dims, 1000, "number of dimensions");
-DEFINE_int32(num_iters, 10, "number of iters");
+DEFINE_uint64(num_dims, 123, "number of dimensions");
+DEFINE_int32(num_iters, 1000, "number of iters");
 
 DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP");
 DEFINE_string(kStorageType, "Vector", "Map/Vector");
 DEFINE_int32(kStaleness, 0, "stalness");
 DEFINE_uint32(num_workers_per_node, 1, "num_workers_per_node");
 DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
-DEFINE_int32(num_local_load_thread, 100, "num_local_load_thread");
+DEFINE_int32(num_local_load_thread, 2, "num_local_load_thread");
 DEFINE_int32(num_nodes, 1, "num_nodes");
 DEFINE_int32(batch_size, 100, "batch size of each epoch");
 DEFINE_uint64(K, 2, "K");
 DEFINE_double(alpha, 0.1, "learning rate coefficient");
 DEFINE_string(kmeans_init_mode, "random", "random/kmeans++/kmeans_parallel");
-DEFINE_int32(report_interval, 10, "report interval");
+DEFINE_int32(report_interval, 2, "report interval");
 DEFINE_int32(report_worker, 0, "report worker");
+
+DEFINE_bool(init_dump, true, "init_dump");
+DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
+DEFINE_bool(checkpoint_toggle, true, "open checkpoint");
+DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
+DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/dump/dump_", "the checkpoint file prefix");
+DEFINE_string(checkpoint_raw_prefix, "hdfs:///dump/dump_", "the checkpoint raw prefix");
+DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
+DEFINE_string(relaunch_cmd,
+              "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
+              "the restart cmd");
+
 
 namespace csci5570 {
 
@@ -256,16 +268,6 @@ namespace csci5570 {
                 table2->Add(keys2, cluster_members);
                 table2->Clock();
                 CHECK_EQ(keys2.size(), cluster_members.size());
-
-                if (iter % 100 == 0 && info.worker_id == FLAGS_report_worker) {
-                    auto now = std::chrono::steady_clock::now();
-                    LOG(INFO) << "Start checkpoint...";
-                    table->CheckPoint();
-                    table2->CheckPoint();
-                    auto cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::steady_clock::now() - start_time).count();
-                    LOG(INFO) << "Finish checkpoint, cost:" << cost << " ms";
-                }
 
                 if (iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker)
                     test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
