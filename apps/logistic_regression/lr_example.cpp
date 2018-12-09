@@ -206,7 +206,7 @@ namespace csci5570 {
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
 //            LOG(INFO) << info.DebugString();
             if (info.worker_id == 0) {
-                LOG(INFO) << "Start KMeans Training...";
+                LOG(INFO) << "Start Logistic Regression Training...";
             }
 
             BatchDataSampler<SVMItem> batch_data_sampler(data, FLAGS_batch_size);
