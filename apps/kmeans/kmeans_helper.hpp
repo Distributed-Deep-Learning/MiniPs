@@ -42,8 +42,9 @@ namespace csci5570 {
     }
 
 // return ID of cluster whose center is the nearest (uses euclidean distance), and the distance
-    std::pair<int, double> get_nearest_center(const std::pair<std::vector<std::pair<int, double>>, double> &point, int K,
-                                             const std::vector<std::vector<double>> &params, int num_features) {
+    std::pair<int, double>
+    get_nearest_center(const std::pair<std::vector<std::pair<int, double>>, double> &point, int K,
+                       const std::vector<std::vector<double>> &params, int num_features) {
         double square_dist, min_square_dist = std::numeric_limits<double>::max();
         int id_cluster_center = -1;
         auto &x = point.first;
@@ -229,6 +230,11 @@ namespace csci5570 {
         for (int i = 0; i < data.size(); i++) {
             // get next data
             id_dist = get_nearest_center(data[i], K, params, num_features);
+
+            if (i > 0 && i % 10000 == 0) {
+                LOG(INFO) << "test_error at iter=" << i;
+            }
+
             sum += id_dist.second;
             count[id_dist.first]++;
         }
