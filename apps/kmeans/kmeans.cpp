@@ -300,7 +300,6 @@ namespace csci5570 {
                     LOG(INFO) << "Start KMeans Training...7";
                 }
                 if (iter > 0 && iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker) {
-                    LOG(INFO) << "start test error";
                     test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
                 }
 

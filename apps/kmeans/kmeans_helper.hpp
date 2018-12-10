@@ -227,11 +227,13 @@ namespace csci5570 {
         std::pair<int, double> id_dist;
         std::vector<int> count(K);
 
+        LOG(INFO) << "Start test data error with size=" << data.size();
+
         for (int i = 0; i < data.size(); i++) {
             // get next data
             id_dist = get_nearest_center(data[i], K, params, num_features);
 
-            if (i > 0 && i % 10000 == 0) {
+            if (i > 0 && i % 1000 == 0) {
                 LOG(INFO) << "test_error at iter=" << i;
             }
 
