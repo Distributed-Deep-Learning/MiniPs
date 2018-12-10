@@ -270,8 +270,10 @@ namespace csci5570 {
                 table2->Clock();
                 CHECK_EQ(keys2.size(), cluster_members.size());
 
-                if (iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker)
+                if (iter > 0 && iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker) {
+                    LOG(INFO) << "start test error";
                     test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
+                }
             }
 
             auto end_time = std::chrono::steady_clock::now();

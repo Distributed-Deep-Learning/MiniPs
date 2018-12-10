@@ -14,17 +14,17 @@ params = {
     "kStaleness": 1,
     "kModelType": "SSP",  # {ASP/SSP/BSP}
     "num_dims": 123 if local_debug else 16609143,
-    "num_workers_per_node": 3,  # 3
+    "num_workers_per_node": 2,  # 3
     "num_servers_per_node": 1,
     "num_local_load_thread": 100,
-    "num_iters": 20,  # 1000
+    "num_iters": 10,  # 1000
     "kStorageType": "Vector",  # {Vector/Map}
     "hdfs_namenode_port": 9000,
     "K": 2,
-    "batch_size": 1000,  # 100
+    "batch_size": 6,  # 100
     "alpha": 0.1,
     "kmeans_init_mode": "random",
-    "report_interval": 1,
+    "report_interval": 10,
     "checkpoint_toggle": False,
     "use_weight_file": False,
     "init_dump": True if local_debug else False,
