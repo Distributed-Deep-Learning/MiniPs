@@ -218,6 +218,10 @@ namespace csci5570 {
                 params[i].resize(FLAGS_num_dims);
             }
 
+            if (info.worker_id == 0) {
+                LOG(INFO) << "Start KMeans Training...1";
+            }
+
             for (int iter = 0; iter < FLAGS_num_iters; ++iter) {
                 table->Get(keys, &pull);
                 CHECK_EQ(keys.size(), pull.size());
@@ -233,15 +237,29 @@ namespace csci5570 {
                 int id_nearest_center;
                 double learning_rate;
                 int startpt = rand() % data.size();
+
+                if (info.worker_id == 0) {
+                    LOG(INFO) << "Start KMeans Training...2";
+                }
+
                 for (int i = 0; i < FLAGS_batch_size / FLAGS_num_workers_per_node; ++i) {
                     if (startpt == data.size())
                         startpt = rand() % data.size();
                     auto &datapt = data[startpt];
                     auto &x = data[startpt].first;
                     startpt += 1;
+
+                    if (info.worker_id == 0) {
+                        LOG(INFO) << "Start KMeans Training...3";
+                    }
+
                     id_nearest_center = get_nearest_center(datapt, FLAGS_K, deltas, FLAGS_num_dims).first;
                     // learning_rate = FLAGS_alpha / ++deltas[FLAGS_K][id_nearest_center];
                     learning_rate = FLAGS_alpha / ++cluster_members[id_nearest_center];
+
+                    if (info.worker_id == 0) {
+                        LOG(INFO) << "Start KMeans Training...4";
+                    }
 
                     std::vector<double> distance = deltas[id_nearest_center];
                     for (auto field : x)
@@ -249,6 +267,10 @@ namespace csci5570 {
 
                     for (int j = 0; j < FLAGS_num_dims; j++)
                         deltas[id_nearest_center][j] -= learning_rate * distance[j];
+                }
+
+                if (info.worker_id == 0) {
+                    LOG(INFO) << "Start KMeans Training...5";
                 }
 
                 // update params
@@ -263,6 +285,10 @@ namespace csci5570 {
                     for (int j = 0; j < FLAGS_num_dims; ++j)
                         push[i * FLAGS_num_dims + j] = std::move(deltas[i][j]);
 
+                if (info.worker_id == 0) {
+                    LOG(INFO) << "Start KMeans Training...6";
+                }
+
                 table->Add(keys, push);
                 table->Clock();
                 CHECK_EQ(push.size(), keys.size());
@@ -270,9 +296,16 @@ namespace csci5570 {
                 table2->Clock();
                 CHECK_EQ(keys2.size(), cluster_members.size());
 
+                if (info.worker_id == 0) {
+                    LOG(INFO) << "Start KMeans Training...7";
+                }
                 if (iter > 0 && iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker) {
                     LOG(INFO) << "start test error";
                     test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
+                }
+
+                if (info.worker_id == 0) {
+                    LOG(INFO) << "Start KMeans Training...8";
                 }
             }
 
