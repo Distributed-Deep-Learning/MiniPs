@@ -56,7 +56,11 @@ namespace csci5570 {
             for (auto field : x)
                 diff[field.first] -= field.second;  // first:fea, second:val
 
+            auto start_time = std::chrono::steady_clock::now();
             square_dist = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+            auto end_time = std::chrono::steady_clock::now();
+            auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+            LOG(INFO) << "inner_product cost time=" << total_time;
             if (square_dist < min_square_dist) {
                 min_square_dist = square_dist;
                 id_cluster_center = i;
