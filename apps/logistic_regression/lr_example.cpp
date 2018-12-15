@@ -208,7 +208,7 @@ namespace csci5570 {
 
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
             if (info.worker_id == 0) {
-                LOG(INFO) << "Start Logistic Regression Training...";
+                LOG(INFO) << "Start Logistic Regression Training...1";
             }
 
             BatchDataSampler<SVMItem> batch_data_sampler(data, FLAGS_batch_size);
@@ -220,6 +220,10 @@ namespace csci5570 {
             // prepare future_keys
             std::vector<third_party::SArray<Key>> future_keys;
             std::vector<std::vector<SVMItem *>> future_data_ptrs;
+
+            if (info.worker_id == 0) {
+                LOG(INFO) << "Start Logistic Regression Training...2";
+            }
 
             for (int i = 0; i < FLAGS_num_iters + FLAGS_kSpeculation; ++i) {
                 batch_data_sampler.random_start_point();
@@ -235,6 +239,10 @@ namespace csci5570 {
             auto table = info.CreateKVClientTable<double>(kTableId);
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
+
+            if (info.worker_id == 0) {
+                LOG(INFO) << "Start Logistic Regression Training...3";
+            }
 
             bool after_checkpoint = false;
             for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
