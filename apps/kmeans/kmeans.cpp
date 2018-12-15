@@ -218,9 +218,6 @@ namespace csci5570 {
                 params[i].resize(FLAGS_num_dims);
             }
 
-            auto iteration_info = FLAGS_report_prefix + std::to_string(info.worker_id);
-            petuum::io::ofstream w_stream(iteration_info, std::ofstream::out | std::ofstream::trunc);
-
             auto start_time = std::chrono::steady_clock::now();
             for (int iter = 0; iter < FLAGS_num_iters; ++iter) {
                 table->Get(keys, &pull);
@@ -280,13 +277,15 @@ namespace csci5570 {
                     auto sum = test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
                     auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::steady_clock::now() - start_time).count();
+
+                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
                     w_stream << std::to_string(iter) << "\t" << std::to_string(sum) << "\t"
-                                  << std::to_string(cur_time) << "\n";
-                    w_stream.flush();
+                                  << std::to_string(cur_time);
+                    w_stream << std::endl;
+                    w_stream.close();
                 }
             }
 
-            w_stream.close();
             auto end_time = std::chrono::steady_clock::now();
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             LOG(INFO) << "Total cost time: " << total_time << " ms on worker: " << info.worker_id;
