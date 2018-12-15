@@ -285,6 +285,7 @@ namespace csci5570 {
                 }
             }
 
+            w_stream.close();
             auto end_time = std::chrono::steady_clock::now();
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             LOG(INFO) << "Total cost time: " << total_time << " ms on worker: " << info.worker_id;
