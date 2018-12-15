@@ -233,7 +233,9 @@ namespace csci5570 {
 
         LOG(INFO) << "Start test data error with size=" << data.size();
 
-        for (int i = 0; i < data.size(); i++) {
+        int test_count = 1000; // only test top `test_count` since it time consuming
+        double ratio = test_count / data.size();
+        for (int i = 0; i < test_count; i++) {
             // get next data
             id_dist = get_nearest_center(data[i], K, params, num_features);
 
@@ -244,6 +246,8 @@ namespace csci5570 {
             sum += id_dist.second;
             count[id_dist.first]++;
         }
+
+        sum = sum / ratio;
 
         LOG(INFO) << "Reporter NodeID " + std::to_string(cluster_id) + ", iter " + std::to_string(iter)
                   << ": Within Set SSError = " << std::to_string(sum);
