@@ -233,7 +233,7 @@ namespace csci5570 {
 
     // test the Sum of Square Error of the model
     template<typename T>
-    void test_error(const std::vector<std::vector<double>> &params, const std::vector<T> &data, int iter, int K,
+    double test_error(const std::vector<std::vector<double>> &params, const std::vector<T> &data, int iter, int K,
                     int num_features, int cluster_id) {
         double sum = 0;  // sum of square error
         std::pair<int, double> id_dist;
@@ -261,6 +261,7 @@ namespace csci5570 {
         auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
         LOG(INFO) << "Current iteration=" + std::to_string(iter) << ", Sum of Squared Errors=" << std::to_string(sum)
                   << ", Cost time=" << total_time << " ms";
+        return sum;
     }
 
 }
