@@ -49,12 +49,14 @@ DEFINE_string(relaunch_cmd,
               "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
               "the restart cmd");
 DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/report_lr_webspam.txt", "the report raw prefix");
+DEFINE_int32(report_interval, 5, "report interval");
+
 
 namespace csci5570 {
 
     template<typename T>
     double test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
-        LOG(INFO) << "start test error with data size=" << data_.size();
+        LOG(INFO) << "start test error with data size=" << data_.size() << ", params size=" << rets_w.size();
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
@@ -209,7 +211,7 @@ namespace csci5570 {
 
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
             if (info.worker_id == 0) {
-                LOG(INFO) << "Start Logistic Regression Training...1";
+                LOG(INFO) << "Start Logistic Regression Training...";
             }
 
             BatchDataSampler<SVMItem> batch_data_sampler(data, FLAGS_batch_size);
@@ -222,10 +224,6 @@ namespace csci5570 {
             std::vector<third_party::SArray<Key>> future_keys;
             std::vector<std::vector<SVMItem *>> future_data_ptrs;
 
-            if (info.worker_id == 0) {
-                LOG(INFO) << "Start Logistic Regression Training...2";
-            }
-
             for (int i = 0; i < FLAGS_num_iters + FLAGS_kSpeculation; ++i) {
                 batch_data_sampler.random_start_point();
                 future_keys.push_back(batch_data_sampler.prepare_next_batch());
@@ -237,35 +235,15 @@ namespace csci5570 {
             std::chrono::steady_clock::time_point end_time;
             srand(time(0));
 
-            if (info.worker_id == 0) {
-                LOG(INFO) << "Start Logistic Regression Training...3";
-            }
-
             auto table = info.CreateKVClientTable<double>(kTableId);
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
-
-            if (info.worker_id == 0) {
-                LOG(INFO) << "Start Logistic Regression Training...4";
-            }
 
             bool after_checkpoint = false;
             for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
                 table->Get(keys, &params);
-
-                if (i > 0 && i % 5 == 0 && info.worker_id == 0) {
-                    double accuracy = test_error<SVMItem>(params, data);
-                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::steady_clock::now() - start_time).count();
-                    LOG(INFO) << "Current iteration=" << i << ", accuracy=" << std::to_string(accuracy);
-                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
-                    w_stream << std::to_string(i) << "\t" << std::to_string(accuracy) << "\t"
-                             << std::to_string(cur_time);
-                    w_stream << std::endl;
-                    w_stream.close();
-                }
 
                 if (recovering) {
                     CheckFaultTolerance(5);
@@ -332,6 +310,23 @@ namespace csci5570 {
                     }
                 }
 
+                if (i > 0 && i % 5 == 0 && info.worker_id == 0) {
+                    LOG(INFO) << "Current iteration=" << i;
+                }
+
+                if (i > 0 && FLAGS_report_interval > 0 && i % FLAGS_report_interval == 0 && info.worker_id == 0) {
+                    table->Get(all_keys, &params);
+                    double accuracy = test_error<SVMItem>(params, data);
+                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start_time).count();
+                    LOG(INFO) << "Current iteration=" << i << ", accuracy=" << std::to_string(accuracy);
+                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
+                    w_stream << std::to_string(i) << "\t" << std::to_string(accuracy) << "\t"
+                             << std::to_string(cur_time);
+                    w_stream << std::endl;
+                    w_stream.close();
+                }
+
                 if (FLAGS_with_injected_straggler) {
                     double r = (double) rand() / RAND_MAX;
                     if (r < 0.05) {
@@ -349,13 +344,15 @@ namespace csci5570 {
                 LOG(INFO) << "Start test accuracy on node=" << Context::get_instance().get_int32("my_id");
                 table->Get(all_keys, &params);
                 double accuracy = test_error<SVMItem>(params, data);
-                auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::steady_clock::now() - start_time).count();
-                petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
-                w_stream << std::to_string(FLAGS_num_iters) << "\t" << std::to_string(accuracy) << "\t"
-                         << std::to_string(cur_time);
-                w_stream << std::endl;
-                w_stream.close();
+                if (info.worker_id == 0) {
+                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start_time).count();
+                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
+                    w_stream << std::to_string(FLAGS_num_iters) << "\t" << std::to_string(accuracy) << "\t"
+                             << std::to_string(cur_time);
+                    w_stream << std::endl;
+                    w_stream.close();
+                }
             }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
