@@ -56,11 +56,7 @@ namespace csci5570 {
             for (auto field : x)
                 diff[field.first] -= field.second;  // first:fea, second:val
 
-            auto start_time = std::chrono::steady_clock::now();
             square_dist = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
-            auto end_time = std::chrono::steady_clock::now();
-            auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-            LOG(INFO) << "inner_product cost time=" << total_time;
             if (square_dist < min_square_dist) {
                 min_square_dist = square_dist;
                 id_cluster_center = i;
@@ -223,6 +219,18 @@ namespace csci5570 {
         }
     }
 
+    int random(int min, int max) {
+        int intervalLen = max - min + 1;
+        int ceilingPowerOf2 = pow(2, ceil(log2(intervalLen)));
+
+        int randomNumber = rand() % ceilingPowerOf2;
+
+        if (randomNumber < intervalLen) {
+            return min + randomNumber;
+        }
+        return random(min, max);
+    }
+
     // test the Sum of Square Error of the model
     template<typename T>
     void test_error(const std::vector<std::vector<double>> &params, const std::vector<T> &data, int iter, int K,
@@ -231,17 +239,14 @@ namespace csci5570 {
         std::pair<int, double> id_dist;
         std::vector<int> count(K);
 
-        LOG(INFO) << "Start test data error with size=" << data.size();
-
-        int test_count = 1000; // only test top `test_count` since it time consuming
+        // only test top `test_count` since it time consuming
+        double test_count = data.size() > 200 ? 200 : data.size();
+//        double test_count = data.size();
         double ratio = test_count / data.size();
         for (int i = 0; i < test_count; i++) {
             // get next data
-            id_dist = get_nearest_center(data[i], K, params, num_features);
-
-            if (i > 0 && i % 1000 == 0) {
-                LOG(INFO) << "test_error at iter=" << i;
-            }
+            int index = random(0, data.size());
+            id_dist = get_nearest_center(data[index], K, params, num_features);
 
             sum += id_dist.second;
             count[id_dist.first]++;
@@ -249,10 +254,7 @@ namespace csci5570 {
 
         sum = sum / ratio;
 
-        LOG(INFO) << "Reporter NodeID " + std::to_string(cluster_id) + ", iter " + std::to_string(iter)
-                  << ": Within Set SSError = " << std::to_string(sum);
-//        for (int i = 0; i < K; i++)  // for tuning learning rate
-//            LOG(INFO) << "Worker " + std::to_string(cluster_id) + ", count" + std::to_string(i) + ": " +
-//                         std::to_string(count[i]);
+        LOG(INFO) << "Current iteration=" + std::to_string(iter) << ", Sum of Squared Errors = " << std::to_string(sum);
     }
+
 }
