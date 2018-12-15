@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 
 import sys
+import os
+import os.path
+from os.path import dirname, join
 from launch_utils import launch_util
 
 local_debug = True if len(sys.argv) >= 2 and sys.argv[1] == "local" else False
 
 hostfile = "config/localnodes" if local_debug else "config/clusternodes"
 progfile = ("cmake-build-debug" if local_debug else "debug") + "/KMeans"
+
+script_path = os.path.realpath(__file__)
+proj_dir = dirname(dirname(script_path))
 
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
@@ -24,7 +30,7 @@ params = {
     "batch_size": 6,  # 100
     "alpha": 0.1,
     "kmeans_init_mode": "random",
-    "report_interval": 5,
+    "report_interval": 2,
     "checkpoint_toggle": False,
     "use_weight_file": False,
     "init_dump": True if local_debug else False,
@@ -33,6 +39,7 @@ params = {
     "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
     "relaunch_cmd": "",
+    "report_prefix": join(proj_dir, "local/report_kmeans_webspam.txt"),
 }
 
 env_params = (

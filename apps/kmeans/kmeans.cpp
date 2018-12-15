@@ -49,6 +49,7 @@ DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
 DEFINE_string(relaunch_cmd,
               "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
               "the restart cmd");
+DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/report_kmeans_webspam.txt", "the report raw prefix");
 
 
 namespace csci5570 {
@@ -198,7 +199,6 @@ namespace csci5570 {
                 LOG(INFO) << "Start KMeans Training...";
             }
 
-            auto start_time = std::chrono::steady_clock::now();
             srand(time(0));
 
             auto table = info.CreateKVClientTable<double>(kTableId);
@@ -218,6 +218,10 @@ namespace csci5570 {
                 params[i].resize(FLAGS_num_dims);
             }
 
+            auto iteration_info = FLAGS_report_prefix;
+            petuum::io::ofstream w_stream(iteration_info, std::ofstream::out | std::ofstream::trunc);
+
+            auto start_time = std::chrono::steady_clock::now();
             for (int iter = 0; iter < FLAGS_num_iters; ++iter) {
                 table->Get(keys, &pull);
                 CHECK_EQ(keys.size(), pull.size());
@@ -273,7 +277,11 @@ namespace csci5570 {
                 CHECK_EQ(keys2.size(), cluster_members.size());
 
                 if (iter > 0 && iter % FLAGS_report_interval == 0 && info.worker_id == FLAGS_report_worker) {
-                    test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
+                    auto sum = test_error(params, data, iter, FLAGS_K, FLAGS_num_dims, info.worker_id);
+                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start_time).count();
+                    w_stream << std::to_string(iter) << "\t" << std::to_string(sum) << "\t"
+                                  << std::to_string(cur_time) << "\n";
                 }
             }
 
