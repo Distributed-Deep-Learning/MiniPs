@@ -282,6 +282,7 @@ namespace csci5570 {
                             std::chrono::steady_clock::now() - start_time).count();
                     w_stream << std::to_string(iter) << "\t" << std::to_string(sum) << "\t"
                                   << std::to_string(cur_time) << "\n";
+                    w_stream.flush();
                 }
             }
 
