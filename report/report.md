@@ -26,6 +26,20 @@ The `use_weight_file` toggle and `weight_file_prefix` are used for training prog
 |4|Failed Process Restart Success|Failed Process Recover Success|3823ms||
 |5|Failed Process Recover Success|All Process Recover Success|3256ms||
 
+## Application
+
+### Logistisc Regression
+
+
+
+### K-Means
+
+* kdd12
+
+* webspam
+
+## Others
+
 ### HDFS Read
 
 * `Question`: When the given training data file size is too small, and the total file blocks is not enough to allocated to every working node, then some of the nodes will crash because the data is null, and finally the cluster will not continue as the barrier will block other nodes.
@@ -114,10 +128,4 @@ if (data.empty()) {
 }
 engine.Barrier();
 ```
-
-## Application
-
-### Logistisc Regression
-
-### K-Means
 

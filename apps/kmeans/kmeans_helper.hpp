@@ -239,8 +239,11 @@ namespace csci5570 {
         std::pair<int, double> id_dist;
         std::vector<int> count(K);
 
+        auto start_time = std::chrono::steady_clock::now();
+        LOG(INFO) << "Start test KMeans error";
+
         // only test top `test_count` since it time consuming
-        double test_count = data.size() > 200 ? 200 : data.size();
+        double test_count = data.size() > 50 ? 50 : data.size();
 //        double test_count = data.size();
         double ratio = test_count / data.size();
         for (int i = 0; i < test_count; i++) {
@@ -254,7 +257,10 @@ namespace csci5570 {
 
         sum = sum / ratio;
 
-        LOG(INFO) << "Current iteration=" + std::to_string(iter) << ", Sum of Squared Errors = " << std::to_string(sum);
+        auto end_time = std::chrono::steady_clock::now();
+        auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+        LOG(INFO) << "Current iteration=" + std::to_string(iter) << ", Sum of Squared Errors=" << std::to_string(sum)
+                  << ", Cost time=" << total_time << " ms";
     }
 
 }
