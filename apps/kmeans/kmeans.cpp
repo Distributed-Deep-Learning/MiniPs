@@ -218,7 +218,7 @@ namespace csci5570 {
                 params[i].resize(FLAGS_num_dims);
             }
 
-            auto iteration_info = FLAGS_report_prefix;
+            auto iteration_info = FLAGS_report_prefix + std::to_string(info.worker_id);
             petuum::io::ofstream w_stream(iteration_info, std::ofstream::out | std::ofstream::trunc);
 
             auto start_time = std::chrono::steady_clock::now();
