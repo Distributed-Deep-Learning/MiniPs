@@ -39,7 +39,7 @@ DEFINE_int32(num_servers_per_node, 1, "num_servers_per_node");
 DEFINE_double(alpha, 0.1, "learning rate");
 
 DEFINE_bool(init_dump, true, "init_dump");
-DEFINE_bool(use_weight_file, true, "use weight file to restore progress");
+DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
 DEFINE_bool(checkpoint_toggle, true, "open checkpoint");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/dump/dump_", "the checkpoint file prefix");
@@ -48,11 +48,12 @@ DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
 DEFINE_string(relaunch_cmd,
               "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
               "the restart cmd");
+DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/report_lr_webspam.txt", "the report raw prefix");
 
 namespace csci5570 {
 
     template<typename T>
-    void test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
+    double test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
@@ -73,7 +74,9 @@ namespace csci5570 {
                 c_count += 1;
             }
         }
-        LOG(INFO) << "The accuracy is " << std::to_string(c_count / count);
+        double accuracy = c_count / count;
+        LOG(INFO) << "The accuracy is " << std::to_string(accuracy);
+        return accuracy;
     }
 
     void RecoverIteration() {
@@ -204,7 +207,6 @@ namespace csci5570 {
         }
 
         task.SetLambda([kTableId, &data, &engine, &recovering](const Info &info) {
-//            LOG(INFO) << info.DebugString();
             if (info.worker_id == 0) {
                 LOG(INFO) << "Start Logistic Regression Training...";
             }
@@ -238,14 +240,24 @@ namespace csci5570 {
             for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
-//                LOG(INFO) << "Start Get With Iter=" << i << " On Node:" << Context::get_instance().get_int32("my_id");
                 table->Get(keys, &params);
+
+                if (i > 0 && i % 5 == 0 && info.worker_id == 0) {
+                    double accuracy = test_error<SVMItem>(params, data);
+                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start_time).count();
+                    LOG(INFO) << "Current iteration=" << i << ", accuracy=" << std::to_string(accuracy);
+                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
+                    w_stream << std::to_string(i) << "\t" << std::to_string(accuracy) << "\t"
+                             << std::to_string(cur_time);
+                    w_stream << std::endl;
+                    w_stream.close();
+                }
 
                 if (recovering) {
                     CheckFaultTolerance(5);
                     recovering = false;
                 }
-//                LOG(INFO) << "End Get With Iter=" << i << " On Node:" << Context::get_instance().get_int32("my_id");
                 if (engine.IsNeedRollBack()) {
                     engine.IncRollBackCount();
 
@@ -307,16 +319,11 @@ namespace csci5570 {
                     }
                 }
 
-                if (i % 20 == 0 && info.worker_id == 0) {
-                    LOG(INFO) << "Current training iteration=" << i;
-                }
-
                 if (FLAGS_with_injected_straggler) {
                     double r = (double) rand() / RAND_MAX;
                     if (r < 0.05) {
                         double delay = (double) rand() / RAND_MAX * 100;
                         std::this_thread::sleep_for(std::chrono::milliseconds(int(delay)));
-                        // LOG(INFO) << "sleep for " << int(delay) << " ms";
                     }
                 }
 
@@ -328,7 +335,14 @@ namespace csci5570 {
             if (info.worker_id % FLAGS_num_workers_per_node == 0) {
                 LOG(INFO) << "Start test accuracy on node=" << Context::get_instance().get_int32("my_id");
                 table->Get(all_keys, &params);
-                test_error<SVMItem>(params, data);
+                double accuracy = test_error<SVMItem>(params, data);
+                auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - start_time).count();
+                petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
+                w_stream << std::to_string(FLAGS_num_iters) << "\t" << std::to_string(accuracy) << "\t"
+                         << std::to_string(cur_time);
+                w_stream << std::endl;
+                w_stream.close();
             }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();

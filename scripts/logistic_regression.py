@@ -57,6 +57,7 @@ params = {
     "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_
+    "report_prefix": join(proj_dir, "local/report_lr_webspam.txt"),
 }
 
 env_params = (
