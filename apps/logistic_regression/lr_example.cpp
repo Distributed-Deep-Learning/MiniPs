@@ -54,6 +54,7 @@ namespace csci5570 {
 
     template<typename T>
     double test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
+        LOG(INFO) << "start test error with data size=" << data_.size();
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
@@ -75,7 +76,7 @@ namespace csci5570 {
             }
         }
         double accuracy = c_count / count;
-        LOG(INFO) << "The accuracy is " << std::to_string(accuracy);
+//        LOG(INFO) << "The accuracy is " << std::to_string(accuracy);
         return accuracy;
     }
 
@@ -236,12 +237,16 @@ namespace csci5570 {
             std::chrono::steady_clock::time_point end_time;
             srand(time(0));
 
+            if (info.worker_id == 0) {
+                LOG(INFO) << "Start Logistic Regression Training...3";
+            }
+
             auto table = info.CreateKVClientTable<double>(kTableId);
             third_party::SArray<double> params;
             third_party::SArray<double> deltas;
 
             if (info.worker_id == 0) {
-                LOG(INFO) << "Start Logistic Regression Training...3";
+                LOG(INFO) << "Start Logistic Regression Training...4";
             }
 
             bool after_checkpoint = false;
