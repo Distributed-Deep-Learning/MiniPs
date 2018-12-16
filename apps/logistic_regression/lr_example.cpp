@@ -314,12 +314,12 @@ namespace csci5570 {
                     LOG(INFO) << "Current iteration=" << i;
                 }
 
-                if (i > 0 && FLAGS_report_interval > 0 && i % FLAGS_report_interval == 0 && info.worker_id == 0) {
+                if (i > 0 && FLAGS_report_interval > 0 && i % FLAGS_report_interval == 0) {
                     table->Get(all_keys, &params);
                     double accuracy = test_error<SVMItem>(params, data);
                     auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::steady_clock::now() - start_time).count();
-                    LOG(INFO) << "Current iteration=" << i << ", accuracy=" << std::to_string(accuracy);
+                    //LOG(INFO) << "Current iteration=" << i << ", accuracy=" << std::to_string(accuracy);
                     petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
                     w_stream << std::to_string(i) << "\t" << std::to_string(accuracy) << "\t"
                              << std::to_string(cur_time);
