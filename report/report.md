@@ -16,7 +16,15 @@ Since `Clock()` will wait for other nodes' response, if wait for too long, the n
 
 The `use_weight_file` toggle and `weight_file_prefix` are used for training progress reload, the node will read and recover the training iteration according to the weight file.
 
-### Fault Tolerance Performance
+### CheckPoint Performance
+
+![](images/webspam_checkpoint.jpg)
+
+![](images/kdd12_checkpoint.jpg)
+
+I run the logistic regression on webspam and kdd12 database with checkpoint interval 300, it is obvious that the time cost and iteration count relationship is almost linear, the checkpoint process time cost is wil not influence the training process a lot.
+
+### Rollback Performance
 
 |Phase|From|To|Time Cost|Percentage|
 |---|---|---|---|---|
