@@ -53,7 +53,7 @@ params = {
     "use_weight_file": False,
     "init_dump": True if local_debug else False,
     "weight_file_prefix": "",
-    "heartbeat_interval": 10 if local_debug else 50, # join(proj_dir, "local/dump_")
+    "heartbeat_interval": 10 if local_debug else 15, # join(proj_dir, "local/dump_")
     "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
     "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_
