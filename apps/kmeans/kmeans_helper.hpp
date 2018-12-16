@@ -243,7 +243,7 @@ namespace csci5570 {
         LOG(INFO) << "Start test KMeans error";
 
         // only test top `test_count` since it time consuming
-        double test_count = data.size() > 50 ? 50 : data.size();
+        double test_count = data.size() > 30 ? 30 : data.size();
 //        double test_count = data.size();
         double ratio = test_count / data.size();
         for (int i = 0; i < test_count; i++) {
