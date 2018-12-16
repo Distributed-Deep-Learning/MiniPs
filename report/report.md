@@ -1,8 +1,8 @@
 # CSCI5570 Report
 
-## Additional feature
+## Additional feature - Fault tolerance
 
-### Fault tolerance
+### Overview
 
 * Store the model parameters and configuration into the file
 
@@ -24,15 +24,72 @@ The `use_weight_file` toggle and `weight_file_prefix` are used for training prog
 
 I run the logistic regression on webspam and kdd12 database with checkpoint interval 300, it is obvious that the time cost and iteration count relationship is almost linear, the checkpoint process time cost is wil not influence the training process a lot.
 
+In details, the checkpoint time cost will major depends on the network speed and paramters data size.
+
 ### Rollback Performance
+
+Use a example, the configuration is:
+
+* Database: `hdfs:///datasets/classification/webspam`
+* CheckPoint Interval: 300 (iterations)
+* HeartBeat Interval for Slave Nodes: 15 (s)
+
+There are 7 stages and 5 phases between them:
+
+1. Start checkPoint
+2. End checkPoint
+3. Kill a running process manually
+4. Master detected process failure
+5. Failed process restart success
+6. Failed Process recover success
+7. All nodes in cluster recover success
 
 |Phase|From|To|Time Cost|Percentage|
 |---|---|---|---|---|
-|1|Start CheckPoint|End CheckPoint|6712ms||
-|2|Kill A Running Process|Master Detect Process Failure|5017ms||
-|3|Master Detect Process Failure|Failed Process Restart Success|10ms||
-|4|Failed Process Restart Success|Failed Process Recover Success|3823ms||
-|5|Failed Process Recover Success|All Process Recover Success|3256ms||
+|1|Start CheckPoint|End CheckPoint|18,771ms|9%|
+|2|Kill A Running Process|Master Detect Process Failure|50,023ms|24%|
+|3|Master Detect Process Failure|Failed Process Restart Success|10ms|1%|
+|4|Failed Process Restart Success|Failed Process Recover Success|122,318ms|65%|
+|5|Failed Process Recover Success|All Process Recover Success|30ms|1%|
+
+Sample Output:
+
+```
+// [Stage 1] Start checkPoint
+I1216 14:49:08.633256 82308 lr_example.cpp:305] [CheckPoint] Start checkpoint...
+
+// dump server progress, model parameters and worker configuration
+I1216 14:49:08.636400 166465 vector_storage.hpp:58] Dump Params Storage To hdfs://proj10:9000/ybai/dump_server_params_2
+I1216 14:49:08.950397 166465 progress_tracker.hpp:75] Dump Progress Storage To hdfs://proj10:9000/ybai/dump_server_progress_2
+I1216 14:49:09.053257 166465 svm_dumper.hpp:58] Dump Config To: hdfs://proj10:9000/ybai/dump_worker_config_2
+
+I1216 14:49:09.206115 82308 lr_example.cpp:309] [CheckPoint] Finish checkpoint, cost time:18771 ms
+
+// [Stage 2] End CheckPoint
+// continue iterations
+I1216 14:49:13.237511 82308 lr_example.cpp:314] Current iteration=570
+
+// [Stage 3] kill the running process manually
+bash: line 1: 162777 Terminated ...1155114481/csci5570/debug/LRExample --my_id=2 
+
+// [Stage 4] Master detect failure
+I1216 14:50:03.018653 107004 utils.hpp:52] [Fault Tolerance][Phase2][1544943003] Master Detect Process Failure
+
+// [Stage 5] Killed process restarted
+I1216 14:50:03.714398 166739 utils.hpp:52] [Fault Tolerance][Phase3][1544943003] Failed Process Restart Success
+
+// [Stage 6] Restarted process recover data success
+I1216 14:52:23.740850 166739 utils.hpp:52] [Fault Tolerance][Phase4][1544943143] Failed Process Recover Success
+
+// [Stage 7] All the nodes in cluster recover success
+I1216 14:52:54.005568 167323 utils.hpp:52] [Fault Tolerance][Phase5][1544943174] Other Process Recover Success
+```
+
+### Performance Diagram Output
+
+![](images/fault_tolerance_phases.jpg)
+
+The most time consuming phases are: `Master detect failed node` and `Failed node reload training data`.
 
 ## Application
 
