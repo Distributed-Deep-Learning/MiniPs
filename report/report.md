@@ -1,20 +1,57 @@
 # CSCI5570 Report
 
+## Base Line
+
+### Overview
+
+![](images/architecture.png)
+
+* `Engine` : The core manager in the framework, interconnected with other module such as Mailbox, Model and Server/WorkerThread in the framework.
+* `KVClientTable`:ProvidecoreparameterserverAPIs such as Get, Add and Clock. Other interfaces like CheckPoint and HeartBeat for fault tolerance, Send for communication.
+* WorkerThread: Sets the callback when KVClient- Table.Get() is called. When ServerThread gets the data successfully and sends it back, it will send the callback to return the data to KVClientTable.
+* ServerThread: The service thread running in the node, providing the response service of Add, Get, Clock.
+* SenderThread: A service used to provide communi- cation information between sending nodes, a stand actor-mailbox model is used.
+* `PartitionManager`: Provides data partition services according to number of nodes in the cluster for data parallel computing.
+* IdMapper: Allocate worker and server threads’ id based on the node configuration. There are maxi- mum 1000 threads running on each machines, the server threads id are range from 0 to 50, while the worker threads id are range from 50 to 100. The id is critical for the communication between different worker and servers.
+* Communication Pattern:In the process of communication, the id of sender and receiver is an important identifier, and all ids are allocated according to the id of the machine node to ensure uniqueness. Each id is associated with each WorkThread, ServerThread queue, and the id is used to find the queue of the corresponding thread.
+* Mailbox : Encapsulates a set of interfaces for sending and receiving information from ZMQ. By main- taining a map to insert messages into the queues of WorkThread and ServerThread, a typical producer- consumer model.
+* Message: The basic data element for communica- tion, it contains important information such as flag that indicate the message’s type, the sender and re- ceiver’s node id, and the updated parameter data.
+* Consistency Model: There are three core operations Add, Get and Clock respectively. The first two are used to update and acquire the model parameters. The latter one is to facilitate the synchronization of each node to ensure data consistency. The three com- monly used models are BSP, ASP, SSP.
+* ProgressTracker:Themodelparametersclockprogress on different machines, based on the tracker, consis- tency model such as BSP and SSP is able to control the global progress.
+* Data Storage: The training data is stored on the dis- tributed storage system called HDFS, each file is par- titioned into blocks and may have several replicas on multiple machines for fault tolerance.
+* Parameter Storage: Implement two common com- puter Maps and Vectors for machine learning data processing.
+* HDFSManager: Provide useful APIs for developers to load data from HDFS with the classical producer- consumer paradigm.
+* `Master` : The master node on the cluster for fault tolerance, when slave machines crashed, the mas- ter is able to detect the error with heartbeat mech- anism, and restart the machine and recover the train- ing progress from last checkpoint.
+* MLTask: This model highly related to the machine learning application, which is used to describe the information about the application’s task, it contains data about the table id, worker allocation and run- ning callback.
+* Launch Utils: The machine learning applications are running on multiple machines, the framework will allow users launch processes on multiple machines according to the node configuration by python scripts. The script is also able to control the debug or provi- sion environment for test convenience.
+
+
+### The Id Mapper
+
+![](images/IdMapper.png)
+
+### Paramters Get/Add
+
+![](images/worker_server.png)
+
+### The Communication Pattern
+
+![](images/network_messaging.png)
+
 ## Additional feature - Fault tolerance
 
 ### Overview
 
-* Store the model parameters and configuration into the file
+There are three important operation in the checkpoint/rollback:
 
-The checkpoint command should sent by the main node, it will not continue training until all the nodes dump the weights into persistent storage like HDFS or local directory start with `checkpoint_file_prefix`.
+1. Store the model parameters and configuration into the file: The checkpoint command should sent by the main node, it will not continue training until all the nodes dump the weights into persistent storage like HDFS or local directory start with `checkpoint_file_prefix`.
 
-* Detect error with heartbeat mechanism, restart the engine
+2. Detect error with heartbeat mechanism, restart the engine: Since `Clock()` will wait for other nodes' response, if wait for too long, the node will notify other nodes in the cluster to quit training directly
+3. Read and recover the model parameters  after restart: The `use_weight_file` toggle and `weight_file_prefix` are used for training progress reload, the node will read and recover the training iteration according to the weight file.
 
-Since `Clock()` will wait for other nodes' response, if wait for too long, the node will notify other nodes in the cluster to quit training directly
+The checkpoint/rollback design:
 
-* Read and recover the model parameters  after restart
-
-The `use_weight_file` toggle and `weight_file_prefix` are used for training progress reload, the node will read and recover the training iteration according to the weight file.
+![](images/fault.jpg)
 
 ### CheckPoint Performance
 
@@ -28,7 +65,7 @@ In details, the checkpoint time cost will major depends on the network speed and
 
 ### Rollback Performance
 
-Use a example, the configuration is:
+I use a example to demonstrate the performance, the configuration is:
 
 * Database: `hdfs:///datasets/classification/webspam`
 * CheckPoint Interval: 300 (iterations)
@@ -91,19 +128,9 @@ I1216 14:52:54.005568 167323 utils.hpp:52] [Fault Tolerance][Phase5][1544943174]
 
 The most time consuming phases are: `Master detect failed node` and `Failed node reload training data`.
 
-## Application
-
-### Logistisc Regression
-
-
-
-### K-Means
-
-* kdd12
-
-* webspam
-
 ## Others
+
+In this session, I demonstrate a bug found on the template while programming on the project.
 
 ### HDFS Read
 

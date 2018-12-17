@@ -26,11 +26,11 @@ params = {
     "num_iters": 1000,  # 1000
     "kStorageType": "Vector",  # {Vector/Map}
     "hdfs_namenode_port": 9000,
-    "K": 2,
+    "K": 5,
     "batch_size": 6,  # 100
     "alpha": 0.1,
     "kmeans_init_mode": "random",
-    "report_interval": 5,
+    "report_interval": 2,
     "checkpoint_toggle": False,
     "use_weight_file": False,
     "init_dump": True if local_debug else False,

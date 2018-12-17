@@ -235,6 +235,7 @@ namespace csci5570 {
     template<typename T>
     double test_error(const std::vector<std::vector<double>> &params, const std::vector<T> &data, int iter, int K,
                     int num_features, int cluster_id) {
+        LOG(INFO) << "Current iteration=" + std::to_string(iter) << ", start test_error"
         double sum = 0;  // sum of square error
         std::pair<int, double> id_dist;
         std::vector<int> count(K);
@@ -243,7 +244,7 @@ namespace csci5570 {
         LOG(INFO) << "Start test KMeans error";
 
         // only test top `test_count` since it time consuming
-        double test_count = data.size() > 100 ? 100 : data.size();
+        double test_count = data.size() > 50 ? 50 : data.size();
 //        double test_count = data.size();
         double ratio = test_count / data.size();
         for (int i = 0; i < test_count; i++) {
