@@ -38,6 +38,10 @@
 
 ![](images/network_messaging.png)
 
+## Application Evaluation
+
+![](images/convengence_curve.jpg)
+
 ## Additional feature - Fault tolerance
 
 ### Overview

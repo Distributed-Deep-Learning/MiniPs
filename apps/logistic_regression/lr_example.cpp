@@ -342,16 +342,17 @@ namespace csci5570 {
                 LOG(INFO) << "Start test accuracy on node=" << Context::get_instance().get_int32("my_id");
                 table->Get(all_keys, &params);
                 double accuracy = test_error<SVMItem>(params, data);
-                if (info.worker_id == 0) {
-                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::steady_clock::now() - start_time).count();
-                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
-                    w_stream << std::to_string(FLAGS_num_iters) << "\t" << std::to_string(accuracy) << "\t"
-                             << std::to_string(cur_time);
-                    w_stream << std::endl;
-                    w_stream.close();
-                }
+                LOG(INFO) << "The accuracy is " << std::to_string(accuracy) << " on node=" << Context::get_instance().get_int32("my_id");
             }
+//                if (info.worker_id == 0) {
+//                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+//                            std::chrono::steady_clock::now() - start_time).count();
+//                    petuum::io::ofstream w_stream(FLAGS_report_prefix, std::ofstream::out | std::ofstream::app);
+//                    w_stream << std::to_string(FLAGS_num_iters) << "\t" << std::to_string(accuracy) << "\t"
+//                             << std::to_string(cur_time);
+//                    w_stream << std::endl;
+//                    w_stream.close();
+//                }
 
             auto total_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
             LOG(INFO) << "Total training time: " << total_time << " ms on worker: " << info.worker_id;
