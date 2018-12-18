@@ -56,7 +56,7 @@ namespace csci5570 {
 
     template<typename T>
     double test_error(third_party::SArray<double> &rets_w, std::vector<T> &data_) {
-        LOG(INFO) << "start test error with data size=" << data_.size() << ", params size=" << rets_w.size();
+//        LOG(INFO) << "start test error with data size=" << data_.size() << ", params size=" << rets_w.size();
         int count = 0;
         float c_count = 0;  /// correct count
         for (int i = 0; i < data_.size(); ++i) {
