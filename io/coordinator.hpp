@@ -22,7 +22,7 @@
 #include "base/serialization.hpp"
 #include "base/zmq_helper.hpp"
 
-namespace csci5570 {
+namespace minips {
 
 /**
  * HDFS coordinator on the worker side connecting file splitter and master
@@ -80,4 +80,4 @@ namespace csci5570 {
 
     };  // class Coordinator
 
-}  // namespace csci5570
+}  // namespace minips

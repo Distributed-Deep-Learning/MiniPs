@@ -7,7 +7,7 @@
 #include <atomic>
 #include <thread>
 
-namespace csci5570 {
+namespace minips {
 
     void TestBgWorker() {
         // Create app_blocker and worker_helper_thread
@@ -110,6 +110,6 @@ namespace csci5570 {
         worker_thread2.join();
     }
 
-}  // namespace csci5570
+}  // namespace minips
 
-int main() { csci5570::TestBgWorker(); }
+int main() { minips::TestBgWorker(); }

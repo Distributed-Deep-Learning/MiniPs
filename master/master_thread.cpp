@@ -7,7 +7,7 @@
 #include "master_thread.hpp"
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
     void MasterThread::Main() {
         Init();

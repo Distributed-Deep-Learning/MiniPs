@@ -4,7 +4,7 @@
 #include "base/message.hpp"
 #include "base/third_party/sarray.h"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestMessage : public testing::Test {
@@ -27,4 +27,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

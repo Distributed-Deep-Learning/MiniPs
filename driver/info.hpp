@@ -9,7 +9,7 @@
 
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
 /**
  * The Info object provides the context of user threads
@@ -42,4 +42,4 @@ namespace csci5570 {
         }
     };
 
-}  // namespace csci5570
+}  // namespace minips

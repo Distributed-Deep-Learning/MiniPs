@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestSender : public testing::Test {
@@ -76,4 +76,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

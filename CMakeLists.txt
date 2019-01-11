@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-project(csci5570)
+project(minips)
 cmake_minimum_required(VERSION 3.0.2)
 
 # CMake Options

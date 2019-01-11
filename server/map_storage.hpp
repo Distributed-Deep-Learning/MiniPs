@@ -5,7 +5,7 @@
 #include "glog/logging.h"
 #include <map>
 
-namespace csci5570 {
+namespace minips {
 
     template<typename Val>
     class MapStorage : public AbstractStorage {
@@ -39,4 +39,4 @@ namespace csci5570 {
         std::map<Key, Val> storage_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

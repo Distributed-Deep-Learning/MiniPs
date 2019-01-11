@@ -1,7 +1,7 @@
 #include "comm/sender.hpp"
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
     Sender::Sender(AbstractMailbox *mailbox) : mailbox_(mailbox) {}
 
     void Sender::Start() {
@@ -29,4 +29,4 @@ namespace csci5570 {
         sender_thread_.join();
     }
 
-}  // namespace csci5570
+}  // namespace minips

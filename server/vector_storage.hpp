@@ -13,7 +13,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-namespace csci5570 {
+namespace minips {
     template<typename Val>
     class VectorStorage : public AbstractStorage {
     public:

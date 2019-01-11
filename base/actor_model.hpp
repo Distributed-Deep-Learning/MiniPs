@@ -8,7 +8,7 @@
 #include <thread>
 #include <unordered_map>
 
-namespace csci5570 {
+namespace minips {
 
     class Actor {
     public:
@@ -33,4 +33,4 @@ namespace csci5570 {
         ThreadsafeQueue <Message> work_queue_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

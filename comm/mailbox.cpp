@@ -4,7 +4,7 @@
 #include <lib/svm_dumper.hpp>
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
     inline void FreeData(void *data, void *hint) {
         if (hint == NULL) {
@@ -358,4 +358,4 @@ namespace csci5570 {
 
     }
 
-}  // namespace csci5570
+}  // namespace minips

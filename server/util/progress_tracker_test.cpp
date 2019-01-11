@@ -3,7 +3,7 @@
 
 #include "server/util/progress_tracker.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestProgressTracker : public testing::Test {
@@ -49,4 +49,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

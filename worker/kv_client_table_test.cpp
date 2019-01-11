@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 
-namespace csci5570 {
+namespace minips {
 
     const uint32_t kTestAppThreadId = 15;
     const uint32_t kTestModelId = 23;
@@ -237,4 +237,4 @@ namespace csci5570 {
         th.join();
     }
 
-}  // namespace csci5570
+}  // namespace minips

@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include "base/node.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class WorkerThread : public Actor, public AbstractCallbackRunner {
     public:
@@ -68,4 +68,4 @@ namespace csci5570 {
         std::map<uint32_t, std::map<uint32_t, std::function<void()>>> recv_finish_handle_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

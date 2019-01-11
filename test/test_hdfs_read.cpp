@@ -10,7 +10,7 @@
 #include "io/hdfs_file_splitter.hpp"
 #include "io/line_input_format.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     void HDFS_Read() {
         std::string hdfs_namenode = "localhost";
@@ -67,11 +67,11 @@ namespace csci5570 {
         worker_thread.join();
     }
 
-}  // namespace csci5570
+}  // namespace minips
 
 int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     FLAGS_stderrthreshold = 0;
     FLAGS_colorlogtostderr = true;
-    csci5570::HDFS_Read();
+    minips::HDFS_Read();
 }

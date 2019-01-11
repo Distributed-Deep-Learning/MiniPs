@@ -2,7 +2,7 @@
 #include "glog/logging.h"
 #include "simple_id_mapper.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     WorkerSpec::WorkerSpec(const std::vector<WorkerAlloc> &worker_alloc) {
         Init(worker_alloc);
@@ -56,4 +56,4 @@ namespace csci5570 {
             }
         }
     }
-}  // namespace csci5570
+}  // namespace minips

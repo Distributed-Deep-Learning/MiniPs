@@ -5,7 +5,7 @@
 #include "driver/simple_id_mapper.hpp"
 #include "driver/worker_spec.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestWorkerSpec : public testing::Test {
@@ -86,4 +86,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

@@ -13,7 +13,7 @@
 #include <zmq.h>
 #include <driver/engine.hpp>
 
-namespace csci5570 {
+namespace minips {
 
     class Engine;
 
@@ -89,4 +89,4 @@ namespace csci5570 {
 
     };
 
-}  // namespace csci5570
+}  // namespace minips

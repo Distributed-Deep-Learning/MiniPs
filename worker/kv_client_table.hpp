@@ -12,7 +12,7 @@
 #include "base/message.hpp"
 #include <algorithm>
 
-namespace csci5570 {
+namespace minips {
 
     /**
      * Provides the API to users, and implements the worker-side abstraction of model
@@ -204,4 +204,4 @@ namespace csci5570 {
 
     };
 
-}  // namespace csci5570
+}  // namespace minips

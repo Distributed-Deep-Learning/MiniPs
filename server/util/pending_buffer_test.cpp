@@ -3,7 +3,7 @@
 
 #include "server/util/pending_buffer.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestPendingBuffer : public testing::Test {
@@ -60,4 +60,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

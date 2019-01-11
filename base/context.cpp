@@ -3,7 +3,7 @@
 #include <glog/logging.h>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
 
     Context &Context::get_instance() {
         static Context instance;
@@ -60,4 +60,4 @@ namespace csci5570 {
         ctx_[key] = value;
     }
 
-}   // namespace csci5570
+}   // namespace minips

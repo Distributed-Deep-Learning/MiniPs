@@ -16,7 +16,7 @@
 #include "kmeans_helper.hpp"
 
 DEFINE_int32(my_id, 0, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnode", "The config file path");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/minips/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///a9a", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -47,12 +47,12 @@ DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/dump/dump_", "the c
 DEFINE_string(checkpoint_raw_prefix, "hdfs:///dump/dump_", "the checkpoint raw prefix");
 DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
 DEFINE_string(relaunch_cmd,
-              "python /Users/aiyongbiao/Desktop/projects/csci5570/scripts/logistic_regression.py relaunch 1",
+              "python /Users/aiyongbiao/Desktop/projects/minips/scripts/logistic_regression.py relaunch 1",
               "the restart cmd");
-DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/csci5570/local/report_kmeans_webspam.txt", "the report raw prefix");
+DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/minips/local/report_kmeans_webspam.txt", "the report raw prefix");
 
 
-namespace csci5570 {
+namespace minips {
 
     void Run() {
         srand(0);
@@ -305,5 +305,5 @@ namespace csci5570 {
 int main(int argc, char **argv) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
-    csci5570::Run();
+    minips::Run();
 }

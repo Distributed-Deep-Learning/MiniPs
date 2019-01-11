@@ -12,7 +12,7 @@
 #include "io/line_input_format.hpp"
 #include "lib/labeled_sample.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace lib {
 
         class AsyncReadBuffer {
@@ -100,4 +100,4 @@ namespace csci5570 {
         };
 
     }  // namespace lib
-}  // namespace csci5570
+}  // namespace minips

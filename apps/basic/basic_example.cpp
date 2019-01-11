@@ -12,9 +12,9 @@
 #include <numeric>
 
 DEFINE_int32(my_id, 1, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/csci5570/config/localnodes", "The config file path");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/minips/config/localnodes", "The config file path");
 
-namespace csci5570 {
+namespace minips {
 
     void Run() {
         CHECK_NE(FLAGS_my_id, -1);
@@ -81,6 +81,6 @@ namespace csci5570 {
 int main(int argc, char **argv) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
-    csci5570::Run();
+    minips::Run();
 }
 

@@ -7,7 +7,7 @@
 #include "worker_thread.hpp"
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
     void WorkerThread::Check(uint32_t app_thread_id, uint32_t model_id) {
         CHECK(recv_handle_.find(app_thread_id) != recv_handle_.end()) << "recv_handle_ for app_thread_id:" << app_thread_id

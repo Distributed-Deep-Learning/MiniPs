@@ -10,7 +10,7 @@
 #include "base/node.hpp"
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
     Node SelectMaster(std::vector<Node> &nodes);
 

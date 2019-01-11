@@ -6,7 +6,7 @@
 #include "glog/logging.h"
 #include "hdfs/hdfs.h"
 
-namespace csci5570 {
+namespace minips {
 
     HDFSFileSplitter::HDFSFileSplitter(int num_threads, int id, Coordinator *coordinator, std::string hostname,
                                        std::string hdfs_namenode, int hdfs_namenode_port) {
@@ -110,4 +110,4 @@ namespace csci5570 {
 
     size_t HDFSFileSplitter::hdfs_block_size = 0;
 
-}  // namespace csci5570
+}  // namespace minips

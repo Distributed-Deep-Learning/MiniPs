@@ -12,13 +12,13 @@ ssh_cmd = (
 )
 
 # [clone]:
-# python3 batch_ops.py -o clone -u https://github.com/RickAi/csci5570.git
+# python3 batch_ops.py -o clone -u https://github.com/RickAi/minips.git
 #
 # [pull]:
 # python3 batch_ops.py -o pull
 #
 # [build]:
-# python3 batch_ops.py -o build -d csci5570
+# python3 batch_ops.py -o build -d minips
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Batch Ops Tool')
     parser.add_argument('-o', choices=['clone', 'pull', 'build'], default="pull", help='The operation, e.g. clone, fetch, build')

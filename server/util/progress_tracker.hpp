@@ -10,7 +10,7 @@
 #include "base/third_party/general_fstream.hpp"
 #include <math.h>
 
-namespace csci5570 {
+namespace minips {
 
     class ProgressTracker {
     public:
@@ -126,4 +126,4 @@ namespace csci5570 {
         int min_clock_;                  // the slowest progress
     };
 
-}  // namespace csci5570
+}  // namespace minips

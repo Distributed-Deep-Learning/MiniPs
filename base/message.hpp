@@ -7,7 +7,7 @@
 #include "base/serialization.hpp"
 #include "base/third_party/sarray.h"
 
-namespace csci5570 {
+namespace minips {
 
     struct Control {
     };
@@ -70,4 +70,4 @@ namespace csci5570 {
         }
     };
 
-}  // namespace csci5570
+}  // namespace minips

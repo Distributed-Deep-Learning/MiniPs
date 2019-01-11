@@ -9,7 +9,7 @@
 
 #include "base/node.hpp"
 
-namespace csci5570 {
+namespace minips {
 
 /*
  * node_id = tid / kMaxThreadsPerNode
@@ -106,4 +106,4 @@ namespace csci5570 {
         std::vector<Node> nodes_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

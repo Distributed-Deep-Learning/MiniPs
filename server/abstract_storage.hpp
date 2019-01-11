@@ -3,7 +3,7 @@
 #include "base/message.hpp"
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
 /*
  * Implement using the template method and dispatch the SubAdd/SubGet to subclasses.
@@ -49,4 +49,4 @@ namespace csci5570 {
 
     };
 
-}  // namespace csci5570
+}  // namespace minips

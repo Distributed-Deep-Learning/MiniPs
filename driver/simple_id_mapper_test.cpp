@@ -4,7 +4,7 @@
 
 #include "driver/simple_id_mapper.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestSimpleIdMapper : public testing::Test {
@@ -75,4 +75,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

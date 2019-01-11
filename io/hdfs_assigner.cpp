@@ -6,7 +6,7 @@
 #include "base/serialization.hpp"
 #include "base/zmq_helper.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     const int HDFSBlockAssigner::kBlockRequest;
     const int HDFSBlockAssigner::kExit;
@@ -221,4 +221,4 @@ namespace csci5570 {
         return ret;
     }
 
-}  // namespace csci5570
+}  // namespace minips

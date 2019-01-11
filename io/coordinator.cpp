@@ -20,7 +20,7 @@
 #include "base/serialization.hpp"
 #include "io/coordinator.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     Coordinator::Coordinator(int proc_id, std::string hostname, zmq::context_t *context,
                              std::string master_host, int master_port)
@@ -80,4 +80,4 @@ namespace csci5570 {
         zmq_send_common(zmq_coord_, message.get_remained_buffer(), message.size());
     }
 
-}  // namespace csci5570
+}  // namespace minips

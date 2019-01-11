@@ -1,6 +1,6 @@
 #pragma once
 
-namespace csci5570 {
+namespace minips {
     namespace lib {
 
         // Consider both sparse and dense feature abstraction
@@ -13,4 +13,4 @@ namespace csci5570 {
         };  // class LabeledSample
 
     }  // namespace lib
-}  // namespace csci5570
+}  // namespace minips

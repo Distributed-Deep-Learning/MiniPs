@@ -4,7 +4,7 @@
 
 #include "base/message.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class AbstractCallbackRunner {
     public:
@@ -43,4 +43,4 @@ namespace csci5570 {
 
     };  // class AbstractCallbackRunner
 
-}  // namespace csci5570
+}  // namespace minips

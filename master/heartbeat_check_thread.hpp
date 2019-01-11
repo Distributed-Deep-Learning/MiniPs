@@ -9,7 +9,7 @@
 #include "base/node.hpp"
 #include "master_thread.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class HeartBeatCheckThread : public Actor {
     public:

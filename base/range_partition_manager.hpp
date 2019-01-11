@@ -9,7 +9,7 @@
 
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
     class RangePartitionManager : public AbstractPartitionManager {
     public:
@@ -75,4 +75,4 @@ namespace csci5570 {
         std::vector<third_party::Range> ranges_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

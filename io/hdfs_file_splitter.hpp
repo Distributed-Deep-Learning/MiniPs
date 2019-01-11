@@ -8,7 +8,7 @@
 
 #include "io/coordinator.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class HDFSFileSplitter {
     public:
@@ -49,4 +49,4 @@ namespace csci5570 {
 
     };  // class HDFSFileSplitter
 
-}  // namespace csci5570
+}  // namespace minips

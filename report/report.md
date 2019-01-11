@@ -1,4 +1,4 @@
-# CSCI5570 Report
+# minips Report
 
 ## Base Line
 
@@ -111,7 +111,7 @@ I1216 14:49:09.206115 82308 lr_example.cpp:309] [CheckPoint] Finish checkpoint, 
 I1216 14:49:13.237511 82308 lr_example.cpp:314] Current iteration=570
 
 // [Stage 3] kill the running process manually
-bash: line 1: 162777 Terminated ...1155114481/csci5570/debug/LRExample --my_id=2 
+bash: line 1: 162777 Terminated ...1155114481/minips/debug/LRExample --my_id=2 
 
 // [Stage 4] Master detect failure
 I1216 14:50:03.018653 107004 utils.hpp:52] [Fault Tolerance][Phase2][1544943003] Master Detect Process Failure

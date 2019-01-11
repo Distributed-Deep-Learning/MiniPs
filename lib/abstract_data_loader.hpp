@@ -8,7 +8,7 @@
 #include <base/node.hpp>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
     namespace lib {
 
         // template <typename Sample, template <typename> typename DataStore<Sample>>
@@ -53,4 +53,4 @@ namespace csci5570 {
         };  // class AbstractDataLoader
 
     }  // namespace lib
-}  // namespace csci5570
+}  // namespace minips

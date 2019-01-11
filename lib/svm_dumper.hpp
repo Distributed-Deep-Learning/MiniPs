@@ -17,7 +17,7 @@
 #include "boost/utility/string_ref.hpp"
 #include "lib/parser.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class SVMDumper {
     public:

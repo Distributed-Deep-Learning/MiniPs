@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-namespace csci5570 {
+namespace minips {
 
     struct Node {
         uint32_t id;
@@ -21,4 +21,4 @@ namespace csci5570 {
         }
     };
 
-}  // namespace csci5570
+}  // namespace minips

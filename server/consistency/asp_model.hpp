@@ -9,7 +9,7 @@
 #include "server/util/pending_buffer.hpp"
 #include "server/util/progress_tracker.hpp"
 
-namespace csci5570 {
+namespace minips {
 
 /**
  * A wrapper for model with Asynchronous Parallel consistency
@@ -43,4 +43,4 @@ namespace csci5570 {
         ProgressTracker progress_tracker_;          // the progresses of all worker threads interacting with the model
     };
 
-}  // namespace csci5570
+}  // namespace minips

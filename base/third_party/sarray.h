@@ -11,7 +11,7 @@
 #include "range.h"
 #include "base/serialization.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace third_party {
 
 /**
@@ -355,4 +355,4 @@ namespace csci5570 {
         }
 
     }  // namespace third_party
-}  // namespace csci5570
+}  // namespace minips

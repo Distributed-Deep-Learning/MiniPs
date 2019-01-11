@@ -4,7 +4,7 @@
 #include "base/magic.hpp"
 #include "base/range_partition_manager.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class TestRangePartitionManager : public testing::Test {
     protected:
@@ -63,4 +63,4 @@ namespace csci5570 {
         EXPECT_DOUBLE_EQ(sliced[2].second.second[0], .9);
     }
 
-}  // namespace csci5570
+}  // namespace minips

@@ -10,7 +10,7 @@
 #include <string>
 #include <base/utils.hpp>
 
-namespace csci5570 {
+namespace minips {
 
     void HeartBeatCheckThread::Main() {
         int32_t interval = Context::get_instance().get_int32("heartbeat_interval");

@@ -7,7 +7,7 @@
 
 #include "driver/info.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     struct WorkerAlloc {
         uint32_t node_id;
@@ -65,4 +65,4 @@ namespace csci5570 {
         std::vector<uint32_t> tables_;           // model ids
     };
 
-}  // namespace csci5570
+}  // namespace minips

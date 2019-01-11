@@ -1,7 +1,7 @@
 #include <utility>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
 
     template<typename T>
     double dist(T &point1, T &point2, int num_features) {

@@ -2,7 +2,7 @@
 
 #include "glog/logging.h"
 
-namespace csci5570 {
+namespace minips {
 
     void ServerThread::RegisterModel(uint32_t model_id, std::unique_ptr<AbstractModel> &&model) {
         CHECK(models_.find(model_id) == models_.end());
@@ -60,5 +60,5 @@ namespace csci5570 {
         }
     }
 
-}  // namespace csci5570
+}  // namespace minips
 

@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include "base/third_party/sarray.h"
 
-namespace csci5570 {
+namespace minips {
 
     using Key = uint32_t;
 
@@ -12,4 +12,4 @@ namespace csci5570 {
 
     using SVMItem = std::pair<std::vector<std::pair<int, double>>, double>;
 
-}  // namespace csci5570
+}  // namespace minips

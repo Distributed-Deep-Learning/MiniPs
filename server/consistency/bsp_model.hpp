@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
 
 /**
  * A wrapper for model with Batch Synchronous Parallel consistency
@@ -49,4 +49,4 @@ namespace csci5570 {
         std::vector<Message> add_buffer_;  // buffer of add requests
     };
 
-}  // namespace csci5570
+}  // namespace minips

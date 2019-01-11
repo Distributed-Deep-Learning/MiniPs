@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-namespace csci5570 {
+namespace minips {
 
     void TestServer() {
         // This should be owned by the sender
@@ -153,6 +153,6 @@ namespace csci5570 {
             server_thread->Stop();
         }
     }
-}  // namespace csci5570
+}  // namespace minips
 
-int main() { csci5570::TestServer(); }
+int main() { minips::TestServer(); }

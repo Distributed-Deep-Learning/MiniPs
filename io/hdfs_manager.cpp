@@ -8,7 +8,7 @@
 #include "glog/logging.h"
 #include "base/node_utils.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     HDFSManager::HDFSManager(Node node, const std::vector<Node> &nodes, const Config &config,
                              zmq::context_t *zmq_context)

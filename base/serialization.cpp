@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
 
     BinStream::BinStream() : front_(0) {}
 
@@ -135,4 +135,4 @@ namespace csci5570 {
 
     BinStream::~BinStream() {}
 
-}  // namespace csci5570
+}  // namespace minips

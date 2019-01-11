@@ -4,7 +4,7 @@
 
 #include "mailbox.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestMailbox : public testing::Test {
@@ -253,4 +253,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

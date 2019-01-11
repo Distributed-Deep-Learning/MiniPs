@@ -7,7 +7,7 @@
 #include <set>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
 
 /*
  * node_id: 0, 1
@@ -76,4 +76,4 @@ namespace csci5570 {
         uint32_t num_workers_ = 0;
     };
 
-}  // namespace csci5570
+}  // namespace minips

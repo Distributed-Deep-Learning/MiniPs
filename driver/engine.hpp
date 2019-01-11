@@ -20,7 +20,7 @@
 #include "base/range_partition_manager.hpp"
 #include "base/context.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     enum class ModelType {
         SSP, BSP, ASP
@@ -377,4 +377,4 @@ namespace csci5570 {
         std::mutex mu_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

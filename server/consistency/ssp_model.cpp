@@ -5,7 +5,7 @@
 #include <lib/svm_dumper.hpp>
 #include <thread>
 
-namespace csci5570 {
+namespace minips {
 
     SSPModel::SSPModel(uint32_t model_id, std::unique_ptr<AbstractStorage> &&storage_ptr, int staleness,
                        ThreadsafeQueue<Message> *reply_queue)
@@ -119,4 +119,4 @@ namespace csci5570 {
         }
     }
 
-}  // namespace csci5570
+}  // namespace minips

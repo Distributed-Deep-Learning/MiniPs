@@ -9,7 +9,7 @@
 #include "server/consistency/asp_model.hpp"
 #include "server/map_storage.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestASPModel : public testing::Test {
@@ -181,4 +181,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

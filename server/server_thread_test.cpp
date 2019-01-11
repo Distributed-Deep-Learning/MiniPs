@@ -5,7 +5,7 @@
 #include "server/abstract_model.hpp"
 #include "server/server_thread.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestServerThread : public testing::Test {
@@ -126,4 +126,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

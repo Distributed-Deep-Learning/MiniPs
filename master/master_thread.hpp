@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include "base/actor_model.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class MasterThread : public Actor {
     public:

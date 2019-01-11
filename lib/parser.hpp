@@ -3,7 +3,7 @@
 #include "boost/utility/string_ref.hpp"
 #include <base/magic.hpp>
 
-namespace csci5570 {
+namespace minips {
     namespace lib {
 
         template<typename Sample>
@@ -56,4 +56,4 @@ namespace csci5570 {
         };  // class Parser
 
     }  // namespace lib
-}  // namespace csci5570
+}  // namespace minips

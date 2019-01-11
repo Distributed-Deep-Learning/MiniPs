@@ -1,12 +1,12 @@
-# CSCI5570 Parameter Server Project Demonstration
+# minips Parameter Server Project Demonstration
 
 In courtesy of the Husky team. Special thanks to Yuzhen Huang. This repo serves as a demo for the course project. Please do not be limited to it and feel free to use or modify the codes to suit your own design. You may also choose a completely different design.
 
 ## Install & Run
 Git clone this repository by
 ```sh
-git clone https://github.com/TatianaJin/csci5570.git
-cd csci5570
+git clone https://github.com/TatianaJin/minips.git
+cd minips
 ```
 Create a directory for putting compiled files, and configure cmake.
 ```

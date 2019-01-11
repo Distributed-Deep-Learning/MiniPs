@@ -7,7 +7,7 @@
 #include <thread>
 #include <unordered_map>
 
-namespace csci5570 {
+namespace minips {
 
     class ServerThread : public Actor {
     public:
@@ -32,4 +32,4 @@ namespace csci5570 {
         std::unordered_map<uint32_t, std::unique_ptr<AbstractModel>> models_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

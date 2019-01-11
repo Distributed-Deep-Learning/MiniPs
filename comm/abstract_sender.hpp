@@ -2,7 +2,7 @@
 
 #include "base/message.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class AbstractSender {
     public:
@@ -15,4 +15,4 @@ namespace csci5570 {
         virtual void Stop() = 0;
     };
 
-}  // namespace csci5570
+}  // namespace minips

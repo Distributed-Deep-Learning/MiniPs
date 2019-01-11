@@ -4,7 +4,7 @@
 #include "driver/engine.hpp"
 #include "worker/kv_client_table.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
 /**
@@ -157,4 +157,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

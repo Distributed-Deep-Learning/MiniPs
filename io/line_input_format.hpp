@@ -8,7 +8,7 @@
 #include "io/hdfs_file_splitter.hpp"
 #include "io/hdfs_assigner.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class LineInputFormat {
     public:
@@ -146,4 +146,4 @@ namespace csci5570 {
 
     };  // class LineInputFormat
 
-}  // namespace csci5570
+}  // namespace minips

@@ -5,7 +5,7 @@
 #include <mutex>
 #include <queue>
 
-namespace csci5570 {
+namespace minips {
 
     template<typename T>
     class ThreadsafeQueue {
@@ -47,4 +47,4 @@ namespace csci5570 {
         std::condition_variable cond_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

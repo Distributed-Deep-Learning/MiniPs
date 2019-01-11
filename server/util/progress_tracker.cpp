@@ -4,7 +4,7 @@
 #include "driver/simple_id_mapper.hpp"
 #include <algorithm>
 
-namespace csci5570 {
+namespace minips {
 
     void ProgressTracker::Init(const std::vector<uint32_t> &tids) {
         progresses_.clear();
@@ -92,4 +92,4 @@ namespace csci5570 {
         return it != progresses_.end();
     }
 
-}  // namespace csci5570
+}  // namespace minips

@@ -5,7 +5,7 @@
 #include "base/threadsafe_queue.hpp"
 #include "base/node.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class AbstractModel {
     public:
@@ -28,4 +28,4 @@ namespace csci5570 {
         virtual ~AbstractModel() {}
     };
 
-}  // namespace csci5570
+}  // namespace minips

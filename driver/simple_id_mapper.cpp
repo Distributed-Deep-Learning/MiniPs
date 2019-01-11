@@ -7,7 +7,7 @@
 #include "glog/logging.h"
 #include "gtest/gtest.h"
 
-namespace csci5570 {
+namespace minips {
 
     uint32_t SimpleIdMapper::GetNodeIdForThread(uint32_t tid) {
         return tid / kMaxThreadsPerNode;
@@ -86,4 +86,4 @@ namespace csci5570 {
     const uint32_t SimpleIdMapper::kMaxBgThreadsPerNode;
     const uint32_t SimpleIdMapper::kWorkerHelperThreadId;
 
-}  // namespace csci5570
+}  // namespace minips

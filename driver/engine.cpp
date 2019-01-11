@@ -12,7 +12,7 @@
 #include "worker/abstract_callback_runner.hpp"
 #include "worker/worker_thread.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     void Engine::StartEverything(int num_server_threads_per_node) {
         CreateIdMapper(num_server_threads_per_node);
@@ -80,7 +80,7 @@ namespace csci5570 {
         VLOG(1) << "worker_thread:" << worker_thread_ids[0] << " starts on node:" << node_.id;
     }
 
-    void Engine::UpdateAndRestart(int failed_node_id, const std::vector<csci5570::Node> &nodes) {
+    void Engine::UpdateAndRestart(int failed_node_id, const std::vector<minips::Node> &nodes) {
         LOG(INFO) << "Engine UpdateAndRestart on node:" << node_.id;
         nodes_ = nodes;
         for (Node node : nodes_) {
@@ -283,4 +283,4 @@ namespace csci5570 {
         mailbox_->RegisterQueue(queue_id, queue);
     }
 
-}  // namespace csci5570
+}  // namespace minips

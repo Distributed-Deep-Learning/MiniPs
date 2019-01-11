@@ -12,7 +12,7 @@
 #include <set>
 #include <map>
 
-namespace csci5570 {
+namespace minips {
 
     // master node id is 1
     Node SelectMaster(std::vector<Node> &nodes) {

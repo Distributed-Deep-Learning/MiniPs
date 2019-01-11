@@ -6,7 +6,7 @@
 
 #include <thread>
 
-namespace csci5570 {
+namespace minips {
 
     class Sender : public AbstractSender {
     public:
@@ -27,4 +27,4 @@ namespace csci5570 {
         std::thread sender_thread_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

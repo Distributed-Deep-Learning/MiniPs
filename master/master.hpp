@@ -9,7 +9,7 @@
 #include "master_thread.hpp"
 #include "heartbeat_check_thread.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class Master {
 

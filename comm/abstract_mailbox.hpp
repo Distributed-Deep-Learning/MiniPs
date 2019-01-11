@@ -3,7 +3,7 @@
 #include "base/message.hpp"
 #include "base/node.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class AbstractMailbox {
     public:
@@ -12,4 +12,4 @@ namespace csci5570 {
         virtual int Send(const Message &msg) = 0;
     };
 
-}  // namespace csci5570
+}  // namespace minips

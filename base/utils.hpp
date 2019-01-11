@@ -10,7 +10,7 @@
 #include <base/third_party/sarray.h>
 #include <ctime>
 
-namespace csci5570 {
+namespace minips {
 
     template<typename T>
     std::vector<T> SArrayToVector(third_party::SArray <T> &sArray) {

@@ -1,6 +1,6 @@
 #include "server/util/pending_buffer.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     std::vector<Message> PendingBuffer::Pop(const int clock) {
         std::vector<Message> pop_msg;
@@ -36,4 +36,4 @@ namespace csci5570 {
         return buffer_[progress].size();
     }
 
-}  // namespace csci5570
+}  // namespace minips

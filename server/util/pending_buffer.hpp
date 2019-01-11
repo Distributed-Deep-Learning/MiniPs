@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 
-namespace csci5570 {
+namespace minips {
 
     class PendingBuffer {
     public:
@@ -33,4 +33,4 @@ namespace csci5570 {
         std::unordered_map<int, std::vector<Message>> buffer_;
     };
 
-}  // namespace csci5570
+}  // namespace minips

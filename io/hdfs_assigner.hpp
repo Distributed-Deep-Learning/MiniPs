@@ -10,7 +10,7 @@
 #include "hdfs/hdfs.h"
 #include "zmq.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class HDFSBlockAssigner {
     public:
@@ -67,13 +67,13 @@ namespace csci5570 {
         std::map<size_t, std::map<std::string, std::pair<std::map<std::string, size_t>, size_t>>> finish_multi_dict_;
     };
 
-}  // namespace csci5570
+}  // namespace minips
 
 namespace std {
 
     template<>
-    struct hash<csci5570::HDFSBlockAssigner::BlkDesc> {
-        size_t operator()(const csci5570::HDFSBlockAssigner::BlkDesc &t) const { return hash<string>()(t.filename); }
+    struct hash<minips::HDFSBlockAssigner::BlkDesc> {
+        size_t operator()(const minips::HDFSBlockAssigner::BlkDesc &t) const { return hash<string>()(t.filename); }
     };
 
 }  // namespace std

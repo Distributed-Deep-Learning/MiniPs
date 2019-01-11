@@ -8,7 +8,7 @@
 #include "base/third_party/sarray.h"
 #include "base/magic.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     /*
      * BatchDataSampler: Sample the data in batch

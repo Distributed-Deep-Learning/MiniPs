@@ -3,7 +3,7 @@
 #include <base/utils.hpp>
 #include <base/node.hpp>
 
-namespace csci5570 {
+namespace minips {
 
     BSPModel::BSPModel(uint32_t model_id, std::unique_ptr<AbstractStorage> &&storage_ptr,
                        ThreadsafeQueue<Message> *reply_queue)
@@ -88,4 +88,4 @@ namespace csci5570 {
 
     void BSPModel::Update(int failed_node_id, std::vector<Node> &nodes, third_party::Range &range) {}
 
-}  // namespace csci5570
+}  // namespace minips

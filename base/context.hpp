@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace csci5570 {
+namespace minips {
 
 // An extension of google flags. It is a singleton that stores 1) google flags
 // and 2) other lightweight global flags. Underlying data structure is map of
@@ -59,4 +59,4 @@ namespace csci5570 {
         std::unordered_map<int, int> iteration_map_;
     };
 
-}   // namespace csci5570
+}   // namespace minips

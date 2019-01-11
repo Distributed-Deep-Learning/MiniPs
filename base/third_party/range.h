@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace csci5570 {
+namespace minips {
     namespace third_party {
 
 /**
@@ -29,4 +29,4 @@ namespace csci5570 {
         };
 
     }  // namespace third_party
-}  // namespace csci5570
+}  // namespace minips

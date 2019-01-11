@@ -5,7 +5,7 @@
 #include "server/consistency/bsp_model.hpp"
 #include "server/map_storage.hpp"
 
-namespace csci5570 {
+namespace minips {
     namespace {
 
         class TestBSPModel : public testing::Test {
@@ -132,4 +132,4 @@ namespace csci5570 {
         }
 
     }  // namespace
-}  // namespace csci5570
+}  // namespace minips

@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace csci5570 {
+namespace minips {
 
     class BinStream {
     public:
@@ -297,4 +297,4 @@ namespace csci5570 {
         return v;
     }
 
-}  // namespace csci5570
+}  // namespace minips

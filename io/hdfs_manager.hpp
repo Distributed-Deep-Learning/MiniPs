@@ -14,7 +14,7 @@
 #include "io/coordinator.hpp"
 #include "io/line_input_format.hpp"
 
-namespace csci5570 {
+namespace minips {
 
     class HDFSManager {
     public:

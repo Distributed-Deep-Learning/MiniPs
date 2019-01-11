@@ -6,7 +6,7 @@
 #include "base/magic.hpp"
 #include "base/third_party/sarray.h"
 
-namespace csci5570 {
+namespace minips {
 
     /*
      * Implments the interface of a PartitionManager which provides the model partitioning scheme
@@ -48,4 +48,4 @@ namespace csci5570 {
         int32_t master_node_id_;
     };  // class AbstractPartitionManager
 
-}  // namespace csci5570
+}  // namespace minips
