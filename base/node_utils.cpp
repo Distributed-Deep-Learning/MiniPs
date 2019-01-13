@@ -11,18 +11,21 @@
 #include <stdexcept>
 #include <set>
 #include <map>
+#include <base/third_party/general_fstream.hpp>
 
 namespace minips {
 
     // master node id is 1
-    Node SelectMaster(std::vector<Node> &nodes) {
+    Node SelectMaster(std::vector<Node> &nodes, int heartbeat_interval) {
         Node master;
-        for (auto it = nodes.begin(); it != nodes.end(); it++) {
-            if ((*it).id == 1) {
-                master = nodes[it - nodes.begin()];
-                master.is_master = true;
-                it = nodes.erase(it);
-                break;
+        if (heartbeat_interval > 0) {
+            for (auto it = nodes.begin(); it != nodes.end(); it++) {
+                if ((*it).id == 1) {
+                    master = nodes[it - nodes.begin()];
+                    master.is_master = true;
+                    it = nodes.erase(it);
+                    break;
+                }
             }
         }
         return master;
@@ -30,8 +33,8 @@ namespace minips {
 
     std::vector<Node> ParseFile(const std::string &filename) {
         std::vector<Node> nodes;
-        std::ifstream input_file(filename.c_str());
-        CHECK(input_file.is_open()) << "Error opening file: " << filename;
+        petuum::io::ifstream input_file(filename.c_str());
+        // CHECK(input_file.is_open()) << "Error opening file: " << filename;
         std::string line;
         while (getline(input_file, line)) {
             size_t id_pos = line.find(":");

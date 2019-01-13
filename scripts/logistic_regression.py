@@ -30,7 +30,7 @@ if local_debug:
     relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relocal \'"
 else:
     relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
-[]
+
 params = {
     "hdfs_namenode": "localhost" if local_debug else "proj10",
     "hdfs_namenode_port": 9000,

@@ -12,7 +12,7 @@
 
 namespace minips {
 
-    Node SelectMaster(std::vector<Node> &nodes);
+    Node SelectMaster(std::vector<Node> &nodes, int heartbeat_interval);
 
 /*
  * Parse a config file which should be in the format of:

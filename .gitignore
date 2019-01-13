@@ -34,5 +34,10 @@ test/test_hdfs_read.cpp
 local/*
 
 # yarn
-yarn/build
+yarn/build/classes
+yarn/build/reports
+yarn/build/resources
+yarn/build/resources
+yarn/build/test-results
+yarn/build/tmp
 yarn/.gradle

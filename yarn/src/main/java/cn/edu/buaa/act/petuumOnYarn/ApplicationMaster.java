@@ -168,7 +168,7 @@ public class ApplicationMaster {
 	protected AtomicInteger numRequestedContainers = new AtomicInteger();
 
 	// Shell command to be executed
-	private String shellCommand = "";
+	private String shellCommand = "python -u";
 	// Args to be passed to the shell command
 	private String shellArgs = "";
 	// Env variables to be setup for the shell command
@@ -904,14 +904,14 @@ public class ApplicationMaster {
 			
 			
 			vargs.add(clientId);			
-			vargs.add("./" + hostfileIdentifier);
+			vargs.add(hostfileHDFSPath);
 			// Set args for the shell command if any
 			vargs.add(shellArgs);
 			// Add log redirect params
 			vargs.add("1>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR
-					+ "/stdout");
+					+ "/App.stdout");
 			vargs.add("2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR
-					+ "/stderr");
+					+ "/App.stderr");
 
 			// Get final commmand
 			StringBuilder command = new StringBuilder();
@@ -965,7 +965,7 @@ public class ApplicationMaster {
 			String text = "";
 			String lineTxt = "";
 			for (int i = 0; i < allocatedIpList.size(); i++) {
-				lineTxt = i + " " + allocatedIpList.get(i) + " " + startPort;
+				lineTxt = i + ":" + allocatedIpList.get(i) + ":" + startPort;
 				text = text + lineTxt + "\n";
 			}
 			LOG.info("server text:" + text.trim());

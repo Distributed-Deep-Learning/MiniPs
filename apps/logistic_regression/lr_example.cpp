@@ -40,16 +40,16 @@ DEFINE_double(alpha, 0.1, "learning rate");
 
 DEFINE_bool(init_dump, true, "init_dump");
 DEFINE_bool(use_weight_file, false, "use weight file to restore progress");
-DEFINE_bool(checkpoint_toggle, true, "open checkpoint");
+DEFINE_bool(checkpoint_toggle, false, "open checkpoint");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/dump/dump_", "the checkpoint file prefix");
 DEFINE_string(checkpoint_raw_prefix, "hdfs:///dump/dump_", "the checkpoint raw prefix");
-DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
+DEFINE_int32(heartbeat_interval, -1, "the heatbeat check interval");
 DEFINE_string(relaunch_cmd,
               "python /Users/aiyongbiao/Desktop/projects/minips/scripts/logistic_regression.py relaunch 1",
               "the restart cmd");
 DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/minips/local/report_lr_webspam.txt", "the report raw prefix");
-DEFINE_int32(report_interval, 5, "report interval");
+DEFINE_int32(report_interval, -1, "report interval");
 
 
 namespace minips {
@@ -372,7 +372,7 @@ namespace minips {
 
         // 0. Parse config_file
         std::vector<Node> nodes = ParseFile(FLAGS_config_file);
-        Node master_node = SelectMaster(nodes);
+        Node master_node = SelectMaster(nodes, FLAGS_heartbeat_interval);
         CHECK(CheckValidNodeIds(nodes));
         CHECK(CheckUniquePort(nodes));
 
@@ -384,7 +384,7 @@ namespace minips {
         }
 
         Node my_node = GetNodeById(nodes, FLAGS_my_id);
-//        LOG(INFO) << my_node.DebugString();
+        LOG(INFO) << my_node.DebugString();
 
         Training(my_node, nodes, master_node);
     }
