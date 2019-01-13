@@ -5,12 +5,12 @@ from os.path import dirname
 from os.path import join
 import time
 
-app_dir = dirname(dirname(os.path.realpath(__file__)))
+app_dir = dirname(dirname(dirname(os.path.realpath(__file__))))
 proj_dir = dirname(app_dir)
 
 params = {
     "jar": join(proj_dir, "yarn/build/libs/yarn-0.5.jar")
-    , "launch_script_path": join(app_dir, "yarn/yarn_example.py")
+    , "launch_script_path": join(app_dir, "yarn/local/yarn_example.py")
     , "container_memory": 500
     , "container_vcores": 1
     , "master_memory": 350
