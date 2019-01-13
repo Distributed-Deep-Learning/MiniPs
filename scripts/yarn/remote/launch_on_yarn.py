@@ -3,10 +3,9 @@
 import os
 from os.path import dirname
 from os.path import join
-import time
 
 app_dir = dirname(dirname(dirname(os.path.realpath(__file__))))
-proj_dir = dirname(dirname(app_dir))
+proj_dir = dirname(app_dir)
 
 params = {
     "jar": join(proj_dir, "yarn/build/libs/yarn-0.5.jar")
