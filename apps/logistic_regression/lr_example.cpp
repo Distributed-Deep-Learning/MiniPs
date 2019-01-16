@@ -243,6 +243,11 @@ namespace minips {
             for (int i = Context::get_instance().GetIteration(info.worker_id); i < FLAGS_num_iters; i++) {
                 CHECK_LT(i, future_keys.size());
                 auto &keys = future_keys[i];
+                if (keys.size() == 0) {
+                    LOG(INFO) << "Get keys size=" << keys.size();
+                    table->Clock();
+                    continue;
+                }
                 table->Get(keys, &params);
 
                 if (recovering) {
