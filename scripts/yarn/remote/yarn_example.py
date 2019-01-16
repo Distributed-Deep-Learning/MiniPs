@@ -19,9 +19,9 @@ client_id = sys.argv[1]
 hostfile = sys.argv[2]
 
 if local_debug:
-    relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relocal \'"
+    relaunch_cmd = "empty"
 else:
-    relaunch_cmd = "\'python " +  proj_dir + "/scripts/logistic_regression.py relaunch \'"
+    relaunch_cmd = "empty"
 
 params = {
     "config_file": hostfile,
