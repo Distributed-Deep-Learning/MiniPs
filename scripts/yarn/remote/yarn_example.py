@@ -33,11 +33,11 @@ params = {
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}
     "kSparseSSPRecorderType": "Vector",  # {Vector/Map}
-    "num_dims": 123 if local_debug else 16609143,
+    "num_dims": 123 if local_debug else 300,
     "batch_size": 1,
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
-    "num_local_load_thread": 2 if local_debug else 100,
+    "num_local_load_thread": 2 if local_debug else 20,
     "num_iters": 1000,
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
