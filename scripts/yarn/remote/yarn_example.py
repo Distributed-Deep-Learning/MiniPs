@@ -42,11 +42,11 @@ params = {
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
     "kStorageType": "Vector",  # {Vector/Map}
-    "checkpoint_toggle": True,
+    "checkpoint_toggle": False,
     "use_weight_file": False,
     "init_dump": True if local_debug else False,
     "weight_file_prefix": "",
-    "heartbeat_interval": 10 if local_debug else 15, # join(proj_dir, "local/dump_")
+    "heartbeat_interval": -1 if local_debug else -1, # join(proj_dir, "local/dump_")
     "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://instance-1:9000/dump/dump_",
     "checkpoint_raw_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://instance-1:9000/dump/dump_",
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_
