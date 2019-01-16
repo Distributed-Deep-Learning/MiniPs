@@ -28,16 +28,16 @@ params = {
     "hdfs_namenode": "localhost" if local_debug else "instance-1",
     "hdfs_namenode_port": 9000,
     "assigner_master_port": 18011,
-    "input": "hdfs:///a2a" if local_debug else "hdfs:///datasets/classification/webspam",
+    "input": "hdfs:///a2a" if local_debug else "hdfs:///webspam",
     "kStaleness": 0,
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}
     "kSparseSSPRecorderType": "Vector",  # {Vector/Map}
-    "num_dims": 123 if local_debug else 300,
+    "num_dims": 123 if local_debug else 16609143,
     "batch_size": 1,
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
-    "num_local_load_thread": 2 if local_debug else 20,
+    "num_local_load_thread": 2 if local_debug else 100,
     "num_iters": 1000,
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
@@ -48,7 +48,7 @@ params = {
     "weight_file_prefix": "",
     "heartbeat_interval": 10 if local_debug else 15, # join(proj_dir, "local/dump_")
     "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://instance-1:9000/dump/dump_",
-    "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
+    "checkpoint_raw_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://instance-1:9000/dump/dump_",
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_
     "report_prefix": join(proj_dir, "local/report_lr_webspam.txt"),
     "report_interval": -1,
