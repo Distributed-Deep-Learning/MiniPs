@@ -38,7 +38,7 @@ params = {
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
     "num_local_load_thread": 2 if local_debug else 100,
-    "num_iters": 1000,
+    "num_iters": 100,
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
     "kStorageType": "Vector",  # {Vector/Map}

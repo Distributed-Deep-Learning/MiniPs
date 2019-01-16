@@ -20,13 +20,13 @@
 DEFINE_int32(my_id, 0, "The process id of this program");
 DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/minips/config/localnode", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
-DEFINE_string(input, "hdfs:///a2a", "The hdfs input url");
+DEFINE_string(input, "hdfs:///real-sim", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
 DEFINE_int32(assigner_master_port, 19201, "The hdfs_assigner master_port");
 
 DEFINE_string(kModelType, "SSP", "ASP/SSP/BSP/SparseSSP");
 DEFINE_string(kStorageType, "Vector", "Map/Vector");
-DEFINE_int32(num_dims, 123, "number of dimensions");
+DEFINE_int32(num_dims, 20958, "number of dimensions");
 DEFINE_int32(batch_size, 1, "batch size of each epoch");
 DEFINE_int32(num_iters, 1000, "number of iters");
 DEFINE_int32(kStaleness, 0, "stalness");
