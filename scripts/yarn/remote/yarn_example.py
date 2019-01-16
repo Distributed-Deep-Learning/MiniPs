@@ -28,7 +28,7 @@ params = {
     "hdfs_namenode": "localhost" if local_debug else "instance-1",
     "hdfs_namenode_port": 9000,
     "assigner_master_port": 18011,
-    "input": "hdfs:///a2a" if local_debug else "hdfs:///real-sim",
+    "input": "hdfs:///a2a" if local_debug else "hdfs:///test_data",
     "kStaleness": 0,
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}
