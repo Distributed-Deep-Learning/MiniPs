@@ -11,7 +11,7 @@ ssh_cmd = (
     "-o UserKnownHostsFile=/dev/null "
 )
 
-app_dir = "/data/opt/tmp/1155114481/MiniPs/scripts/yarn"
+app_dir = "/home/yongbiaoai/projects/MiniPs/scripts/yarn"
 proj_dir = dirname(dirname(app_dir))
 prog_path = join(proj_dir, ("cmake-build-debug" if local_debug else "debug") + "/LRExample")
 
@@ -25,7 +25,7 @@ else:
 
 params = {
     "config_file": hostfile,
-    "hdfs_namenode": "localhost" if local_debug else "proj10",
+    "hdfs_namenode": "localhost" if local_debug else "instance-1",
     "hdfs_namenode_port": 9000,
     "assigner_master_port": 18011,
     "input": "hdfs:///a2a" if local_debug else "hdfs:///datasets/classification/webspam",
@@ -47,7 +47,7 @@ params = {
     "init_dump": True if local_debug else False,
     "weight_file_prefix": "",
     "heartbeat_interval": 10 if local_debug else 15, # join(proj_dir, "local/dump_")
-    "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://proj10:9000/ybai/dump_",
+    "checkpoint_file_prefix": "hdfs://localhost:9000/dump/dump_" if local_debug else "hdfs://instance-1:9000/dump/dump_",
     "checkpoint_raw_prefix": "hdfs:///dump/dump_" if local_debug else "hdfs:///ybai/dump_",
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_
     "report_prefix": join(proj_dir, "local/report_lr_webspam.txt"),
@@ -61,7 +61,7 @@ env_params = (
 )
 
 if (local_debug is False):
-    env_params += "LIBHDFS3_CONF=/data/opt/course/hadoop/etc/hadoop/hdfs-site.xml"
+    env_params += "LIBHDFS3_CONF=/usr/local/hadoop/etc/hadoop/hdfs-site.xml"
 
 # clear_cmd = "ls " + hostfile + " > /dev/null; ls " + prog_path + " > /dev/null; "
 
