@@ -83,8 +83,8 @@ cmd += "\""  # Remote command starts
 cmd += env_params + " " + prog_path
 cmd += " --my_id="+client_id
 cmd += "".join([" --%s=%s" % (k,v) for k,v in params.items()])
-
-cmd += "\""  # Remote Command ends
-cmd += " &"
+# 
+# cmd += "\""  # Remote Command ends
+# cmd += " &"
 print cmd
 os.system(cmd)
