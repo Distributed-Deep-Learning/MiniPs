@@ -28,12 +28,12 @@ params = {
     "hdfs_namenode": "localhost" if local_debug else "instance-1",
     "hdfs_namenode_port": 9000,
     "assigner_master_port": 18011,
-    "input": "hdfs:///a2a" if local_debug else "hdfs:///webspam",
+    "input": "hdfs:///a2a" if local_debug else "hdfs:///real-sim",
     "kStaleness": 0,
     "kSpeculation": 5,
     "kModelType": "SSP",  # {ASP/SSP/BSP/SparseSSP}
     "kSparseSSPRecorderType": "Vector",  # {Vector/Map}
-    "num_dims": 123 if local_debug else 16609143,
+    "num_dims": 123 if local_debug else 20958,
     "batch_size": 1,
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
