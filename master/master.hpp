@@ -31,7 +31,12 @@ namespace minips {
             std::function<void(int32_t)> func = [this](int32_t failed_node_id){
                 RollBack(failed_node_id);
             };
+
+            std::function<void(int32_t)> scale_func = [this](int32_t failed_node_id){
+                ScaleRollBack(failed_node_id);
+            };
             master_thread_->SetRollBack(func);
+            master_thread_->SetScaleRollBack(scale_func);
             engine_->RegisterQueue(master_thread_->GetId(), master_thread_->GetWorkQueue());
             master_thread_->Start();
 
@@ -52,6 +57,18 @@ namespace minips {
         void RollBack(int failed_node_id) {
             LOG(INFO) << "Rollback with failed node:" << failed_node_id;
             engine_->RollBack(failed_node_id);
+
+            nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
+                return failed_node_id == node.id;
+            }), nodes_.end());
+
+            master_thread_->UpdateNodes(nodes_, failed_node_id);
+            heartbeat_thread_->UpdateNodes(nodes_);
+        }
+
+        void ScaleRollBack(int failed_node_id) {
+            LOG(INFO) << "ScaleRollback with failed node:" << failed_node_id;
+            engine_->ScaleRollBack(failed_node_id);
 
             nodes_.erase(std::remove_if(nodes_.begin(), nodes_.end(), [&](Node const &node) {
                 return failed_node_id == node.id;

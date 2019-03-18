@@ -39,8 +39,8 @@ namespace minips {
          * @param node     the current node
          * @param nodes    all nodes in the cluster
          */
-        Engine(const Node &node, const std::vector<Node> &nodes, const Node &master_node = {}) :
-                node_(node), nodes_(nodes), master_node_(master_node) {
+        Engine(const Node &node, const std::vector<Node> &nodes, const Node &master_node = {}, const Node &scale_node = {}) :
+                node_(node), nodes_(nodes), master_node_(master_node), scale_node_(scale_node) {
             // load config into context
             Context::get_instance();
         }
@@ -78,6 +78,17 @@ namespace minips {
             }
         }
 
+        void Scale(uint32_t node_id) {
+            CHECK_NOTNULL(sender_);
+            if (HasMaster()) {
+                Message msg;
+                msg.meta.sender = node_id;
+                msg.meta.recver = GetMasterNodeId();
+                msg.meta.flag = Flag::kScale;
+                sender_->GetMessageQueue()->Push(std::move(msg));
+            }
+        }
+
         void RollBack(uint32_t failed_node_id) const {
             CHECK_NOTNULL(sender_);
             for (Node node : nodes_) {
@@ -90,10 +101,22 @@ namespace minips {
             }
         }
 
+        void ScaleRollBack(uint32_t failed_node_id) const {
+            CHECK_NOTNULL(sender_);
+            for (Node node : nodes_) {
+                Message msg;
+                msg.meta.sender = failed_node_id;
+                msg.meta.failed_node_id = failed_node_id;
+                msg.meta.recver = node.id;
+                msg.meta.flag = Flag::kScaleRollback;
+                sender_->GetMessageQueue()->Push(std::move(msg));
+            }
+        }
+
         // update rather than fully restart
         void UpdateAndRestart(int failed_node_id, const std::vector<Node> &nodes);
 
-        void SetRestarter(std::function<void(Node &, std::vector<Node> &, Node &)> &func) {
+        void SetRestarter(std::function<void(Node &, std::vector<Node> &, Node &, Node &)> &func) {
             restarter_ = func;
         }
 
@@ -350,6 +373,7 @@ namespace minips {
         // nodes
         Node node_;
         Node master_node_;
+        Node scale_node_;
         std::vector<Node> nodes_;
 
         // mailbox
@@ -367,7 +391,7 @@ namespace minips {
         bool heartbeat_running_;
         std::thread heartbeat_thread_;
 
-        std::function<void(Node &, std::vector<Node> &, Node &)> restarter_;
+        std::function<void(Node &, std::vector<Node> &, Node &, Node &)> restarter_;
         std::function<void()> dump_callback_;
 
         int rollback_counter_ = 1000;

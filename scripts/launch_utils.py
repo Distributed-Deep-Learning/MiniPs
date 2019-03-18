@@ -49,6 +49,34 @@ def relaunch(prog_path, hostfile_path, env_params, params, failed_node_id):
       print cmd
       os.system(cmd)
 
+def launch_node(progfile, hostfile, env_params, params, node_id, host, port):
+  script_path = os.path.realpath(__file__)
+  proj_dir = dirname(dirname(script_path))
+  print "porj_dir:", proj_dir
+  hostfile_path = join(proj_dir, hostfile)
+  params["config_file"] = hostfile_path
+  prog_path = join(proj_dir, progfile)
+  print "hostfile_path:%s, prog_path:%s" % (hostfile_path, prog_path)
+
+  assert os.path.isfile(prog_path)
+  assert os.path.isfile(hostfile_path)
+
+  clear_cmd = "ls " + prog_path + " > /dev/null; "
+
+  print "node_id:%s, host:%s, port:%s" %(node_id, host, port)
+  cmd = ssh_cmd + host + " "  # Start ssh command
+  cmd += "\""  # Remote command starts
+  cmd += clear_cmd
+  # Command to run program
+  cmd += env_params + " " + prog_path
+  cmd += " --my_id="+node_id
+  cmd += "".join([" --%s=%s" % (k,v) for k,v in params.items()])
+
+  cmd += "\""  # Remote Command ends
+  cmd += " &"
+  print cmd
+  os.system(cmd)
+
 def launch_nodes(prog_path, hostfile_path, env_params, params):
   assert os.path.isfile(prog_path)
   assert os.path.isfile(hostfile_path)

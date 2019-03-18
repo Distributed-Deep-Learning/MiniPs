@@ -16,6 +16,8 @@ namespace minips {
             Message msg;
             work_queue_.WaitAndPop(&msg);
 
+            LOG(INFO) << "Master fucker:" << msg.DebugString();
+
             if (msg.meta.flag == Flag::kQuitHeartBeat) {
                 quit_count_++;
 //                LOG(INFO) << "MasterThread heartbeat quit serving on process:" << quit_count_;
@@ -35,6 +37,11 @@ namespace minips {
                     RollBack(msg.meta.sender);
                 }
                 LOG(INFO) << "[Master] heartbeat updated on node:" << msg.meta.sender;
+            }
+
+            if (msg.meta.flag == Flag::kScale) {
+                LOG(INFO) << "[Master] send rollback message to other nodes for scale.";
+                ScaleRollBack(msg.meta.sender);
             }
         }
     }

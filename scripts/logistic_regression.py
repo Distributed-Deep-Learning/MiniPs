@@ -6,6 +6,7 @@ import os.path
 from os.path import dirname, join
 from launch_utils import launch_util
 from launch_utils import relaunch_nodes
+from launch_utils import launch_node
 
 # [Local]
 # python logistic_regression.py local
@@ -13,8 +14,11 @@ from launch_utils import relaunch_nodes
 # [Cluster]
 # python logistic_regression.py
 
-local_debug = True if len(sys.argv) >= 2 and (sys.argv[1] == "local" or sys.argv[1] == "relocal") else False
+local_debug = True if len(sys.argv) >= 2 and (sys.argv[1] == "local" or sys.argv[1] == "relocal" or sys.argv[1] == "scale") else False
 relaunch = True if len(sys.argv) >= 2 and (sys.argv[1] == "relaunch" or sys.argv[1] == "relocal") else False
+
+# python2 logistic_regression.py scale 3 'localhost' 14563
+scale = True if sys.argv[1] == "scale" else False
 
 failed_node_id = -1
 if relaunch:
@@ -45,7 +49,7 @@ params = {
     "num_workers_per_node": 2,
     "num_servers_per_node": 1,
     "num_local_load_thread": 2 if local_debug else 100,
-    "num_iters": 1000,
+    "num_iters": 10000,
     "alpha": 0.1,  # learning rate
     "with_injected_straggler": 1,  # {0/1}
     "kStorageType": "Vector",  # {Vector/Map}
@@ -59,6 +63,8 @@ params = {
     "relaunch_cmd": relaunch_cmd, # hdfs://localhost:9000/dump/dump_
     "report_prefix": join(proj_dir, "local/report_lr_webspam.txt"),
     "report_interval": -1,
+    "scale": scale,
+    "scale_file": "hdfs://localhost:9000/dump/scale" if local_debug else "hdfs://proj10:9000/ybai/scale",
 }
 
 env_params = (
@@ -70,10 +76,18 @@ env_params = (
 # this is to enable hdfs short-circuit read (disable the warning info)
 # change this path accordingly when we use other cluster
 # the current setting is for proj5-10
-if (local_debug is False):
+if local_debug is False:
     env_params += "LIBHDFS3_CONF=/data/opt/course/hadoop/etc/hadoop/hdfs-site.xml"
 
-if relaunch is False:
-    launch_util(progfile, hostfile, env_params, params, sys.argv)
+if scale is True:
+    node_id = sys.argv[2]
+    host = sys.argv[3]
+    port = sys.argv[4]
+    params['scale_name'] = host
+    params['scale_port'] = port
+    launch_node(progfile, hostfile, env_params, params, node_id, host, port)
 else:
-    relaunch_nodes(progfile, hostfile, env_params, params, failed_node_id)
+    if relaunch is False:
+        launch_util(progfile, hostfile, env_params, params, sys.argv)
+    else:
+        relaunch_nodes(progfile, hostfile, env_params, params, failed_node_id)

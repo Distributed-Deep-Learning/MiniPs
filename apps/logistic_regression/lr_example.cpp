@@ -17,8 +17,8 @@
 #include <lib/svm_dumper.hpp>
 #include <base/utils.hpp>
 
-DEFINE_int32(my_id, 0, "The process id of this program");
-DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/minips/config/localnode", "The config file path");
+DEFINE_int32(my_id, 3, "The process id of this program");
+DEFINE_string(config_file, "/Users/aiyongbiao/Desktop/projects/minips/config/localnodes", "The config file path");
 DEFINE_string(hdfs_namenode, "localhost", "The hdfs namenode hostname");
 DEFINE_string(input, "hdfs:///real-sim", "The hdfs input url");
 DEFINE_int32(hdfs_namenode_port, 9000, "The hdfs namenode port");
@@ -44,12 +44,16 @@ DEFINE_bool(checkpoint_toggle, false, "open checkpoint");
 DEFINE_string(weight_file_prefix, "", "the prefix filename of weight file");
 DEFINE_string(checkpoint_file_prefix, "hdfs://localhost:9000/dump/dump_", "the checkpoint file prefix");
 DEFINE_string(checkpoint_raw_prefix, "hdfs:///dump/dump_", "the checkpoint raw prefix");
-DEFINE_int32(heartbeat_interval, -1, "the heatbeat check interval");
+DEFINE_int32(heartbeat_interval, 10, "the heatbeat check interval");
 DEFINE_string(relaunch_cmd,
               "python /Users/aiyongbiao/Desktop/projects/minips/scripts/logistic_regression.py relaunch 1",
               "the restart cmd");
 DEFINE_string(report_prefix, "/Users/aiyongbiao/Desktop/projects/minips/local/report_lr_webspam.txt", "the report raw prefix");
 DEFINE_int32(report_interval, -1, "report interval");
+DEFINE_bool(scale, true, "scale");
+DEFINE_string(scale_name, "localhost", "scale name");
+DEFINE_int32(scale_port, 14563, "sclae port");
+DEFINE_string(scale_file, "hdfs://localhost:9000/dump/scale", "scale log file");
 
 
 namespace minips {
@@ -90,7 +94,7 @@ namespace minips {
         }
     }
 
-    void Training(Node &my_node, std::vector<Node> &nodes, Node &master_node) {
+    void Training(Node &my_node, std::vector<Node> &nodes, Node &master_node, Node &scale_node) {
         if (FLAGS_my_id == 0) {
             LOG(INFO) << "Running in " << FLAGS_kModelType << " mode";
             LOG(INFO) << "num_dims: " << FLAGS_num_dims;
@@ -111,7 +115,7 @@ namespace minips {
         config.hdfs_namenode_port = FLAGS_hdfs_namenode_port;
         config.num_local_load_thread = FLAGS_num_local_load_thread;
 
-        bool recovering = FLAGS_use_weight_file;
+        bool recovering = FLAGS_use_weight_file || FLAGS_scale;
         if (recovering) {
             CheckFaultTolerance(3);
             SVMDumper dumper;
@@ -128,9 +132,9 @@ namespace minips {
         LOG(INFO) << "Finished loading data on node " << my_node.id;
 
         // 2. Start engine
-        Engine engine(my_node, nodes, master_node);
+        Engine engine(my_node, nodes, master_node, scale_node);
         engine.StartEverything();
-        std::function<void(Node &, std::vector<Node> &, Node &)> restarter_func = Training;
+        std::function<void(Node &, std::vector<Node> &, Node &, Node &)> restarter_func = Training;
         engine.SetRestarter(restarter_func);
 
         if (recovering) {
@@ -258,11 +262,11 @@ namespace minips {
                     engine.IncRollBackCount();
 
                     if (info.worker_id % FLAGS_num_workers_per_node == 0) {
-                        LOG(INFO) << "Start RecoverIteration On Node:" << Context::get_instance().get_int32("my_id");
+                        LOG(INFO) << "Start RecoverIteration On Node:" << FLAGS_my_id;
                         RecoverIteration();
                         engine.Barrier();
                         engine.RecoverEnd();
-                        LOG(INFO) << "End RecoverIteration On Node:" << Context::get_instance().get_int32("my_id");
+                        LOG(INFO) << "End RecoverIteration On Node:" << FLAGS_my_id;
                     } else {
 //                        LOG(INFO) << "Start Wait Recover On Worker:" << info.worker_id;
                         engine.WaitRecover();
@@ -302,7 +306,7 @@ namespace minips {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                if (i > 0 && i % 300 == 0 && info.worker_id == 0) {
+                if (i > 0 && i % 500 == 0 && info.worker_id == 0) {
                     if (after_checkpoint) {
                         after_checkpoint = false;
                     } else {
@@ -315,8 +319,8 @@ namespace minips {
                     }
                 }
 
-                if (i > 0 && i % 5 == 0 && info.worker_id == 0) {
-                    LOG(INFO) << "Current iteration=" << i;
+                if (i > 0 && i % 500 == 0) {
+                    LOG(INFO) << "Current iteration=" << i << " on node=" << FLAGS_my_id;
                 }
 
                 if (i > 0 && FLAGS_report_interval > 0 && i % FLAGS_report_interval == 0 && info.worker_id == 0) {
@@ -344,10 +348,10 @@ namespace minips {
 
             // test error
             if (info.worker_id % FLAGS_num_workers_per_node == 0) {
-                LOG(INFO) << "Start test accuracy on node=" << Context::get_instance().get_int32("my_id");
+                LOG(INFO) << "Start test accuracy on node=" << FLAGS_my_id;
                 table->Get(all_keys, &params);
                 double accuracy = test_error<SVMItem>(params, data);
-                LOG(INFO) << "The accuracy is " << std::to_string(accuracy) << " on node=" << Context::get_instance().get_int32("my_id");
+                LOG(INFO) << "The accuracy is " << std::to_string(accuracy) << " on node=" << FLAGS_my_id;
             }
 //                if (info.worker_id == 0) {
 //                    auto cur_time = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -378,6 +382,21 @@ namespace minips {
         // 0. Parse config_file
         std::vector<Node> nodes = ParseFile(FLAGS_config_file);
         Node master_node = SelectMaster(nodes, FLAGS_heartbeat_interval);
+        Node scale_node;
+        if (FLAGS_scale) {
+            LOG(INFO) << "The node=" << FLAGS_my_id <<  " is scaling out";
+            scale_node.id = static_cast<uint32_t>(FLAGS_my_id);
+            scale_node.hostname = FLAGS_scale_name;
+            scale_node.port = FLAGS_scale_port;
+
+            SVMDumper dumper;
+            dumper.DumpScaleFile(scale_node);
+            nodes.push_back(std::move(scale_node));
+
+            Context::get_instance().set("my_id", 0);
+            Context::get_instance().set("use_weight_file", true);
+        }
+
         CHECK(CheckValidNodeIds(nodes));
         CHECK(CheckUniquePort(nodes));
 
@@ -388,10 +407,16 @@ namespace minips {
             return;
         }
 
-        Node my_node = GetNodeById(nodes, FLAGS_my_id);
+
+        Node my_node;
+//        if (FLAGS_scale) {
+//            my_node = GetNodeById(nodes, 0);
+//        } else {
+            my_node = GetNodeById(nodes, FLAGS_my_id);
+//        }
         LOG(INFO) << my_node.DebugString();
 
-        Training(my_node, nodes, master_node);
+        Training(my_node, nodes, master_node, scale_node);
     }
 }
 

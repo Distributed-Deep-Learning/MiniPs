@@ -92,6 +92,39 @@ namespace minips {
             return result_map;
         }
 
+        void DumpScaleFile(Node& node) {
+            auto dump_file = Context::get_instance().get_string("scale_file");
+            LOG(INFO) << "Dump Scale File Into: " << dump_file;
+
+            petuum::io::ofstream w_stream(dump_file, std::ofstream::out | std::ofstream::trunc);
+            CHECK(w_stream);
+            w_stream << node.id << ":" << node.hostname << ":" << node.port;
+            w_stream.close();
+        }
+
+        Node LoadScaleFile() {
+            auto filename = Context::get_instance().get_string("scale_file");
+            LOG(INFO) << "Load Scale File From: " << filename;
+
+            petuum::io::ifstream input_file(filename.c_str());
+            // CHECK(input_file.is_open()) << "Error opening file: " << filename;
+            std::string line;
+            getline(input_file, line);
+            size_t id_pos = line.find(":");
+            CHECK_NE(id_pos, std::string::npos);
+            std::string id = line.substr(0, id_pos);
+            size_t host_pos = line.find(":", id_pos + 1);
+            CHECK_NE(host_pos, std::string::npos);
+            std::string hostname = line.substr(id_pos + 1, host_pos - id_pos - 1);
+            std::string port = line.substr(host_pos + 1, line.size() - host_pos - 1);
+
+            Node node;
+            node.id = std::stoi(id);
+            node.hostname = std::move(hostname);
+            node.port = std::stoi(port);
+            return node;
+        }
+
         std::vector<SVMItem> LoadSVMData(Node node, HDFSManager::Config config,
                                          std::vector<SVMItem> &datastore) {
             auto dump_prefix = Context::get_instance().get_string("checkpoint_raw_prefix");

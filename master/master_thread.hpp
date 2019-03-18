@@ -38,6 +38,14 @@ namespace minips {
             rollback_func_ = func;
         }
 
+        void ScaleRollBack(int32_t failed_node_id) {
+            scale_rollback_func_(failed_node_id);
+        }
+
+        void SetScaleRollBack(std::function<void(int32_t)> func) {
+            scale_rollback_func_ = func;
+        }
+
         void UpdateNodes(std::vector<Node> &nodes, int32_t failed_node_id) {
             nodes_ = nodes;
             heartbeats_.erase(failed_node_id);
@@ -60,6 +68,7 @@ namespace minips {
         std::vector<Node> nodes_;
 
         std::function<void(int32_t)> rollback_func_;
+        std::function<void(int32_t)> scale_rollback_func_;
 
         int32_t recovering_node_id_ = -1;
     };

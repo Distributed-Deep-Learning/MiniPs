@@ -22,6 +22,11 @@ namespace minips {
         StartSender();
         StartServerThreads();
         StartWorkerThreads();
+
+//        if (Context::get_instance().get_bool("scale")) {
+//            node_.id = scale_node_.id;
+//        }
+
         StartHeartbeatThread();
     }
 
@@ -102,6 +107,7 @@ namespace minips {
         if (HasMaster()) {
             heartbeat_running_ = true;
             heartbeat_thread_ = std::thread([this]{
+                bool scale_signal = Context::get_instance().get_bool("scale");
 //                if (Context::get_instance().get_bool("use_weight_file")) {
 //                    LOG(INFO) << "Send heartbeat right now after restart...";
 //                    HeartBeat(node_.id);
@@ -109,8 +115,15 @@ namespace minips {
 
                 int32_t interval = Context::get_instance().get_int32("heartbeat_interval");
                 while (interval > 0 && heartbeat_running_) {
+                    if (scale_signal) {
+                        LOG(INFO) << "Send Scale signal to Master with node id=" << node_.id;
+                        Scale(node_.id);
+                        scale_signal = false;
+                    }
+
                     std::this_thread::sleep_for(std::chrono::seconds(interval));
                     HeartBeat(node_.id);
+
                     //LOG(INFO) << "[Slave] post heartbeat to master from node:" << node_.id;
                 }
                 //LOG(INFO) << "[Slave] node:" << node_.id << ", heartbeat service stopped...";
@@ -128,7 +141,7 @@ namespace minips {
 
     void Engine::StartMailbox() {
         CHECK(mailbox_);
-        mailbox_->Start(master_node_);
+        mailbox_->Start(master_node_, scale_node_);
         VLOG(1) << "mailbox starts on node" << node_.id;
     }
 

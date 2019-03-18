@@ -32,17 +32,21 @@ namespace minips {
 
     size_t Mailbox::GetQueueMapSize() const { return queue_map_.size(); }
 
-    void Mailbox::Start(const Node &master_node) {
-        ConnectAndBind(master_node);
+    void Mailbox::Start(const Node &master_node, const Node &scale_node) {
+        ConnectAndBind(master_node, scale_node);
         StartReceiving();
     }
 
-    void Mailbox::ConnectAndBind(const Node &master_node) {
+    void Mailbox::ConnectAndBind(const Node &master_node, const Node &scale_node) {
         context_ = zmq_ctx_new();
         CHECK(context_ != nullptr) << "create zmq context failed";
         zmq_ctx_set(context_, ZMQ_MAX_SOCKETS, 65536);
 
-        Bind(node_);
+//        if (Context::get_instance().get_bool("scale")) {
+//            Bind(scale_node);
+//        } else {
+            Bind(node_);
+//        }
         VLOG(1) << "Finished binding";
         for (const auto &node : nodes_) {
             Connect(node);
@@ -50,6 +54,9 @@ namespace minips {
         if (master_node.is_master) {
             Connect(master_node);
         }
+//        if (Context::get_instance().get_bool("scale")) {
+//            Connect(scale_node);
+//        }
         VLOG(1) << "Finished connecting";
     }
 
@@ -142,9 +149,11 @@ namespace minips {
             } else if (msg.meta.flag == Flag::kBarrier) {
                 std::unique_lock<std::mutex> lk(mu_);
                 barrier_count_ += 1;
+                LOG(INFO) << "Received barrier from node=" << msg.meta.sender << ", on node=" << node_.id
+                          << ", current count=" << barrier_count_;
                 if (barrier_count_ >= nodes_.size()) {
-                    VLOG(1) << "Collected " << nodes_.size() << " barrier, Node:"
-                            << node_.id << " unblocking main thread";
+                    LOG(INFO) << "Collected " << nodes_.size() << " barrier, Node:"
+                              << node_.id << " unblocking main thread with count=" << barrier_count_;
                     barrier_cond_.notify_all();
                 }
             } else if (msg.meta.flag == Flag::kForceQuit) {
@@ -185,10 +194,34 @@ namespace minips {
                 engine_->RunDumpCallback();
                 CHECK(queue_map_.find(msg.meta.recver) != queue_map_.end());
                 queue_map_[msg.meta.recver]->Push(std::move(msg));
+            } else if (msg.meta.flag == Flag::kScaleRollback) {
+                int failed_node_id = msg.meta.sender;
+                if (failed_node_id != node_.id) {
+                    LOG(INFO) << "Receving node scale msg:" << failed_node_id << ", on node=" << node_.id;
+                    SVMDumper dumper;
+                    std::unordered_map<int, int> map = dumper.LoadConfigData();
+                    for (auto it = map.begin(); it != map.end(); it++) {
+                        Context::get_instance().SetIteration(it->first, it->second);
+                        LOG(INFO) << "Restore iteration on worker=" << it->first << ", with iter=" << it->second;
+                    }
+
+                    Node node = dumper.LoadScaleFile();
+                    CHECK_EQ(failed_node_id, node.id);
+                    LOG(INFO) << "kScaleRollback node id=" << node.id << ", and start connect to " << node.hostname
+                              << " on port=" << node.port;
+//                    nodes_.push_back(node);
+                    Connect(node);
+
+                    engine_->SetNeedRollBack(true);
+                    engine_->RollBackServer();
+                    engine_->RollBackWorker();
+                }
             } else {
                 // CHECK(queue_map_.find(msg.meta.recver) != queue_map_.end()) << msg.DebugString();
                 if (queue_map_.find(msg.meta.recver) != queue_map_.end()) {
                     queue_map_[msg.meta.recver]->Push(std::move(msg));
+                } else {
+                    LOG(INFO) << "Fucker!!! ingore";
                 }
             }
         }
@@ -200,7 +233,8 @@ namespace minips {
         int id;
         if (msg.meta.flag == Flag::kBarrier || msg.meta.flag == Flag::kExit ||
             msg.meta.flag == Flag::kForceQuit || msg.meta.flag == Flag::kHeartBeat ||
-            msg.meta.flag == Flag::kQuitHeartBeat || msg.meta.flag == Flag::kRollBack) {
+            msg.meta.flag == Flag::kQuitHeartBeat || msg.meta.flag == Flag::kRollBack ||
+            msg.meta.flag == Flag::kScale || msg.meta.flag == Flag::kScaleRollback) {
             // For kBarrier, kExit and kForceQuit which are sent by the Mailbox directly, no need to lookup for node id.
             id = msg.meta.recver;
         } else {
@@ -341,6 +375,10 @@ namespace minips {
 
         if (send) {
             barrier_count_ -= nodes_.size();
+            if (barrier_count_ < 0) {
+                LOG(INFO) << "barrier count not right with=" << barrier_count_;
+                barrier_count_ = 0;
+            }
         }
     }
 

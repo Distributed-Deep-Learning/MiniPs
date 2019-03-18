@@ -23,10 +23,12 @@ namespace minips {
         kCheckpoint,
         kHeartBeat,
         kQuitHeartBeat,
-        kRollBack
+        kRollBack,
+        kScale,
+        kScaleRollback,
     };
     static const char *FlagName[] = {"kExit", "kBarrier", "kResetWorkerInModel", "kClock", "kAdd", "kGet", "kForceQuit",
-                                     "kCheckpoint", "kHeartBeat", "kQuitHeartBeat", "kRollBack"
+                                     "kCheckpoint", "kHeartBeat", "kQuitHeartBeat", "kRollBack", "kScale", "kScaleRollback",
     };
 
     struct Meta {

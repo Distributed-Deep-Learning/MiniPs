@@ -30,7 +30,7 @@ namespace minips {
 
         int Recv(Message *msg);
 
-        void Start(const Node &master_node = {});
+        void Start(const Node &master_node = {}, const Node &scale_node = {});
 
         void Stop(bool barrier = true);
 
@@ -47,7 +47,7 @@ namespace minips {
         void SafeQuit();
 
         // For testing only
-        void ConnectAndBind(const Node &master_node = {});
+        void ConnectAndBind(const Node &master_node = {}, const Node &scale_node = {});
 
         void StartReceiving();
 
