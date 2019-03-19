@@ -16,8 +16,6 @@ namespace minips {
             Message msg;
             work_queue_.WaitAndPop(&msg);
 
-            LOG(INFO) << "Master fucker:" << msg.DebugString();
-
             if (msg.meta.flag == Flag::kQuitHeartBeat) {
                 quit_count_++;
 //                LOG(INFO) << "MasterThread heartbeat quit serving on process:" << quit_count_;

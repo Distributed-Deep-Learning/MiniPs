@@ -42,11 +42,11 @@ namespace minips {
         CHECK(context_ != nullptr) << "create zmq context failed";
         zmq_ctx_set(context_, ZMQ_MAX_SOCKETS, 65536);
 
-//        if (Context::get_instance().get_bool("scale")) {
-//            Bind(scale_node);
-//        } else {
+        if (Context::get_instance().get_bool("scale")) {
+            Bind(scale_node);
+        } else {
             Bind(node_);
-//        }
+        }
         VLOG(1) << "Finished binding";
         for (const auto &node : nodes_) {
             Connect(node);
@@ -54,9 +54,9 @@ namespace minips {
         if (master_node.is_master) {
             Connect(master_node);
         }
-//        if (Context::get_instance().get_bool("scale")) {
-//            Connect(scale_node);
-//        }
+        if (Context::get_instance().get_bool("scale")) {
+            Connect(scale_node);
+        }
         VLOG(1) << "Finished connecting";
     }
 
@@ -211,6 +211,7 @@ namespace minips {
                               << " on port=" << node.port;
 //                    nodes_.push_back(node);
                     Connect(node);
+                    engine_->SetScaleNode(node);
 
                     engine_->SetNeedRollBack(true);
                     engine_->RollBackServer();
@@ -367,14 +368,26 @@ namespace minips {
                 barrier_msg.meta.flag = Flag::kBarrier;
                 Send(barrier_msg);
             }
+
+            if (engine_->HasScaleNode()) {
+                Message barrier_msg;
+                barrier_msg.meta.sender = node_.id;
+                barrier_msg.meta.recver = engine_->GetScaleNode().id;
+                barrier_msg.meta.flag = Flag::kBarrier;
+                Send(barrier_msg);
+            }
         }
+
+        int32_t target_size = static_cast<int32_t>(engine_->HasScaleNode() ? nodes_.size() + 1 : nodes_.size());
 
         std::unique_lock<std::mutex> lk(mu_);
         // Very tricky. Consider to use all-one-all method instead of all-all.
-        barrier_cond_.wait(lk, [this]() { return barrier_count_ >= nodes_.size(); });
+        barrier_cond_.wait(lk, [this, target_size]() {
+            return barrier_count_ >= target_size;
+        });
 
         if (send) {
-            barrier_count_ -= nodes_.size();
+            barrier_count_ -= target_size;
             if (barrier_count_ < 0) {
                 LOG(INFO) << "barrier count not right with=" << barrier_count_;
                 barrier_count_ = 0;

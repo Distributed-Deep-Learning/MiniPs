@@ -140,6 +140,19 @@ namespace minips {
             return nodes_;
         }
 
+        bool HasScaleNode() {
+            return has_scale_node_;
+        }
+
+        void SetScaleNode(Node &node) {
+            has_scale_node_ = true;
+            scale_node_ = node;
+        }
+
+        Node GetScaleNode() {
+            return scale_node_;
+        }
+
         std::vector<third_party::Range> getRanges() {
             int32_t num_servers_per_node = Context::get_instance().get_int32("num_servers_per_node");
             int32_t num_dims = Context::get_instance().get_int32("num_dims");
@@ -374,6 +387,7 @@ namespace minips {
         Node node_;
         Node master_node_;
         Node scale_node_;
+        bool has_scale_node_ = false;
         std::vector<Node> nodes_;
 
         // mailbox

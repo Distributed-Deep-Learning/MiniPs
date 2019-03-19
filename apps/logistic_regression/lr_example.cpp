@@ -306,7 +306,7 @@ namespace minips {
                 table->Clock();
                 CHECK_EQ(params.size(), keys.size());
 
-                if (i > 0 && i % 500 == 0 && info.worker_id == 0) {
+                if (i > 0 && i % 3000 == 0 && info.worker_id == 0) {
                     if (after_checkpoint) {
                         after_checkpoint = false;
                     } else {
@@ -391,7 +391,7 @@ namespace minips {
 
             SVMDumper dumper;
             dumper.DumpScaleFile(scale_node);
-            nodes.push_back(std::move(scale_node));
+            nodes.push_back(scale_node);
 
             Context::get_instance().set("my_id", 0);
             Context::get_instance().set("use_weight_file", true);
