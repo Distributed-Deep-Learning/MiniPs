@@ -9,6 +9,7 @@
 #include <base/context.hpp>
 #include "base/third_party/general_fstream.hpp"
 #include <math.h>
+#include <driver/simple_id_mapper.hpp>
 
 namespace minips {
 

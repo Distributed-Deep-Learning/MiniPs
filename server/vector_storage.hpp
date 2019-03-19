@@ -31,7 +31,9 @@ namespace minips {
             for (size_t index = 0; index < typed_keys.size(); index++) {
                 CHECK_GE(typed_keys[index], range_.begin());
                 CHECK_LT(typed_keys[index], range_.end());
-                storage_[typed_keys[index] - range_.begin()] += typed_vals[index];
+                if (typed_keys[index] - range_.begin() >= 0 && typed_keys[index] < range_.end()) {
+                    storage_[typed_keys[index] - range_.begin()] += typed_vals[index];
+                }
             }
         }
 
@@ -40,7 +42,9 @@ namespace minips {
             for (size_t i = 0; i < typed_keys.size(); i++) {
                 CHECK_GE(typed_keys[i], range_.begin());
                 CHECK_LT(typed_keys[i], range_.end());
-                reply_vals[i] = storage_[typed_keys[i] - range_.begin()];
+                if (typed_keys[i] - range_.begin() >= 0 && typed_keys[i] < range_.end()) {
+                    reply_vals[i] = storage_[typed_keys[i] - range_.begin()];
+                }
             }
             return third_party::SArray<char>(reply_vals);
         }

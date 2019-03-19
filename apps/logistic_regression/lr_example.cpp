@@ -249,7 +249,9 @@ namespace minips {
                 auto &keys = future_keys[i];
                 if (keys.size() == 0) {
                     LOG(INFO) << "Get keys size=" << keys.size();
-                    table->Clock();
+                    if (!FLAGS_scale) {
+                        table->Clock();
+                    }
                     continue;
                 }
                 table->Get(keys, &params);
@@ -303,7 +305,9 @@ namespace minips {
                     }
                 }
                 table->Add(keys, deltas);
-                table->Clock();
+                if (!FLAGS_scale) {
+                    table->Clock();
+                }
                 CHECK_EQ(params.size(), keys.size());
 
                 if (i > 0 && i % 3000 == 0 && info.worker_id == 0) {

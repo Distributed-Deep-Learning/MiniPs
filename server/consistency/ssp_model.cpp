@@ -45,9 +45,10 @@ namespace minips {
     }
 
     void SSPModel::Get(Message &msg) {
-        CHECK(progress_tracker_.CheckThreadValid(msg.meta.sender));
+        int tid = ConvertTID(msg.meta.sender);
+        CHECK(progress_tracker_.CheckThreadValid(tid));
 
-        int progress = progress_tracker_.GetProgress(msg.meta.sender);
+        int progress = progress_tracker_.GetProgress(tid);
         int min_clock = progress_tracker_.GetMinClock();
 //        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
 //        progress_tracker_.DebugString();

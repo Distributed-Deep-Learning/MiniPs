@@ -145,6 +145,8 @@ namespace minips {
         }
 
         void SetScaleNode(Node &node) {
+            Context::get_instance().set("has_scale_node", true);
+            Context::get_instance().set("scale_node_id", (int) node.id);
             has_scale_node_ = true;
             scale_node_ = node;
         }

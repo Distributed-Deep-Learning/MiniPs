@@ -36,7 +36,7 @@ namespace minips {
     std::string Context::get_string(std::string key) {
         auto it = ctx_.find(key);
         if (it == ctx_.end()) {
-            LOG(INFO) << "Failed to lookup " << key << " in context.";
+//            LOG(INFO) << "Failed to lookup " << key << " in context.";
             return "";
         }
         return it->second;
