@@ -21,7 +21,7 @@ namespace minips {
 
         virtual void Clock(Message &msg) override;
 
-        virtual void Flush(int updated_min_clock);
+        virtual void Flush(int updated_min_clock, int progress = 0);
 
         virtual void FlushAll();
 

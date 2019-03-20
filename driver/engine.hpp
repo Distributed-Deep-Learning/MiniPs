@@ -161,6 +161,9 @@ namespace minips {
 
             std::vector<third_party::Range> range;
             uint32_t num_total_servers = nodes_.size() * num_servers_per_node;
+            if (Context::get_instance().get_bool("scale")) {
+                num_total_servers -= num_servers_per_node;
+            }
             for (uint32_t i = 0; i < num_total_servers - 1; ++i) {
                 range.push_back({num_dims / num_total_servers * i, num_dims / num_total_servers * (i + 1)});
             }

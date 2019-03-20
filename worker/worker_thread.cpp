@@ -34,6 +34,10 @@ namespace minips {
                 continue;
             }
 
+//            if (msg.meta.recver / 1000 == 3) {
+//                LOG(INFO) << "Response GET:" << msg.DebugString();
+//            }
+
             AddResponse(msg.meta.recver, msg.meta.model_id, msg);
         }
     }
@@ -53,6 +57,7 @@ namespace minips {
     void WorkerThread::NewRequest(uint32_t app_thread_id, uint32_t model_id, uint32_t expected_responses) {
         std::lock_guard<std::mutex> lk(mu_);
         Check(app_thread_id, model_id);
+
         tracker_[app_thread_id][model_id] = {expected_responses, 0};
     }
 
@@ -84,7 +89,12 @@ namespace minips {
         {
             std::lock_guard<std::mutex> lk(mu_);
             tracker_[app_thread_id][model_id].second += 1;
-//            LOG(INFO) << "AddResponse finish=" << recv_finish << ",id=" << app_thread_id << ",cur=" << tracker_[app_thread_id][model_id].second;
+
+//            if (app_thread_id / 1000 == 3) {
+//                LOG(INFO) << "AddResponse finish=" << recv_finish << ",id=" << app_thread_id << ",cur=" << tracker_[app_thread_id][model_id].second;
+//                LOG(INFO) << "sender node id=" << msg.meta.sender;
+//            }
+
             if (recv_finish) {
                 cond_.notify_all();
             }

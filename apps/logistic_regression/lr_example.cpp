@@ -249,12 +249,18 @@ namespace minips {
                 auto &keys = future_keys[i];
                 if (keys.size() == 0) {
                     LOG(INFO) << "Get keys size=" << keys.size();
-                    if (!FLAGS_scale) {
+//                    if (!FLAGS_scale) {
                         table->Clock();
-                    }
+//                    }
                     continue;
                 }
+//                if (i % 300 == 0 && FLAGS_scale) {
+//                    LOG(INFO) << "Get start i=" << i;
+//                }
                 table->Get(keys, &params);
+//                if (i % 300 == 0 && FLAGS_scale) {
+//                    LOG(INFO) << "Get end i=" << i;
+//                }
 
                 if (recovering) {
                     CheckFaultTolerance(5);
@@ -281,7 +287,7 @@ namespace minips {
                     continue;
                 }
 
-                CHECK_EQ(keys.size(), params.size());
+//                CHECK_EQ(keys.size(), params.size());
                 deltas.resize(keys.size(), 0.0);
 
                 for (auto data : future_data_ptrs[i]) {  // iterate over the data in the batch
@@ -305,10 +311,10 @@ namespace minips {
                     }
                 }
                 table->Add(keys, deltas);
-                if (!FLAGS_scale) {
+//                if (!FLAGS_scale) {
                     table->Clock();
-                }
-                CHECK_EQ(params.size(), keys.size());
+//                }
+//                CHECK_EQ(params.size(), keys.size());
 
                 if (i > 0 && i % 3000 == 0 && info.worker_id == 0) {
                     if (after_checkpoint) {
@@ -399,6 +405,7 @@ namespace minips {
 
             Context::get_instance().set("my_id", 0);
             Context::get_instance().set("use_weight_file", true);
+            Context::get_instance().set("scale_node_id", (int) scale_node.id);
         }
 
         CHECK(CheckValidNodeIds(nodes));

@@ -56,6 +56,10 @@ namespace minips {
         CHECK(sender_);
         CHECK(mailbox_);
         auto server_thread_ids = id_mapper_->GetServerThreadsForId(node_.id);
+        if (Context::get_instance().get_bool("scale")) {
+            uint32_t my_id = static_cast<uint32_t>(Context::get_instance().get_int32("my_id"));
+            server_thread_ids = id_mapper_->GetServerThreadsForId(my_id);
+        }
         CHECK_GT(server_thread_ids.size(), 0);
 
         for (int server_thread_id : server_thread_ids) {
@@ -77,6 +81,10 @@ namespace minips {
         CHECK(id_mapper_);
         CHECK(mailbox_);
         auto worker_thread_ids = id_mapper_->GetWorkerHelperThreadsForId(node_.id);
+        if (Context::get_instance().get_bool("scale")) {
+            uint32_t my_id = static_cast<uint32_t>(Context::get_instance().get_int32("my_id"));
+            worker_thread_ids = id_mapper_->GetWorkerHelperThreadsForId(my_id);
+        }
         CHECK_EQ(worker_thread_ids.size(), 1);
 
         worker_thread_.reset(new WorkerThread(worker_thread_ids[0]));

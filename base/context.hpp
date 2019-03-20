@@ -42,6 +42,9 @@ namespace minips {
         };
 
         int GetIteration(int worker_id) {
+            if (Context::get_instance().get_bool("scale")) {
+                worker_id = worker_id % Context::get_instance().get_int32("num_workers_per_node");
+            }
             int result = 0;
             if (iteration_map_.count(worker_id)) {
                 result = iteration_map_[worker_id];

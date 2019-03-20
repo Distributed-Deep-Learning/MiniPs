@@ -149,11 +149,11 @@ namespace minips {
             } else if (msg.meta.flag == Flag::kBarrier) {
                 std::unique_lock<std::mutex> lk(mu_);
                 barrier_count_ += 1;
-                LOG(INFO) << "Received barrier from node=" << msg.meta.sender << ", on node=" << node_.id
-                          << ", current count=" << barrier_count_;
+//                LOG(INFO) << "Received barrier from node=" << msg.meta.sender << ", on node=" << node_.id
+//                          << ", current count=" << barrier_count_;
                 if (barrier_count_ >= nodes_.size()) {
-                    LOG(INFO) << "Collected " << nodes_.size() << " barrier, Node:"
-                              << node_.id << " unblocking main thread with count=" << barrier_count_;
+//                    LOG(INFO) << "Collected " << nodes_.size() << " barrier, Node:"
+//                              << node_.id << " unblocking main thread with count=" << barrier_count_;
                     barrier_cond_.notify_all();
                 }
             } else if (msg.meta.flag == Flag::kForceQuit) {

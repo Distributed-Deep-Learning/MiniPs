@@ -44,12 +44,28 @@ namespace minips {
     }
 
     int ProgressTracker::AdvanceAndGetChangedMinClock(int tid) {
+        bool is_scale_node = false;
+        if (Context::get_instance().get_bool("has_scale_node")) {
+            int scale_node_id = Context::get_instance().get_int32("scale_node_id");
+            int converted_node_id = tid / SimpleIdMapper::kMaxThreadsPerNode;
+            if (scale_node_id == converted_node_id) {
+                tid = tid % SimpleIdMapper::kMaxThreadsPerNode;
+                is_scale_node = true;
+            }
+        }
+
         CHECK(CheckThreadValid(tid)) << "tid:" << tid;
         if (IsUniqueMin(tid)) {
+            if (is_scale_node) {
+                return min_clock_;
+            }
             min_clock_ += 1;
             progresses_[tid] += 1;
             return min_clock_;
         } else {
+            if (is_scale_node) {
+                return -1;
+            }
             progresses_[tid] += 1;
             return -1;
         }

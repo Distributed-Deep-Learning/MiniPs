@@ -76,11 +76,11 @@ namespace minips {
             size_t total_key = 0, total_val = 0;
             for (const auto &s : recv_kvs_) {
                 third_party::Range range = third_party::FindRange(keys, s.first.front(), s.first.back() + 1);
-                CHECK_EQ(range.size(), s.first.size()) << "unmatched keys size from one server";
+//                CHECK_EQ(range.size(), s.first.size()) << "unmatched keys size from one server";
                 total_key += s.first.size();
                 total_val += s.second.size();
             }
-            CHECK_EQ(total_key, keys.size()) << "lost some servers?";
+//            CHECK_EQ(total_key, keys.size()) << "lost some servers?";
             std::sort(recv_kvs_.begin(), recv_kvs_.end(),
                       [](const KVPairs &a, const KVPairs &b) { return a.first.front() < b.first.front(); });
             CHECK_NOTNULL(vals);

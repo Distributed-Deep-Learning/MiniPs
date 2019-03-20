@@ -19,14 +19,25 @@ namespace minips {
     void SSPModel::Clock(Message &msg) {
         int updated_min_clock = progress_tracker_.AdvanceAndGetChangedMinClock(msg.meta.sender);
         if (updated_min_clock != -1) {  // min clock updated
-            Flush(updated_min_clock);
+            Flush(updated_min_clock, progress_tracker_.GetProgress(msg.meta.sender % 1000));
         }
     }
 
-    void SSPModel::Flush(int updated_min_clock) {
+    void SSPModel::Flush(int updated_min_clock, int progress) {
         auto reqs_blocked_at_this_min_clock = buffer_.Pop(updated_min_clock);
         for (auto req : reqs_blocked_at_this_min_clock) {
-            reply_queue_->Push(storage_->Get(req));
+            Message msg = storage_->Get(req);
+//            if (Context::get_instance().get_bool("has_scale_node")) {
+//                int scale_node_id = Context::get_instance().get_int32("scale_node_id");
+//                int converted_node_id = msg.meta.recver / SimpleIdMapper::kMaxThreadsPerNode;
+//                if (scale_node_id == converted_node_id) {
+//                    if (progress % 300 == 0) {
+//                        LOG(INFO) << "Flush scale node msg:" << msg.DebugString() << ", progress=" << progress;
+//                    }
+//                }
+//            }
+
+            reply_queue_->Push(msg);
         }
         storage_->FinishIter();
     }
@@ -50,12 +61,36 @@ namespace minips {
 
         int progress = progress_tracker_.GetProgress(tid);
         int min_clock = progress_tracker_.GetMinClock();
+
+//        if (Context::get_instance().get_bool("has_scale_node")) {
+//            int scale_node_id = Context::get_instance().get_int32("scale_node_id");
+//            int converted_node_id = msg.meta.sender / SimpleIdMapper::kMaxThreadsPerNode;
+//            if (scale_node_id == converted_node_id) {
+//                tid = msg.meta.sender % SimpleIdMapper::kMaxThreadsPerNode;
+//                if (progress % 300 == 0) {
+//                    LOG(INFO) << "Get scale node=" << scale_node_id << ", tid=" << tid << ", progress=" << progress
+//                              << ", min_clock=" << min_clock;
+//                }
+//            }
+//        }
+
 //        LOG(INFO) << "SSPModel Get:" << "process," << progress << ", min_clock," << min_clock;
 //        progress_tracker_.DebugString();
         if (progress > min_clock + staleness_) {
             buffer_.Push(progress - staleness_, msg);
         } else {
-            reply_queue_->Push(storage_->Get(msg));
+            Message message = storage_->Get(msg);
+//            if (Context::get_instance().get_bool("has_scale_node")) {
+//                int scale_node_id = Context::get_instance().get_int32("scale_node_id");
+//                int converted_node_id = message.meta.recver / SimpleIdMapper::kMaxThreadsPerNode;
+//                if (scale_node_id == converted_node_id) {
+//                    if (progress % 300 == 0) {
+//                        LOG(INFO) << "progress=" << progress << ", min_clock=" << min_clock;
+//                        LOG(INFO) << "Flush scale node msg:" << message.DebugString() << ", progress=" << progress;
+//                    }
+//                }
+//            }
+            reply_queue_->Push(message);
         }
     }
 

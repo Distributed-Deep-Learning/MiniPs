@@ -2,6 +2,7 @@
 
 #include <cinttypes>
 #include <vector>
+#include <base/context.hpp>
 
 #include "base/node.hpp"
 #include "glog/logging.h"
@@ -20,6 +21,12 @@ namespace minips {
         // Suppose there are 1 server and 1 worker_thread for each node
         for (const auto &node : nodes_) {
             CHECK_LT(node.id, kMaxNodeId);
+
+            if (Context::get_instance().get_bool("scale")
+                && Context::get_instance().get_int32("scale_node_id") == node.id) {
+                LOG(INFO) << "Skipping create data for scale node=" << node.id;
+                continue;
+            }
 
             for (int i = 0; i < num_server_threads_per_node; i++) {
                 node2server_[node.id].push_back(node.id * kMaxThreadsPerNode + i);
