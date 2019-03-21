@@ -30,13 +30,13 @@ namespace minips {
         virtual void Get(Message &msg) override;
 
         int ConvertTID(int tid) {
-            if (Context::get_instance().get_bool("has_scale_node")) {
-                int scale_node_id = Context::get_instance().get_int32("scale_node_id");
-                int converted_node_id = tid / SimpleIdMapper::kMaxThreadsPerNode;
-                if (scale_node_id == converted_node_id) {
-                    tid = tid % SimpleIdMapper::kMaxThreadsPerNode;
-                }
-            }
+//            if (Context::get_instance().get_bool("has_scale_node")) {
+//                int scale_node_id = Context::get_instance().get_int32("scale_node_id");
+//                int converted_node_id = tid / SimpleIdMapper::kMaxThreadsPerNode;
+//                if (scale_node_id == converted_node_id) {
+//                    tid = tid % SimpleIdMapper::kMaxThreadsPerNode;
+//                }
+//            }
             return tid;
         }
 

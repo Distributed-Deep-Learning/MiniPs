@@ -65,12 +65,19 @@ namespace minips {
         Check(app_thread_id, model_id);
         std::unique_lock<std::mutex> lk(mu_);
 
-//        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---start";
+//        bool is_scale = Context::get_instance().get_bool("scale");
+//        if (is_scale && app_thread_id % 2 == 0) {
+//            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---start";
+//        }
         cond_.wait(lk, [this, app_thread_id, model_id] {
-//            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---middle, " << tracker_[app_thread_id][model_id].first << "," << tracker_[app_thread_id][model_id].second;
+//            if (is_scale && app_thread_id % 2 == 0) {
+//                LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---middle, " << tracker_[app_thread_id][model_id].first << "," << tracker_[app_thread_id][model_id].second;
+//            }
             return tracker_[app_thread_id][model_id].first <= tracker_[app_thread_id][model_id].second;
         });
-//        LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---end";
+//        if (is_scale && app_thread_id % 2 == 0) {
+//            LOG(INFO) << "WorkerThread WaitRequest:" << app_thread_id << ", " << model_id << "---end";
+//        }
     }
 
     void WorkerThread::AddResponse(uint32_t app_thread_id, uint32_t model_id, Message &msg) {
@@ -89,6 +96,10 @@ namespace minips {
         {
             std::lock_guard<std::mutex> lk(mu_);
             tracker_[app_thread_id][model_id].second += 1;
+//            bool is_scale = Context::get_instance().get_bool("scale");
+//            if (is_scale && app_thread_id % 2 == 0) {
+//                LOG(INFO) << "WorkerThread AddResponse current=" << tracker_[app_thread_id][model_id].second;
+//            }
 
 //            if (app_thread_id / 1000 == 3) {
 //                LOG(INFO) << "AddResponse finish=" << recv_finish << ",id=" << app_thread_id << ",cur=" << tracker_[app_thread_id][model_id].second;

@@ -62,14 +62,14 @@ namespace minips {
         int progress = progress_tracker_.GetProgress(tid);
         int min_clock = progress_tracker_.GetMinClock();
 
+
 //        if (Context::get_instance().get_bool("has_scale_node")) {
 //            int scale_node_id = Context::get_instance().get_int32("scale_node_id");
 //            int converted_node_id = msg.meta.sender / SimpleIdMapper::kMaxThreadsPerNode;
 //            if (scale_node_id == converted_node_id) {
-//                tid = msg.meta.sender % SimpleIdMapper::kMaxThreadsPerNode;
-//                if (progress % 300 == 0) {
-//                    LOG(INFO) << "Get scale node=" << scale_node_id << ", tid=" << tid << ", progress=" << progress
-//                              << ", min_clock=" << min_clock;
+//                if (progress % 100 == 0) {
+//                    LOG(INFO) << "progress=" << progress << ", min_clock=" << min_clock;
+//                    LOG(INFO) << "Flush scale node msg:" << msg.DebugString() << ", progress=" << progress;
 //                }
 //            }
 //        }
@@ -80,16 +80,6 @@ namespace minips {
             buffer_.Push(progress - staleness_, msg);
         } else {
             Message message = storage_->Get(msg);
-//            if (Context::get_instance().get_bool("has_scale_node")) {
-//                int scale_node_id = Context::get_instance().get_int32("scale_node_id");
-//                int converted_node_id = message.meta.recver / SimpleIdMapper::kMaxThreadsPerNode;
-//                if (scale_node_id == converted_node_id) {
-//                    if (progress % 300 == 0) {
-//                        LOG(INFO) << "progress=" << progress << ", min_clock=" << min_clock;
-//                        LOG(INFO) << "Flush scale node msg:" << message.DebugString() << ", progress=" << progress;
-//                    }
-//                }
-//            }
             reply_queue_->Push(message);
         }
     }

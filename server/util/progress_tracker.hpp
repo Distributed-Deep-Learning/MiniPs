@@ -108,6 +108,13 @@ namespace minips {
                     } else {
                         int model_id = std::atoi(pair[0].c_str());
                         progresses_[model_id] = std::atoi(pair[1].c_str());
+
+                        if (Context::get_instance().get_bool("has_scale_node")) {
+                            int scale_node_id = Context::get_instance().get_int32("scale_node_id");
+                            int mid = scale_node_id * SimpleIdMapper::kMaxThreadsPerNode + model_id % SimpleIdMapper::kMaxThreadsPerNode;
+                            progresses_[mid] = progresses_[model_id];
+                            LOG(INFO) << "Add scale node tracker=" << mid << ", progress=" << progresses_[mid];
+                        }
                     }
                 }
             }

@@ -316,7 +316,7 @@ namespace minips {
 //                }
 //                CHECK_EQ(params.size(), keys.size());
 
-                if (i > 0 && i % 3000 == 0 && info.worker_id == 0) {
+                if (i > 0 && i % 100 == 0 && info.worker_id == 0) {
                     if (after_checkpoint) {
                         after_checkpoint = false;
                     } else {
@@ -329,7 +329,7 @@ namespace minips {
                     }
                 }
 
-                if (i > 0 && i % 500 == 0) {
+                if (i > 0 && i % 10 == 0 && info.worker_id % 2 == 0) {
                     LOG(INFO) << "Current iteration=" << i << " on node=" << FLAGS_my_id;
                 }
 
