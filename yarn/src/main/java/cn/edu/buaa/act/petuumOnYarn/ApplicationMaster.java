@@ -782,7 +782,7 @@ public class ApplicationMaster {
 		}
 
 		@Override
-		public void onContainerStopped(ContainerId containerId) {
+		public void (ContainerId containerId) {
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Succeeded to stop Container " + containerId);
 			}
